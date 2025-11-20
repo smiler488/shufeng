@@ -2,9 +2,7 @@
 import React, { useState } from 'react';
 // @ts-ignore;
 import { User, Settings, HelpCircle, Phone, Mail, MapPin, Navigation, Globe, MessageCircle, ChevronRight, Shield, FileText, Star, LogOut, Award, Building } from 'lucide-react'; // @ts-ignore;
-import { useToast } from '@/components/ui';
-import { LogoHeader } from '@/components/LogoHeader';
-import { TabBar } from '@/components/TabBar';
+import { useToast } from '@/components/ui';import { LogoHeader } from '@/components/LogoHeader';import { TabBar } from '@/components/TabBar';
 export default function Profile(props) {
   const {
     $w } =
@@ -344,7 +342,7 @@ export default function Profile(props) {
                 <div className="flex space-x-2">
                   <button onClick={handleWebsiteClick} className="bg-purple-600 text-white hover:bg-purple-700 px-3 py-2 rounded-lg font-medium transition-colors flex items-center space-x-1">
                     <Globe className="w-4 h-4" />
-                    <span>访问</span>
+                    <span></span>
                   </button>
                   <button onClick={handleWebsiteCopy} className="bg-gray-600 text-white hover:bg-gray-700 px-3 py-2 rounded-lg font-medium transition-colors">
                     <Globe className="w-4 h-4" />
