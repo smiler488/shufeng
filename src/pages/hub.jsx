@@ -1,7 +1,7 @@
 // @ts-ignore;
 import React, { useState } from 'react';
 // @ts-ignore;
-import { Calculator, Beaker, Microscope, Database, BarChart3, Settings, Zap, Leaf, Ruler, Map } from 'lucide-react';
+import { Calculator, Beaker, Microscope, Database, BarChart3, Settings, Zap, Leaf, Ruler, Map, Cloud } from 'lucide-react';
 // @ts-ignore;
 import { useToast } from '@/components/ui';
 
@@ -26,7 +26,7 @@ export default function Hub(props) {
     }
   };
 
-  // 简化工具列表，只保留两个实际可用的工具
+  // 更新工具列表，添加农业气象分析工具
   const tools = [{
     id: 1,
     name: '叶片角度测量',
@@ -34,7 +34,7 @@ export default function Hub(props) {
     icon: Ruler,
     color: 'bg-green-500',
     category: '测量工具',
-    pageId: 'leafAngle' // 添加页面ID用于跳转
+    pageId: 'leafAngle'
   }, {
     id: 2,
     name: '土地面积测量',
@@ -42,7 +42,15 @@ export default function Hub(props) {
     icon: Map,
     color: 'bg-blue-500',
     category: '测量工具',
-    pageId: 'landArea' // 添加页面ID用于跳转
+    pageId: 'landArea'
+  }, {
+    id: 3,
+    name: '农业气象分析',
+    description: 'NASA POWER气象数据获取与分析',
+    icon: Cloud,
+    color: 'bg-sky-500',
+    category: '数据分析',
+    pageId: 'agriWeather'
   }];
   const handleToolClick = tool => {
     // 直接跳转到对应页面，而不是显示提示
