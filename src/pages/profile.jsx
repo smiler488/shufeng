@@ -1,28 +1,26 @@
 // @ts-ignore;
 import React, { useState } from 'react';
 // @ts-ignore;
-import { User, Settings, HelpCircle, Phone, Mail, MapPin, Navigation, Globe, MessageCircle, ChevronRight, Shield, FileText, Star, LogOut, Award, Building } from 'lucide-react';
-// @ts-ignore;
+import { User, Settings, HelpCircle, Phone, Mail, MapPin, Navigation, Globe, MessageCircle, ChevronRight, Shield, FileText, Star, LogOut, Award, Building } from 'lucide-react'; // @ts-ignore;
 import { useToast } from '@/components/ui';
-
 import { LogoHeader } from '@/components/LogoHeader';
 import { TabBar } from '@/components/TabBar';
 export default function Profile(props) {
   const {
-    $w
-  } = props;
+    $w } =
+  props;
   const {
-    toast
-  } = useToast();
+    toast } =
+  useToast();
   const [activeTab, setActiveTab] = useState('profile');
-  const handleTabChange = tabId => {
+  const handleTabChange = (tabId) => {
     if (tabId === 'profile') {
       setActiveTab(tabId);
     } else {
       $w.utils.navigateTo({
         pageId: tabId,
-        params: {}
-      });
+        params: {} });
+
     }
   };
   const contactInfo = {
@@ -31,8 +29,8 @@ export default function Profile(props) {
     website: 'https://www.shu-feng.com.cn/',
     address: '上海市中国(上海)自由贸易试验区临港新片区云汉路979号2楼',
     workHours: '周一至周五 9:00-18:00',
-    emergencySupport: '7×24小时技术支持'
-  };
+    emergencySupport: '7×24小时技术支持' };
+
   const companyInfo = {
     name: '黍峰生物Agent',
     title: '光合&表型解决方案',
@@ -41,8 +39,8 @@ export default function Profile(props) {
     certification: '国家高新技术企业认证',
     employees: '50+人',
     researchFields: 6,
-    products: 14
-  };
+    products: 14 };
+
   const handlePhoneCall = () => {
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     if (isMobile) {
@@ -52,14 +50,14 @@ export default function Profile(props) {
         toast({
           title: '电话号码已复制',
           description: `电话号码 ${contactInfo.phone} 已复制到剪贴板，请使用手机拨打`,
-          duration: 3000
-        });
+          duration: 3000 });
+
       }).catch(() => {
         toast({
           title: '联系电话',
           description: contactInfo.phone,
-          duration: 5000
-        });
+          duration: 5000 });
+
       });
     }
   };
@@ -85,22 +83,22 @@ export default function Profile(props) {
     toast({
       title: '地图导航',
       description: '正在为您打开地图导航',
-      duration: 2000
-    });
+      duration: 2000 });
+
   };
   const handleAddressCopy = () => {
     navigator.clipboard.writeText(contactInfo.address).then(() => {
       toast({
         title: '地址已复制',
         description: '公司地址已复制到剪贴板',
-        duration: 3000
-      });
+        duration: 3000 });
+
     }).catch(() => {
       toast({
         title: '公司地址',
         description: contactInfo.address,
-        duration: 5000
-      });
+        duration: 5000 });
+
     });
   };
   const handleWebsiteCopy = () => {
@@ -108,14 +106,14 @@ export default function Profile(props) {
       toast({
         title: '官网地址已复制',
         description: '公司官网地址已复制到剪贴板',
-        duration: 3000
-      });
+        duration: 3000 });
+
     }).catch(() => {
       toast({
         title: '公司官网',
         description: contactInfo.website,
-        duration: 5000
-      });
+        duration: 5000 });
+
     });
   };
   const menuItems = [{
@@ -126,10 +124,10 @@ export default function Profile(props) {
       toast({
         title: '个人资料',
         description: '个人资料功能正在开发中',
-        duration: 2000
-      });
-    }
-  }, {
+        duration: 2000 });
+
+    } },
+  {
     icon: Settings,
     label: '系统设置',
     description: '应用设置和偏好配置',
@@ -137,10 +135,10 @@ export default function Profile(props) {
       toast({
         title: '系统设置',
         description: '系统设置功能正在开发中',
-        duration: 2000
-      });
-    }
-  }, {
+        duration: 2000 });
+
+    } },
+  {
     icon: Shield,
     label: '隐私政策',
     description: '查看隐私保护政策',
@@ -148,10 +146,10 @@ export default function Profile(props) {
       toast({
         title: '隐私政策',
         description: '隐私政策功能正在开发中',
-        duration: 2000
-      });
-    }
-  }, {
+        duration: 2000 });
+
+    } },
+  {
     icon: FileText,
     label: '用户协议',
     description: '查看用户服务协议',
@@ -159,10 +157,10 @@ export default function Profile(props) {
       toast({
         title: '用户协议',
         description: '用户协议功能正在开发中',
-        duration: 2000
-      });
-    }
-  }, {
+        duration: 2000 });
+
+    } },
+  {
     icon: HelpCircle,
     label: '帮助中心',
     description: '获取使用帮助和支持',
@@ -170,10 +168,10 @@ export default function Profile(props) {
       toast({
         title: '帮助中心',
         description: '帮助中心功能正在开发中',
-        duration: 2000
-      });
-    }
-  }, {
+        duration: 2000 });
+
+    } },
+  {
     icon: Star,
     label: '给我们评分',
     description: '在应用商店为我们评分',
@@ -181,10 +179,10 @@ export default function Profile(props) {
       toast({
         title: '感谢支持',
         description: '感谢您的支持！',
-        duration: 2000
-      });
-    }
-  }];
+        duration: 2000 });
+
+    } }];
+
   return <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-16">
       <LogoHeader />
       
@@ -207,8 +205,8 @@ export default function Profile(props) {
             toast({
               title: '编辑资料',
               description: '个人资料编辑功能正在开发中',
-              duration: 2000
-            });
+              duration: 2000 });
+
           }} className="p-2 bg-white/20 hover:bg-white/30 rounded-lg transition-colors">
               <Settings className="w-5 h-5" />
             </button>
@@ -314,15 +312,15 @@ export default function Profile(props) {
                 <div className="flex space-x-2">
                   <button onClick={handleEmailClick} className="bg-blue-600 text-white hover:bg-blue-700 px-3 py-2 rounded-lg font-medium transition-colors flex items-center space-x-1">
                     <Mail className="w-4 h-4" />
-                    <span>发送</span>
+                    <span></span>
                   </button>
                   <button onClick={() => {
                   navigator.clipboard.writeText(contactInfo.email).then(() => {
                     toast({
                       title: '邮箱已复制',
                       description: '邮箱地址已复制到剪贴板',
-                      duration: 3000
-                    });
+                      duration: 3000 });
+
                   });
                 }} className="bg-gray-600 text-white hover:bg-gray-700 px-3 py-2 rounded-lg font-medium transition-colors">
                     <Mail className="w-4 h-4" />
@@ -393,8 +391,8 @@ export default function Profile(props) {
                 toast({
                   title: '在线客服',
                   description: '客服功能正在开发中，请暂时使用电话联系',
-                  duration: 3000
-                });
+                  duration: 3000 });
+
               }} className="bg-green-600 text-white hover:bg-green-700 px-3 py-2 rounded-lg font-medium transition-colors flex items-center space-x-1">
                   <MessageCircle className="w-4 h-4" />
                   <span>咨询</span>
@@ -430,8 +428,8 @@ export default function Profile(props) {
           toast({
             title: '退出登录',
             description: '退出登录功能正在开发中',
-            duration: 2000
-          });
+            duration: 2000 });
+
         }} className="w-full flex items-center justify-center space-x-2 text-red-600 hover:text-red-700 transition-colors">
             <LogOut className="w-5 h-5" />
             <span>退出登录</span>
