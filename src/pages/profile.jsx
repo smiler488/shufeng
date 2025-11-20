@@ -48,10 +48,7 @@ export default function Profile(props) {
     title: '光合&表型解决方案',
     description: '国家高新技术企业，专注于植物光合表型研究领域',
     established: '2020年',
-    certification: '国家高新技术企业认证',
-    employees: '50+人',
-    researchFields: 6,
-    products: 14
+    certification: '国家高新技术企业认证'
   };
 
   // 机器人头像选项 - 使用机器人风格的头像
@@ -63,7 +60,7 @@ export default function Profile(props) {
   }, []);
   const checkLoginStatus = async () => {
     if (!$w.auth.currentUser?.userId) {
-      // 未登录，显示登录提示
+      // 未登录，显示登录引导
       return;
     }
 
@@ -535,24 +532,6 @@ export default function Profile(props) {
               <p className="text-gray-600 dark:text-gray-300 text-sm mb-3">
                 {companyInfo.description}
               </p>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 text-center">
-                  <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-                    {companyInfo.researchFields}
-                  </div>
-                  <div className="text-xs text-gray-600 dark:text-gray-300">
-                    研究领域
-                  </div>
-                </div>
-                <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 text-center">
-                  <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-                    {companyInfo.products}
-                  </div>
-                  <div className="text-xs text-gray-600 dark:text-gray-300">
-                    产品数量
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </div>
@@ -677,24 +656,6 @@ export default function Profile(props) {
             <p className="text-gray-600 dark:text-gray-300 text-sm mb-3">
               {companyInfo.description}
             </p>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 text-center">
-                <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-                  {companyInfo.researchFields}
-                </div>
-                <div className="text-xs text-gray-600 dark:text-gray-300">
-                  研究领域
-                </div>
-              </div>
-              <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 text-center">
-                <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-                  {companyInfo.products}
-                </div>
-                <div className="text-xs text-gray-600 dark:text-gray-300">
-                  产品数量
-                </div>
-              </div>
-            </div>
           </div>
 
           <div className="space-y-2">
@@ -702,13 +663,9 @@ export default function Profile(props) {
               <span className="text-sm text-gray-600 dark:text-gray-300">成立时间</span>
               <span className="text-sm font-medium text-gray-900 dark:text-white">{companyInfo.established}</span>
             </div>
-            <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700">
+            <div className="flex items-center justify-between py-2">
               <span className="text-sm text-gray-600 dark:text-gray-300">企业认证</span>
               <span className="text-sm font-medium text-gray-900 dark:text-white">{companyInfo.certification}</span>
-            </div>
-            <div className="flex items-center justify-between py-2">
-              <span className="text-sm text-gray-600 dark:text-gray-300">团队规模</span>
-              <span className="text-sm font-medium text-gray-900 dark:text-white">{companyInfo.employees}</span>
             </div>
           </div>
         </div>
