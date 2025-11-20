@@ -2,14 +2,28 @@
 import React, { useState, useEffect } from 'react';
 // @ts-ignore;
 import { User, Settings, HelpCircle, Phone, Mail, MapPin, Navigation, Globe, MessageCircle, ChevronRight, Shield, FileText, Star, LogOut, Award, Building, Camera, Edit2, Save, X, Upload } from 'lucide-react'; // @ts-ignore;
-import { useToast } from '@/components/ui';import { LogoHeader } from '@/components/LogoHeader';import { TabBar } from '@/components/TabBar';export default function Profile(props) {const { $w } = props;
-  const {
-    toast } =
+import { useToast } from '@/components/ui';import { LogoHeader } from '@/components/LogoHeader';import { TabBar } from '@/components/TabBar';export default function Profile(props) {const { $w } = props;const { toast } =
   useToast();
   const [activeTab, setActiveTab] = useState('profile');
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+  // 用户资料状态
+  // 用户资料状态
+  // 用户资料状态
+  // 用户资料状态
+  // 用户资料状态
+  // 用户资料状态
+  // 用户资料状态
+  // 用户资料状态
+  // 用户资料状态
+  // 用户资料状态
+  // 用户资料状态
+  // 用户资料状态
+  // 用户资料状态
+  // 用户资料状态
+  // 用户资料状态
+  // 用户资料状态
   // 用户资料状态
   // 用户资料状态
   // 用户资料状态
@@ -42,7 +56,38 @@ import { useToast } from '@/components/ui';import { LogoHeader } from '@/compone
   // 编辑表单状态
   // 编辑表单状态
   // 编辑表单状态
-  const [editForm, setEditForm] = useState({ avatar: '', nickname: '', phone: '', email: '', bio: '' });const contactInfo = { phone: '400-1866090', email: 'info@shu-feng.com.cn', website: 'https://www.shu-feng.com.cn/', address: '上海市中国(上海)自由贸易试验区临港新片区云汉路979号2楼', workHours: '周一至周五 9:00-18:00', emergencySupport: '7×24小时技术支持' };const companyInfo = { name: '黍峰生物Agent', title: '光合&表型解决方案', description: '国家高新技术企业，专注于植物光合表型研究领域', established: '2020年', certification: '国家高新技术企业认证' };
+  // 编辑表单状态
+  // 编辑表单状态
+  // 编辑表单状态
+  // 编辑表单状态
+  // 编辑表单状态
+  // 编辑表单状态
+  // 编辑表单状态
+  // 编辑表单状态
+  // 编辑表单状态
+  // 编辑表单状态
+  // 编辑表单状态
+  // 编辑表单状态
+  // 编辑表单状态
+  // 编辑表单状态
+  // 编辑表单状态
+  // 编辑表单状态
+  const [editForm, setEditForm] = useState({ avatar: '', nickname: '', phone: '', email: '', bio: '' });const contactInfo = { phone: '400-1866090', email: 'info@shu-feng.com.cn', website: 'https://www.shu-feng.com.cn/', address: '上海市中国(上海)自由贸易试验区临港新片区云汉路979号2楼', workHours: '周一至周五 9:00-18:00', emergencySupport: '7×24小时技术支持' };const companyInfo = { name: '黍峰生物Agent', title: '光合&表型解决方案', description: '国家高新技术企业，专注于植物光合表型研究领域', established: '2020年', certification: '国家高新技术企业认证' }; // 机器人头像选项 - 使用机器人风格的头像
+  // 机器人头像选项 - 使用机器人风格的头像
+  // 机器人头像选项 - 使用机器人风格的头像
+  // 机器人头像选项 - 使用机器人风格的头像
+  // 机器人头像选项 - 使用机器人风格的头像
+  // 机器人头像选项 - 使用机器人风格的头像
+  // 机器人头像选项 - 使用机器人风格的头像
+  // 机器人头像选项 - 使用机器人风格的头像
+  // 机器人头像选项 - 使用机器人风格的头像
+  // 机器人头像选项 - 使用机器人风格的头像
+  // 机器人头像选项 - 使用机器人风格的头像
+  // 机器人头像选项 - 使用机器人风格的头像
+  // 机器人头像选项 - 使用机器人风格的头像
+  // 机器人头像选项 - 使用机器人风格的头像
+  // 机器人头像选项 - 使用机器人风格的头像
+  // 机器人头像选项 - 使用机器人风格的头像
   // 机器人头像选项 - 使用机器人风格的头像
   // 机器人头像选项 - 使用机器人风格的头像
   // 机器人头像选项 - 使用机器人风格的头像
@@ -75,8 +120,40 @@ import { useToast } from '@/components/ui';import { LogoHeader } from '@/compone
   // 检查登录状态
   // 检查登录状态
   // 检查登录状态
+  // 检查登录状态
+  // 检查登录状态
+  // 检查登录状态
+  // 检查登录状态
+  // 检查登录状态
+  // 检查登录状态
+  // 检查登录状态
+  // 检查登录状态
+  // 检查登录状态
+  // 检查登录状态
+  // 检查登录状态
+  // 检查登录状态
+  // 检查登录状态
+  // 检查登录状态
+  // 检查登录状态
+  // 检查登录状态
   useEffect(() => {checkLoginStatus();}, []);const checkLoginStatus = async () => {if (!$w.auth.currentUser?.userId) {// 未登录，显示登录引导
       return;} // 已登录，加载用户资料
+    // 已登录，加载用户资料
+    // 已登录，加载用户资料
+    // 已登录，加载用户资料
+    // 已登录，加载用户资料
+    // 已登录，加载用户资料
+    // 已登录，加载用户资料
+    // 已登录，加载用户资料
+    // 已登录，加载用户资料
+    // 已登录，加载用户资料
+    // 已登录，加载用户资料
+    // 已登录，加载用户资料
+    // 已登录，加载用户资料
+    // 已登录，加载用户资料
+    // 已登录，加载用户资料
+    // 已登录，加载用户资料
+    // 已登录，加载用户资料
     // 已登录，加载用户资料
     // 已登录，加载用户资料
     // 已登录，加载用户资料
@@ -108,15 +185,39 @@ import { useToast } from '@/components/ui';import { LogoHeader } from '@/compone
   // 加载用户资料 - 使用数据源API
   // 加载用户资料 - 使用数据源API
   // 加载用户资料 - 使用数据源API
+  // 加载用户资料 - 使用数据源API
+  // 加载用户资料 - 使用数据源API
+  // 加载用户资料 - 使用数据源API
+  // 加载用户资料 - 使用数据源API
+  // 加载用户资料 - 使用数据源API
+  // 加载用户资料 - 使用数据源API
+  // 加载用户资料 - 使用数据源API
+  // 加载用户资料 - 使用数据源API
+  // 加载用户资料 - 使用数据源API
+  // 加载用户资料 - 使用数据源API
+  // 加载用户资料 - 使用数据源API
+  // 加载用户资料 - 使用数据源API
+  // 加载用户资料 - 使用数据源API
+  // 加载用户资料 - 使用数据源API
+  // 加载用户资料 - 使用数据源API
+  // 加载用户资料 - 使用数据源API
   const loadUserProfile = async () => {try {const result = await $w.cloud.callDataSource({ dataSourceName: 'user_profiles', methodName: 'wedaGetRecordsV2', params: { filter: { where: { $and: [{ userId: { $eq: $w.auth.currentUser.userId } }] } }, select: { $master: true }, pageSize: 1 } });if (result.records && result.records.length > 0) {const profile = result.records[0];setUserProfile({ avatar: profile.avatar || defaultAvatars[0], nickname: profile.nickname || $w.auth.currentUser.name || '用户', phone: profile.phone || '', email: profile.email || '', bio: profile.bio || '' });setEditForm({ avatar: profile.avatar || defaultAvatars[0], nickname: profile.nickname || $w.auth.currentUser.name || '用户', phone: profile.phone || '', email: profile.email || '', bio: profile.bio || '' });} else {// 创建默认资料
-        const defaultProfile = { userId: $w.auth.currentUser.userId, avatar: defaultAvatars[0], nickname: $w.auth.currentUser.name || '用户', phone: '', email: '', bio: '' };setUserProfile({ avatar: defaultProfile.avatar,
-          nickname: defaultProfile.nickname,
-          phone: defaultProfile.phone,
-          email: defaultProfile.email,
-          bio: defaultProfile.bio });
-
-        setEditForm(defaultProfile);
-
+        const defaultProfile = { userId: $w.auth.currentUser.userId, avatar: defaultAvatars[0], nickname: $w.auth.currentUser.name || '用户', phone: '', email: '', bio: '' };setUserProfile({ avatar: defaultProfile.avatar, nickname: defaultProfile.nickname, phone: defaultProfile.phone, email: defaultProfile.email, bio: defaultProfile.bio });setEditForm(defaultProfile); // 保存默认资料到数据库
+        // 保存默认资料到数据库
+        // 保存默认资料到数据库
+        // 保存默认资料到数据库
+        // 保存默认资料到数据库
+        // 保存默认资料到数据库
+        // 保存默认资料到数据库
+        // 保存默认资料到数据库
+        // 保存默认资料到数据库
+        // 保存默认资料到数据库
+        // 保存默认资料到数据库
+        // 保存默认资料到数据库
+        // 保存默认资料到数据库
+        // 保存默认资料到数据库
+        // 保存默认资料到数据库
+        // 保存默认资料到数据库
         // 保存默认资料到数据库
         // 保存默认资料到数据库
         // 保存默认资料到数据库
@@ -149,63 +250,26 @@ import { useToast } from '@/components/ui';import { LogoHeader } from '@/compone
   // 保存用户资料到数据库 - 使用数据源API
   // 保存用户资料到数据库 - 使用数据源API
   // 保存用户资料到数据库 - 使用数据源API
+  // 保存用户资料到数据库 - 使用数据源API
+  // 保存用户资料到数据库 - 使用数据源API
+  // 保存用户资料到数据库 - 使用数据源API
+  // 保存用户资料到数据库 - 使用数据源API
+  // 保存用户资料到数据库 - 使用数据源API
+  // 保存用户资料到数据库 - 使用数据源API
+  // 保存用户资料到数据库 - 使用数据源API
+  // 保存用户资料到数据库 - 使用数据源API
+  // 保存用户资料到数据库 - 使用数据源API
+  // 保存用户资料到数据库 - 使用数据源API
+  // 保存用户资料到数据库 - 使用数据源API
+  // 保存用户资料到数据库 - 使用数据源API
+  // 保存用户资料到数据库 - 使用数据源API
+  // 保存用户资料到数据库 - 使用数据源API
+  // 保存用户资料到数据库 - 使用数据源API
+  // 保存用户资料到数据库 - 使用数据源API
   const saveUserProfileToDB = async (profile) => {try {// 先查询是否已存在记录
-      const existingResult = await $w.cloud.callDataSource({ dataSourceName: 'user_profiles', methodName: 'wedaGetRecordsV2', params: { filter: { where: { $and: [{ userId: { $eq: $w.auth.currentUser.userId } }] } }, select: { $master: true }, pageSize: 1 } });
-
-
-      if (existingResult.records && existingResult.records.length > 0) {
-        // 更新现有记录
-        const updateResult = await $w.cloud.callDataSource({
-          dataSourceName: 'user_profiles',
-          methodName: 'wedaUpdateV2',
-          params: {
-            data: {
-              avatar: profile.avatar,
-              nickname: profile.nickname,
-              phone: profile.phone,
-              email: profile.email,
-              bio: profile.bio },
-
-            filter: {
-              where: {
-                $and: [{
-                  userId: {
-                    $eq: $w.auth.currentUser.userId } }] } } } });
-
-
-
-
-
-
-        if (updateResult.count === 0) {
-          throw new Error('更新失败，记录不存在');
-        }
-      } else {
-        // 创建新记录
-        const createResult = await $w.cloud.callDataSource({
-          dataSourceName: 'user_profiles',
-          methodName: 'wedaCreateV2',
-          params: {
-            data: {
-              userId: profile.userId,
-              avatar: profile.avatar,
-              nickname: profile.nickname,
-              phone: profile.phone,
-              email: profile.email,
-              bio: profile.bio } } });
-
-
-
-        if (!createResult.id) {
-          throw new Error('创建失败');
-        }
-      }
-    } catch (error) {
-      console.error('保存用户资料失败:', error);
-      throw error;
-    }
-  };
-
+      const existingResult = await $w.cloud.callDataSource({ dataSourceName: 'user_profiles', methodName: 'wedaGetRecordsV2', params: { filter: { where: { $and: [{ userId: { $eq: $w.auth.currentUser.userId } }] } }, select: { $master: true }, pageSize: 1 } });if (existingResult.records && existingResult.records.length > 0) {// 更新现有记录
+        const updateResult = await $w.cloud.callDataSource({ dataSourceName: 'user_profiles', methodName: 'wedaUpdateV2', params: { data: { avatar: profile.avatar, nickname: profile.nickname, phone: profile.phone, email: profile.email, bio: profile.bio }, filter: { where: { $and: [{ userId: { $eq: $w.auth.currentUser.userId } }] } } } });if (updateResult.count === 0) {throw new Error('更新失败，记录不存在');}} else {// 创建新记录
+        const createResult = await $w.cloud.callDataSource({ dataSourceName: 'user_profiles', methodName: 'wedaCreateV2', params: { data: { userId: profile.userId, avatar: profile.avatar, nickname: profile.nickname, phone: profile.phone, email: profile.email, bio: profile.bio } } });if (!createResult.id) {throw new Error('创建失败');}}} catch (error) {console.error('保存用户资料失败:', error);throw error;}}; // 微信登录
   // 微信登录
   // 微信登录
   // 微信登录
@@ -222,11 +286,37 @@ import { useToast } from '@/components/ui';import { LogoHeader } from '@/compone
   // 微信登录
   // 微信登录
   // 微信登录
-  const handleWeChatLogin = async () => {try {const tcb = await $w.cloud.getCloudInstance();tcb.auth().toDefaultLoginPage({ config_version: "env", redirect_uri: window.location.href, query: { s_domain: $w.utils.resolveStaticResourceUrl("/").replace(/^https?:\/\//, "").split("/")[0] } });} catch (error) {console.error('微信登录失败:', error);toast({ title: '登录失败', description: '微信登录失败，请稍后重试', duration: 3000 });
-
-    }
-  };
-
+  // 微信登录
+  // 微信登录
+  // 微信登录
+  // 微信登录
+  // 微信登录
+  // 微信登录
+  // 微信登录
+  // 微信登录
+  // 微信登录
+  // 微信登录
+  // 微信登录
+  // 微信登录
+  // 微信登录
+  // 微信登录
+  // 微信登录
+  const handleWeChatLogin = async () => {try {const tcb = await $w.cloud.getCloudInstance();tcb.auth().toDefaultLoginPage({ config_version: "env", redirect_uri: window.location.href, query: { s_domain: $w.utils.resolveStaticResourceUrl("/").replace(/^https?:\/\//, "").split("/")[0] } });} catch (error) {console.error('微信登录失败:', error);toast({ title: '登录失败', description: '微信登录失败，请稍后重试', duration: 3000 });}}; // 退出登录
+  // 退出登录
+  // 退出登录
+  // 退出登录
+  // 退出登录
+  // 退出登录
+  // 退出登录
+  // 退出登录
+  // 退出登录
+  // 退出登录
+  // 退出登录
+  // 退出登录
+  // 退出登录
+  // 退出登录
+  // 退出登录
+  // 退出登录
   // 退出登录
   // 退出登录
   // 退出登录
@@ -259,17 +349,38 @@ import { useToast } from '@/components/ui';import { LogoHeader } from '@/compone
       // 重置用户资料
       // 重置用户资料
       // 重置用户资料
-      setUserProfile({ avatar: '', nickname: '', phone: '', email: '', bio: '' });setEditForm({ avatar: '', nickname: '', phone: '', email: '', bio: '' });} catch (error) {console.error('退出登录失败:', error);
-      toast({
-        title: '退出失败',
-        description: '退出登录失败，请稍后重试',
-        duration: 3000 });
-
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
+      // 重置用户资料
+      // 重置用户资料
+      // 重置用户资料
+      // 重置用户资料
+      // 重置用户资料
+      // 重置用户资料
+      // 重置用户资料
+      // 重置用户资料
+      // 重置用户资料
+      // 重置用户资料
+      // 重置用户资料
+      // 重置用户资料
+      // 重置用户资料
+      // 重置用户资料
+      // 重置用户资料
+      // 重置用户资料
+      setUserProfile({ avatar: '', nickname: '', phone: '', email: '', bio: '' });setEditForm({ avatar: '', nickname: '', phone: '', email: '', bio: '' });} catch (error) {console.error('退出登录失败:', error);toast({ title: '退出失败', description: '退出登录失败，请稍后重试', duration: 3000 });} finally {setIsLoading(false);}}; // 开始编辑
+  // 开始编辑
+  // 开始编辑
+  // 开始编辑
+  // 开始编辑
+  // 开始编辑
+  // 开始编辑
+  // 开始编辑
+  // 开始编辑
+  // 开始编辑
+  // 开始编辑
+  // 开始编辑
+  // 开始编辑
+  // 开始编辑
+  // 开始编辑
+  // 开始编辑
   // 开始编辑
   // 开始编辑
   // 开始编辑
@@ -302,6 +413,22 @@ import { useToast } from '@/components/ui';import { LogoHeader } from '@/compone
   // 取消编辑
   // 取消编辑
   // 取消编辑
+  // 取消编辑
+  // 取消编辑
+  // 取消编辑
+  // 取消编辑
+  // 取消编辑
+  // 取消编辑
+  // 取消编辑
+  // 取消编辑
+  // 取消编辑
+  // 取消编辑
+  // 取消编辑
+  // 取消编辑
+  // 取消编辑
+  // 取消编辑
+  // 取消编辑
+  // 取消编辑
   const handleCancel = () => {setEditForm({ ...userProfile });setIsEditing(false);}; // 保存编辑
   // 保存编辑
   // 保存编辑
@@ -318,28 +445,39 @@ import { useToast } from '@/components/ui';import { LogoHeader } from '@/compone
   // 保存编辑
   // 保存编辑
   // 保存编辑
+  // 保存编辑
+  // 保存编辑
+  // 保存编辑
+  // 保存编辑
+  // 保存编辑
+  // 保存编辑
+  // 保存编辑
+  // 保存编辑
+  // 保存编辑
+  // 保存编辑
+  // 保存编辑
+  // 保存编辑
+  // 保存编辑
+  // 保存编辑
+  // 保存编辑
+  // 保存编辑
   const handleSave = async () => {// 验证表单
-    if (!editForm.nickname.trim()) {toast({ title: '验证失败', description: '昵称不能为空', duration: 3000 });return;}if (editForm.phone && !/^1[3-9]\d{9}$/.test(editForm.phone)) {toast({ title: '验证失败', description: '请输入正确的手机号码', duration: 3000 });return;}if (editForm.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(editForm.email)) {toast({ title: '验证失败', description: '请输入正确的邮箱地址', duration: 3000 });return;}try {setIsLoading(true);await saveUserProfileToDB({ userId: $w.auth.currentUser.userId, ...editForm });setUserProfile({
-        ...editForm });
-
-      setIsEditing(false);
-      toast({
-        title: '保存成功',
-        description: '个人资料已更新',
-        duration: 2000 });
-
-    } catch (error) {
-      console.error('保存失败:', error);
-      toast({
-        title: '保存失败',
-        description: '保存个人资料失败，请稍后重试',
-        duration: 3000 });
-
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
+    if (!editForm.nickname.trim()) {toast({ title: '验证失败', description: '昵称不能为空', duration: 3000 });return;}if (editForm.phone && !/^1[3-9]\d{9}$/.test(editForm.phone)) {toast({ title: '验证失败', description: '请输入正确的手机号码', duration: 3000 });return;}if (editForm.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(editForm.email)) {toast({ title: '验证失败', description: '请输入正确的邮箱地址', duration: 3000 });return;}try {setIsLoading(true);await saveUserProfileToDB({ userId: $w.auth.currentUser.userId, ...editForm });setUserProfile({ ...editForm });setIsEditing(false);toast({ title: '保存成功', description: '个人资料已更新', duration: 2000 });} catch (error) {console.error('保存失败:', error);toast({ title: '保存失败', description: '保存个人资料失败，请稍后重试', duration: 3000 });} finally {setIsLoading(false);}}; // 选择头像
+  // 选择头像
+  // 选择头像
+  // 选择头像
+  // 选择头像
+  // 选择头像
+  // 选择头像
+  // 选择头像
+  // 选择头像
+  // 选择头像
+  // 选择头像
+  // 选择头像
+  // 选择头像
+  // 选择头像
+  // 选择头像
+  // 选择头像
   // 选择头像
   // 选择头像
   // 选择头像
@@ -372,6 +510,22 @@ import { useToast } from '@/components/ui';import { LogoHeader } from '@/compone
   // 处理表单输入
   // 处理表单输入
   // 处理表单输入
+  // 处理表单输入
+  // 处理表单输入
+  // 处理表单输入
+  // 处理表单输入
+  // 处理表单输入
+  // 处理表单输入
+  // 处理表单输入
+  // 处理表单输入
+  // 处理表单输入
+  // 处理表单输入
+  // 处理表单输入
+  // 处理表单输入
+  // 处理表单输入
+  // 处理表单输入
+  // 处理表单输入
+  // 处理表单输入
   const handleInputChange = (field, value) => {setEditForm({ ...editForm, [field]: value });};const handleTabChange = (tabId) => {if (tabId === 'profile') {setActiveTab(tabId);} else {$w.utils.navigateTo({ pageId: tabId, params: {} });}}; // ... 保持已有的联系信息处理函数
   // ... 保持已有的联系信息处理函数
   // ... 保持已有的联系信息处理函数
@@ -388,61 +542,23 @@ import { useToast } from '@/components/ui';import { LogoHeader } from '@/compone
   // ... 保持已有的联系信息处理函数
   // ... 保持已有的联系信息处理函数
   // ... 保持已有的联系信息处理函数
-  const handlePhoneCall = () => {const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);if (isMobile) {window.location.href = `tel:${contactInfo.phone}`;} else {navigator.clipboard.writeText(contactInfo.phone).then(() => {toast({ title: '电话号码已复制', description: `电话号码 ${contactInfo.phone} 已复制到剪贴板，请使用手机拨打`, duration: 3000 });}).catch(() => {toast({ title: '联系电话', description: contactInfo.phone, duration: 5000 });});}};const handleEmailClick = () => {window.location.href = `mailto:${contactInfo.email}`;
-  };
-  const handleWebsiteClick = () => {
-    window.open(contactInfo.website, '_blank');
-  };
-  const handleMapClick = () => {
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    if (isMobile) {
-      const gaodeUrl = `https://uri.amap.com/navigation?to=${encodeURIComponent(contactInfo.address)}&mode=car&coordinate=121.825,30.865&callnative=1`;
-      const baiduUrl = `https://api.map.baidu.com/direction?destination=${encodeURIComponent(contactInfo.address)}&mode=driving&region=上海&output=html`;
-      window.open(gaodeUrl, '_blank');
-      setTimeout(() => {
-        window.open(baiduUrl, '_blank');
-      }, 500);
-    } else {
-      const baiduMapUrl = `https://map.baidu.com/search/${encodeURIComponent(contactInfo.address)}`;
-      window.open(baiduMapUrl, '_blank');
-    }
-    toast({
-      title: '地图导航',
-      description: '正在为您打开地图导航',
-      duration: 2000 });
-
-  };
-  const handleAddressCopy = () => {
-    navigator.clipboard.writeText(contactInfo.address).then(() => {
-      toast({
-        title: '地址已复制',
-        description: '公司地址已复制到剪贴板',
-        duration: 3000 });
-
-    }).catch(() => {
-      toast({
-        title: '公司地址',
-        description: contactInfo.address,
-        duration: 5000 });
-
-    });
-  };
-  const handleWebsiteCopy = () => {
-    navigator.clipboard.writeText(contactInfo.website).then(() => {
-      toast({
-        title: '官网地址已复制',
-        description: '公司官网地址已复制到剪贴板',
-        duration: 3000 });
-
-    }).catch(() => {
-      toast({
-        title: '公司官网',
-        description: contactInfo.website,
-        duration: 5000 });
-
-    });
-  };
-
+  // ... 保持已有的联系信息处理函数
+  // ... 保持已有的联系信息处理函数
+  // ... 保持已有的联系信息处理函数
+  // ... 保持已有的联系信息处理函数
+  // ... 保持已有的联系信息处理函数
+  // ... 保持已有的联系信息处理函数
+  // ... 保持已有的联系信息处理函数
+  // ... 保持已有的联系信息处理函数
+  // ... 保持已有的联系信息处理函数
+  // ... 保持已有的联系信息处理函数
+  // ... 保持已有的联系信息处理函数
+  // ... 保持已有的联系信息处理函数
+  // ... 保持已有的联系信息处理函数
+  // ... 保持已有的联系信息处理函数
+  // ... 保持已有的联系信息处理函数
+  // ... 保持已有的联系信息处理函数
+  const handlePhoneCall = () => {const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);if (isMobile) {window.location.href = `tel:${contactInfo.phone}`;} else {navigator.clipboard.writeText(contactInfo.phone).then(() => {toast({ title: '电话号码已复制', description: `电话号码 ${contactInfo.phone} 已复制到剪贴板，请使用手机拨打`, duration: 3000 });}).catch(() => {toast({ title: '联系电话', description: contactInfo.phone, duration: 5000 });});}};const handleEmailClick = () => {window.location.href = `mailto:${contactInfo.email}`;};const handleWebsiteClick = () => {window.open(contactInfo.website, '_blank');};const handleMapClick = () => {const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);if (isMobile) {const gaodeUrl = `https://uri.amap.com/navigation?to=${encodeURIComponent(contactInfo.address)}&mode=car&coordinate=121.825,30.865&callnative=1`;const baiduUrl = `https://api.map.baidu.com/direction?destination=${encodeURIComponent(contactInfo.address)}&mode=driving&region=上海&output=html`;window.open(gaodeUrl, '_blank');setTimeout(() => {window.open(baiduUrl, '_blank');}, 500);} else {const baiduMapUrl = `https://map.baidu.com/search/${encodeURIComponent(contactInfo.address)}`;window.open(baiduMapUrl, '_blank');}toast({ title: '地图导航', description: '正在为您打开地图导航', duration: 2000 });};const handleAddressCopy = () => {navigator.clipboard.writeText(contactInfo.address).then(() => {toast({ title: '地址已复制', description: '公司地址已复制到剪贴板', duration: 3000 });}).catch(() => {toast({ title: '公司地址', description: contactInfo.address, duration: 5000 });});};const handleWebsiteCopy = () => {navigator.clipboard.writeText(contactInfo.website).then(() => {toast({ title: '官网地址已复制', description: '公司官网地址已复制到剪贴板', duration: 3000 });}).catch(() => {toast({ title: '公司官网', description: contactInfo.website, duration: 5000 });});}; // 更新菜单项，移除帮助中心和给我评分
   // 更新菜单项，移除帮助中心和给我评分
   // 更新菜单项，移除帮助中心和给我评分
   // 更新菜单项，移除帮助中心和给我评分
@@ -459,26 +575,37 @@ import { useToast } from '@/components/ui';import { LogoHeader } from '@/compone
   // 更新菜单项，移除帮助中心和给我评分
   // 更新菜单项，移除帮助中心和给我评分
   // 更新菜单项，移除帮助中心和给我评分
-  const menuItems = [{ icon: Settings, label: '系统设置', description: '应用设置和偏好配置', onClick: () => {toast({ title: '系统设置', description: '系统设置功能正在开发中', duration: 2000 });} }, { icon: Shield, label: '隐私政策', description: '查看隐私保护政策', onClick: () => {
-      toast({
-        title: '隐私政策',
-        description: '隐私政策功能正在开发中',
-        duration: 2000 });
-
-    } },
-  {
-    icon: FileText,
-    label: '用户协议',
-    description: '查看用户服务协议',
-    onClick: () => {
-      toast({
-        title: '用户协议',
-        description: '用户协议功能正在开发中',
-        duration: 2000 });
-
-    } }];
-
-
+  // 更新菜单项，移除帮助中心和给我评分
+  // 更新菜单项，移除帮助中心和给我评分
+  // 更新菜单项，移除帮助中心和给我评分
+  // 更新菜单项，移除帮助中心和给我评分
+  // 更新菜单项，移除帮助中心和给我评分
+  // 更新菜单项，移除帮助中心和给我评分
+  // 更新菜单项，移除帮助中心和给我评分
+  // 更新菜单项，移除帮助中心和给我评分
+  // 更新菜单项，移除帮助中心和给我评分
+  // 更新菜单项，移除帮助中心和给我评分
+  // 更新菜单项，移除帮助中心和给我评分
+  // 更新菜单项，移除帮助中心和给我评分
+  // 更新菜单项，移除帮助中心和给我评分
+  // 更新菜单项，移除帮助中心和给我评分
+  // 更新菜单项，移除帮助中心和给我评分
+  const menuItems = [{ icon: Settings, label: '系统设置', description: '应用设置和偏好配置', onClick: () => {toast({ title: '系统设置', description: '系统设置功能正在开发中', duration: 2000 });} }, { icon: Shield, label: '隐私政策', description: '查看隐私保护政策', onClick: () => {toast({ title: '隐私政策', description: '隐私政策功能正在开发中', duration: 2000 });} }, { icon: FileText, label: '用户协议', description: '查看用户服务协议', onClick: () => {toast({ title: '用户协议', description: '用户协议功能正在开发中', duration: 2000 });} }]; // 如果用户未登录，显示登录引导
+  // 如果用户未登录，显示登录引导
+  // 如果用户未登录，显示登录引导
+  // 如果用户未登录，显示登录引导
+  // 如果用户未登录，显示登录引导
+  // 如果用户未登录，显示登录引导
+  // 如果用户未登录，显示登录引导
+  // 如果用户未登录，显示登录引导
+  // 如果用户未登录，显示登录引导
+  // 如果用户未登录，显示登录引导
+  // 如果用户未登录，显示登录引导
+  // 如果用户未登录，显示登录引导
+  // 如果用户未登录，显示登录引导
+  // 如果用户未登录，显示登录引导
+  // 如果用户未登录，显示登录引导
+  // 如果用户未登录，显示登录引导
   // 如果用户未登录，显示登录引导
   // 如果用户未登录，显示登录引导
   // 如果用户未登录，显示登录引导
@@ -787,7 +914,7 @@ import { useToast } from '@/components/ui';import { LogoHeader } from '@/compone
                 </div>
                 <button onClick={() => {toast({ title: '在线客服', description: '客服功能正在开发中，请暂时使用电话联系', duration: 3000 });}} className="bg-green-600 text-white hover:bg-green-700 px-3 py-2 rounded-lg font-medium transition-colors flex items-center space-x-1">
                   <MessageCircle className="w-4 h-4" />
-                  <span>咨询</span>
+                  <span></span>
                 </button>
               </div>
             </div>
