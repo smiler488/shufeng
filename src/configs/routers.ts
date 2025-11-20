@@ -2,6 +2,7 @@ import HOME from '../pages/home.jsx';
 import HUB from '../pages/hub.jsx';
 import PROFILE from '../pages/profile.jsx';
 import PRODUCTS from '../pages/products.jsx';
+import LEAFANGLE from '../pages/leafAngle.jsx';
 export const routers = [{
   id: "home",
   component: HOME
@@ -14,4 +15,7 @@ export const routers = [{
 }, {
   id: "products",
   component: PRODUCTS
+}, {
+  id: "leafAngle",
+  component: LEAFANGLE
 }]

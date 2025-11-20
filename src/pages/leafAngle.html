@@ -1,0 +1,267 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>叶片角度测量工具</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <div class="bg-green-600 text-white p-4">
+        <div class="flex items-center space-x-3">
+            <i data-lucide="compass" class="w-6 h-6"></i>
+            <h1 class="text-xl font-bold">叶片角度测量工具</h1>
+        </div>
+    </div>
+
+    <div class="p-4 space-y-4">
+        <!-- 实时数据卡片 -->
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <i data-lucide="activity" class="w-5 h-5 mr-2 text-green-600"></i>
+                实时传感器数据
+            </h2>
+            
+            <div class="grid grid-cols-3 gap-4 mb-4">
+                <div class="bg-gray-50 rounded-lg p-4 text-center">
+                    <div class="text-2xl font-bold text-green-600" id="alpha">0.00°</div>
+                    <div class="text-sm text-gray-600">Alpha (Z轴)</div>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-4 text-center">
+                    <div class="text-2xl font-bold text-blue-600" id="beta">0.00°</div>
+                    <div class="text-sm text-gray-600">Beta (X轴)</div>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-4 text-center">
+                    <div class="text-2xl font-bold text-purple-600" id="gamma">0.00°</div>
+                    <div class="text-sm text-gray-600">Gamma (Y轴)</div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div class="bg-blue-50 rounded-lg p-4">
+                    <div class="text-sm text-gray-600 mb-1">经度</div>
+                    <div class="text-lg font-semibold text-blue-600" id="longitude">0.000000</div>
+                </div>
+                <div class="bg-blue-50 rounded-lg p-4">
+                    <div class="text-sm text-gray-600 mb-1">纬度</div>
+                    <div class="text-lg font-semibold text-blue-600" id="latitude">0.000000</div>
+                </div>
+                <div class="bg-green-50 rounded-lg p-4">
+                    <div class="text-sm text-gray-600 mb-1">海拔</div>
+                    <div class="text-lg font-semibold text-green-600" id="altitude">0m</div>
+                </div>
+                <div class="bg-purple-50 rounded-lg p-4">
+                    <div class="text-sm text-gray-600 mb-1">精度</div>
+                    <div class="text-lg font-semibold text-purple-600" id="accuracy">0m</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 时间信息 -->
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <i data-lucide="clock" class="w-5 h-5 mr-2 text-green-600"></i>
+                时间信息
+            </h2>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <div class="text-sm text-gray-600 mb-1">日期</div>
+                    <div class="text-lg font-semibold text-gray-900" id="date">2024-01-01</div>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <div class="text-sm text-gray-600 mb-1">时间</div>
+                    <div class="text-lg font-semibold text-gray-900" id="time">12:00:00</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 样品输入和操作 -->
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <i data-lucide="edit-3" class="w-5 h-5 mr-2 text-green-600"></i>
+                样品信息
+            </h2>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">样品名称</label>
+                    <input type="text" id="sampleName" placeholder="请输入样品名称" 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                </div>
+                <div class="flex space-x-3">
+                    <button onclick="recordData()" class="flex-1 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center">
+                        <i data-lucide="save" class="w-4 h-4 mr-2"></i>
+                        记录数据
+                    </button>
+                    <button onclick="downloadCSV()" class="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center">
+                        <i data-lucide="download" class="w-4 h-4 mr-2"></i>
+                        下载CSV
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 历史记录 -->
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <i data-lucide="database" class="w-5 h-5 mr-2 text-green-600"></i>
+                测量记录
+            </h2>
+            <div id="recordsList" class="space-y-2 max-h-64 overflow-y-auto">
+                <div class="text-gray-500 text-center py-4">暂无记录</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 初始化Lucide图标
+        lucide.createIcons();
+
+        // 数据记录数组
+        let records = [];
+
+        // 更新时间
+        function updateDateTime() {
+            const now = new Date();
+            document.getElementById('date').textContent = now.toLocaleDateString('zh-CN');
+            document.getElementById('time').textContent = now.toLocaleTimeString('zh-CN');
+        }
+
+        // 请求传感器权限并开始监听
+        function initSensors() {
+            // 陀螺仪
+            if (window.DeviceOrientationEvent) {
+                window.addEventListener('deviceorientation', function(event) {
+                    document.getElementById('alpha').textContent = event.alpha ? event.alpha.toFixed(2) + '°' : '0.00°';
+                    document.getElementById('beta').textContent = event.beta ? event.beta.toFixed(2) + '°' : '0.00°';
+                    document.getElementById('gamma').textContent = event.gamma ? event.gamma.toFixed(2) + '°' : '0.00°';
+                });
+            }
+
+            // 地理位置
+            if (navigator.geolocation) {
+                navigator.geolocation.watchPosition(function(position) {
+                    document.getElementById('latitude').textContent = position.coords.latitude.toFixed(6);
+                    document.getElementById('longitude').textContent = position.coords.longitude.toFixed(6);
+                    document.getElementById('altitude').textContent = Math.round(position.coords.altitude || 0) + 'm';
+                    document.getElementById('accuracy').textContent = Math.round(position.coords.accuracy) + 'm';
+                }, function(error) {
+                    console.error('位置获取失败:', error);
+                });
+            }
+        }
+
+        // 记录数据
+        function recordData() {
+            const sampleName = document.getElementById('sampleName').value.trim();
+            if (!sampleName) {
+                alert('请输入样品名称');
+                return;
+            }
+
+            const now = new Date();
+            const record = {
+                id: Date.now(),
+                sampleName: sampleName,
+                date: now.toLocaleDateString('zh-CN'),
+                time: now.toLocaleTimeString('zh-CN'),
+                alpha: document.getElementById('alpha').textContent,
+                beta: document.getElementById('beta').textContent,
+                gamma: document.getElementById('gamma').textContent,
+                latitude: document.getElementById('latitude').textContent,
+                longitude: document.getElementById('longitude').textContent,
+                altitude: document.getElementById('altitude').textContent
+            };
+
+            records.push(record);
+            updateRecordsList();
+            
+            // 清空输入框
+            document.getElementById('sampleName').value = '';
+            
+            // 显示成功提示
+            showToast('数据记录成功');
+        }
+
+        // 更新记录列表
+        function updateRecordsList() {
+            const listContainer = document.getElementById('recordsList');
+            if (records.length === 0) {
+                listContainer.innerHTML = '<div class="text-gray-500 text-center py-4">暂无记录</div>';
+                return;
+            }
+
+            listContainer.innerHTML = records.map(record => `
+                <div class="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                    <div class="flex justify-between items-start mb-2">
+                        <div class="font-medium text-gray-900">${record.sampleName}</div>
+                        <div class="text-xs text-gray-500">${record.date} ${record.time}</div>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2 text-xs">
+                        <div>α: ${record.alpha}</div>
+                        <div>β: ${record.beta}</div>
+                        <div>γ: ${record.gamma}</div>
+                    </div>
+                    <div class="text-xs text-gray-600 mt-1">
+                        位置: ${record.latitude}, ${record.longitude} | 海拔: ${record.altitude}
+                    </div>
+                </div>
+            `).reverse().join('');
+        }
+
+        // 下载CSV
+        function downloadCSV() {
+            if (records.length === 0) {
+                alert('暂无数据可下载');
+                return;
+            }
+
+            const headers = ['样品名称', '日期', '时间', 'Alpha(°)', 'Beta(°)', 'Gamma(°)', '纬度', '经度', '海拔'];
+            const csvContent = [
+                headers.join(','),
+                ...records.map(record => [
+                    record.sampleName,
+                    record.date,
+                    record.time,
+                    record.alpha.replace('°', ''),
+                    record.beta.replace('°', ''),
+                    record.gamma.replace('°', ''),
+                    record.latitude,
+                    record.longitude,
+                    record.altitude.replace('m', '')
+                ].join(','))
+            ].join('\n');
+
+            const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `叶片角度测量_${new Date().toLocaleDateString('zh-CN')}.csv`;
+            link.click();
+            
+            showToast('CSV文件下载成功');
+        }
+
+        // 显示提示
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg z-50';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                document.body.removeChild(toast);
+            }, 2000);
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            updateDateTime();
+            setInterval(updateDateTime, 1000);
+            initSensors();
+        });
+    </script>
+</body>
+</html>
+    
