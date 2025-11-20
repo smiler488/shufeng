@@ -179,7 +179,7 @@ export default function ImageQuantitativeAnalysis(props) {
     return object;
   };
 
-  // 绘制标注
+  // 绘制标注 - 使用最小包围框
   const drawAnnotations = (objects, canvas, ctx) => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(imageRef.current, 0, 0, canvas.width, canvas.height);
@@ -190,17 +190,8 @@ export default function ImageQuantitativeAnalysis(props) {
     ctx.font = 'bold 14px Arial';
     ctx.fillStyle = '#FF0000';
     objects.forEach((object, index) => {
-      // 绘制轮廓
-      ctx.beginPath();
-      object.points.forEach(([x, y], i) => {
-        if (i === 0) {
-          ctx.moveTo(x, y);
-        } else {
-          ctx.lineTo(x, y);
-        }
-      });
-      ctx.closePath();
-      ctx.stroke();
+      // 绘制最小包围框
+      ctx.strokeRect(object.minX, object.minY, object.maxX - object.minX, object.maxY - object.minY);
 
       // 绘制标签
       const labelX = object.minX;
@@ -534,9 +525,6 @@ export default function ImageQuantitativeAnalysis(props) {
                     </p>
                   </div> : <div className="relative">
                     <img src={annotatedImage} alt="标注图像" className="w-full rounded-lg" />
-                    <div className="absolute top-4 right-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-medium">
-                      检测到 {analysisResults?.objectCount || 0} 个对象
-                    </div>
                   </div>}
                 
                 {/* 隐藏的canvas用于图像处理 */}
