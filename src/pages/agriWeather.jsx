@@ -410,6 +410,26 @@ export default function AgriWeather(props) {
     key: 'PRECTOTCORR',
     label: '降水量(mm/day)'
   }];
+
+  // 安全格式化数值的函数
+  const formatCellValue = (value, key) => {
+    if (value === null || value === undefined) {
+      return '-';
+    }
+
+    // 日期字段直接返回
+    if (key === 'date') {
+      return value;
+    }
+
+    // 检查是否为数字
+    if (typeof value === 'number' && !isNaN(value)) {
+      return value.toFixed(2);
+    }
+
+    // 其他情况转为字符串
+    return String(value);
+  };
   return <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-16">
       <LogoHeader />
       
@@ -613,7 +633,7 @@ export default function AgriWeather(props) {
                 <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                   {weatherData.slice(0, 100).map((row, index) => <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                       {tableColumns.map(col => <td key={col.key} className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                          {row[col.key] !== null ? row[col.key].toFixed(2) : '-'}
+                          {formatCellValue(row[col.key], col.key)}
                         </td>)}
                     </tr>)}
                 </tbody>
