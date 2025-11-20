@@ -1,0 +1,38 @@
+
+{
+  "name": "user_profiles",
+  "title": "用户资料",
+  "schemas": [
+    {
+      "name": "userId",
+      "title": "用户ID",
+      "type": "String"
+    },
+    {
+      "name": "avatar",
+      "title": "头像",
+      "type": "Image"
+    },
+    {
+      "name": "nickname",
+      "title": "昵称",
+      "type": "String"
+    },
+    {
+      "name": "phone",
+      "title": "手机号",
+      "type": "String"
+    },
+    {
+      "name": "email",
+      "title": "邮箱",
+      "type": "Email"
+    },
+    {
+      "name": "bio",
+      "title": "个人简介",
+      "type": "MultiLineString"
+    }
+  ]
+}
+  

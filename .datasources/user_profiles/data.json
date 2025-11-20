@@ -1,0 +1,43 @@
+
+[
+  {
+    "_id": "user_001",
+    "userId": "user_001",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=1",
+    "nickname": "张三",
+    "phone": "13800138000",
+    "email": "zhangsan@example.com",
+    "bio": "热爱植物研究的科研工作者",
+    "createdAt": 1732185600000,
+    "updatedAt": 1732185600000,
+    "createBy": "system",
+    "updateBy": "system"
+  },
+  {
+    "_id": "user_002",
+    "userId": "user_002",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=2",
+    "nickname": "李四",
+    "phone": "13900139000",
+    "email": "lisi@example.com",
+    "bio": "专注于光合作用研究",
+    "createdAt": 1732185600000,
+    "updatedAt": 1732185600000,
+    "createBy": "system",
+    "updateBy": "system"
+  },
+  {
+    "_id": "user_003",
+    "userId": "user_003",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=3",
+    "nickname": "王五",
+    "phone": "",
+    "email": "wangwu@example.com",
+    "bio": "植物表型分析专家",
+    "createdAt": 1732185600000,
+    "updatedAt": 1732185600000,
+    "createBy": "system",
+    "updateBy": "system"
+  }
+]
+  

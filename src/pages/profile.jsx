@@ -71,18 +71,30 @@ export default function Profile(props) {
     await loadUserProfile();
   };
 
-  // 加载用户资料
+  // 加载用户资料 - 使用数据源API
   const loadUserProfile = async () => {
     try {
-      const tcb = await $w.cloud.getCloudInstance();
-      const db = tcb.database();
-
-      // 查询用户资料
-      const result = await db.collection('user_profiles').where({
-        userId: $w.auth.currentUser.userId
-      }).get();
-      if (result.data.length > 0) {
-        const profile = result.data[0];
+      const result = await $w.cloud.callDataSource({
+        dataSourceName: 'user_profiles',
+        methodName: 'wedaGetRecordsV2',
+        params: {
+          filter: {
+            where: {
+              $and: [{
+                userId: {
+                  $eq: $w.auth.currentUser.userId
+                }
+              }]
+            }
+          },
+          select: {
+            $master: true
+          },
+          pageSize: 1
+        }
+      });
+      if (result.records && result.records.length > 0) {
+        const profile = result.records[0];
         setUserProfile({
           avatar: profile.avatar || defaultAvatars[0],
           nickname: profile.nickname || $w.auth.currentUser.name || '用户',
@@ -100,13 +112,20 @@ export default function Profile(props) {
       } else {
         // 创建默认资料
         const defaultProfile = {
+          userId: $w.auth.currentUser.userId,
           avatar: defaultAvatars[0],
           nickname: $w.auth.currentUser.name || '用户',
           phone: '',
           email: '',
           bio: ''
         };
-        setUserProfile(defaultProfile);
+        setUserProfile({
+          avatar: defaultProfile.avatar,
+          nickname: defaultProfile.nickname,
+          phone: defaultProfile.phone,
+          email: defaultProfile.email,
+          bio: defaultProfile.bio
+        });
         setEditForm(defaultProfile);
 
         // 保存默认资料到数据库
@@ -122,16 +141,76 @@ export default function Profile(props) {
     }
   };
 
-  // 保存用户资料到数据库
+  // 保存用户资料到数据库 - 使用数据源API
   const saveUserProfileToDB = async profile => {
     try {
-      const tcb = await $w.cloud.getCloudInstance();
-      const db = tcb.database();
-      await db.collection('user_profiles').doc($w.auth.currentUser.userId).set({
-        userId: $w.auth.currentUser.userId,
-        ...profile,
-        updatedAt: new Date()
+      // 先查询是否已存在记录
+      const existingResult = await $w.cloud.callDataSource({
+        dataSourceName: 'user_profiles',
+        methodName: 'wedaGetRecordsV2',
+        params: {
+          filter: {
+            where: {
+              $and: [{
+                userId: {
+                  $eq: $w.auth.currentUser.userId
+                }
+              }]
+            }
+          },
+          select: {
+            $master: true
+          },
+          pageSize: 1
+        }
       });
+      if (existingResult.records && existingResult.records.length > 0) {
+        // 更新现有记录
+        const updateResult = await $w.cloud.callDataSource({
+          dataSourceName: 'user_profiles',
+          methodName: 'wedaUpdateV2',
+          params: {
+            data: {
+              avatar: profile.avatar,
+              nickname: profile.nickname,
+              phone: profile.phone,
+              email: profile.email,
+              bio: profile.bio
+            },
+            filter: {
+              where: {
+                $and: [{
+                  userId: {
+                    $eq: $w.auth.currentUser.userId
+                  }
+                }]
+              }
+            }
+          }
+        });
+        if (updateResult.count === 0) {
+          throw new Error('更新失败，记录不存在');
+        }
+      } else {
+        // 创建新记录
+        const createResult = await $w.cloud.callDataSource({
+          dataSourceName: 'user_profiles',
+          methodName: 'wedaCreateV2',
+          params: {
+            data: {
+              userId: profile.userId,
+              avatar: profile.avatar,
+              nickname: profile.nickname,
+              phone: profile.phone,
+              email: profile.email,
+              bio: profile.bio
+            }
+          }
+        });
+        if (!createResult.id) {
+          throw new Error('创建失败');
+        }
+      }
     } catch (error) {
       console.error('保存用户资料失败:', error);
       throw error;
@@ -247,7 +326,10 @@ export default function Profile(props) {
     }
     try {
       setIsLoading(true);
-      await saveUserProfileToDB(editForm);
+      await saveUserProfileToDB({
+        userId: $w.auth.currentUser.userId,
+        ...editForm
+      });
       setUserProfile({
         ...editForm
       });
@@ -258,6 +340,7 @@ export default function Profile(props) {
         duration: 2000
       });
     } catch (error) {
+      console.error('保存失败:', error);
       toast({
         title: '保存失败',
         description: '保存个人资料失败，请稍后重试',
@@ -370,6 +453,8 @@ export default function Profile(props) {
       });
     });
   };
+
+  // 更新菜单项，移除帮助中心和给我评分
   const menuItems = [{
     icon: Settings,
     label: '系统设置',
@@ -400,28 +485,6 @@ export default function Profile(props) {
       toast({
         title: '用户协议',
         description: '用户协议功能正在开发中',
-        duration: 2000
-      });
-    }
-  }, {
-    icon: HelpCircle,
-    label: '帮助中心',
-    description: '获取使用帮助和支持',
-    onClick: () => {
-      toast({
-        title: '帮助中心',
-        description: '帮助中心功能正在开发中',
-        duration: 2000
-      });
-    }
-  }, {
-    icon: Star,
-    label: '给我们评分',
-    description: '在应用商店为我们评分',
-    onClick: () => {
-      toast({
-        title: '感谢支持',
-        description: '感谢您的支持！',
         duration: 2000
       });
     }
