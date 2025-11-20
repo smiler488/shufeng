@@ -1,7 +1,7 @@
 // @ts-ignore;
 import React, { useState } from 'react';
 // @ts-ignore;
-import { Search, TrendingUp, BarChart3, Beaker, Calculator, Image, FileText, PieChart, Activity, Star, Clock, Users, ChevronRight, Filter, Grid, List } from 'lucide-react';
+import { Search, TrendingUp, BarChart3, Calculator, Image, Activity, Star, Clock, Users, ChevronRight, Grid, List } from 'lucide-react';
 // @ts-ignore;
 import { useToast } from '@/components/ui';
 
@@ -31,7 +31,7 @@ export default function Hub(props) {
     }
   };
 
-  // 工具数据
+  // 工具数据 - 只保留实际存在的4个工具
   const tools = [{
     id: 'leafAngle',
     name: '叶倾角测量',
@@ -80,33 +80,9 @@ export default function Hub(props) {
     users: 650,
     tags: ['图像分析', '生物样本', '量化'],
     color: 'from-purple-400 to-purple-600'
-  }, {
-    id: 'dataVisualization',
-    name: '数据可视化',
-    description: '创建交互式图表和可视化展示，支持多种图表类型',
-    category: 'visualization',
-    icon: PieChart,
-    difficulty: '中级',
-    estimatedTime: '12分钟',
-    rating: 4.5,
-    users: 1100,
-    tags: ['图表', '可视化', '交互'],
-    color: 'from-pink-400 to-pink-600'
-  }, {
-    id: 'reportGenerator',
-    name: '报告生成器',
-    description: '自动生成科研报告，支持多种模板和格式导出',
-    category: 'data',
-    icon: FileText,
-    difficulty: '初级',
-    estimatedTime: '8分钟',
-    rating: 4.4,
-    users: 780,
-    tags: ['报告', '文档', '自动化'],
-    color: 'from-indigo-400 to-indigo-600'
   }];
 
-  // 分类数据 - 移除实验室工具
+  // 分类数据 - 根据实际工具调整
   const categories = [{
     id: 'all',
     name: '全部工具',
@@ -125,12 +101,6 @@ export default function Hub(props) {
     icon: BarChart3,
     count: tools.filter(tool => tool.category === 'data').length,
     color: 'from-green-400 to-green-600'
-  }, {
-    id: 'visualization',
-    name: '可视化工具',
-    icon: PieChart,
-    count: tools.filter(tool => tool.category === 'visualization').length,
-    color: 'from-purple-400 to-purple-600'
   }];
 
   // 过滤工具
@@ -279,7 +249,7 @@ export default function Hub(props) {
             </div>
           </div>
           
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             {categories.map(category => {
             const Icon = category.icon;
             return <button key={category.id} onClick={() => setSelectedCategory(category.id)} className={`p-4 rounded-lg border-2 transition-all duration-200 ${selectedCategory === category.id ? `border-blue-500 bg-gradient-to-r ${category.color} text-white` : 'border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:hover:border-gray-500'}`}>
