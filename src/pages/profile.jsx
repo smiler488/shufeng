@@ -2,9 +2,7 @@
 import React, { useState, useEffect } from 'react';
 // @ts-ignore;
 import { User, Settings, HelpCircle, Phone, Mail, MapPin, Navigation, Globe, MessageCircle, ChevronRight, Shield, FileText, Star, LogOut, Award, Building, Camera, Edit2, Save, X, Upload } from 'lucide-react'; // @ts-ignore;
-import { useToast } from '@/components/ui';
-import { LogoHeader } from '@/components/LogoHeader';
-import { TabBar } from '@/components/TabBar';
+import { useToast } from '@/components/ui';import { LogoHeader } from '@/components/LogoHeader';import { TabBar } from '@/components/TabBar';
 export default function Profile(props) {
   const {
     $w } =
@@ -18,18 +16,18 @@ export default function Profile(props) {
 
   // 用户资料状态
   // 用户资料状态
-  const [userProfile, setUserProfile] = useState({ avatar: '',
-    nickname: '',
-    phone: '',
+  // 用户资料状态
+  // 用户资料状态
+  const [userProfile, setUserProfile] = useState({ avatar: '', nickname: '', phone: '',
     email: '',
     bio: '' });
 
 
   // 编辑表单状态
   // 编辑表单状态
-  const [editForm, setEditForm] = useState({ avatar: '',
-    nickname: '',
-    phone: '',
+  // 编辑表单状态
+  // 编辑表单状态
+  const [editForm, setEditForm] = useState({ avatar: '', nickname: '', phone: '',
     email: '',
     bio: '' });
 
@@ -51,26 +49,26 @@ export default function Profile(props) {
 
   // 机器人头像选项 - 使用机器人风格的头像
   // 机器人头像选项 - 使用机器人风格的头像
-  const defaultAvatars = ['https://api.dicebear.com/7.x/bottts/svg?seed=robot1&backgroundColor=b6e3f4', 'https://api.dicebear.com/7.x/bottts/svg?seed=robot2&backgroundColor=c0aede', 'https://api.dicebear.com/7.x/bottts/svg?seed=robot3&backgroundColor=d1d4f9', 'https://api.dicebear.com/7.x/bottts/svg?seed=robot4&backgroundColor=ffd5dc', 'https://api.dicebear.com/7.x/bottts/svg?seed=robot5&backgroundColor=ffdfbf', 'https://api.dicebear.com/7.x/bottts/svg?seed=robot6&backgroundColor=69d2e7'];
+  // 机器人头像选项 - 使用机器人风格的头像
+  // 机器人头像选项 - 使用机器人风格的头像
+  const defaultAvatars = ['https://api.dicebear.com/7.x/bottts/svg?seed=robot1&backgroundColor=b6e3f4', 'https://api.dicebear.com/7.x/bottts/svg?seed=robot2&backgroundColor=c0aede', 'https://api.dicebear.com/7.x/bottts/svg?seed=robot3&backgroundColor=d1d4f9', 'https://api.dicebear.com/7.x/bottts/svg?seed=robot4&backgroundColor=ffd5dc', 'https://api.dicebear.com/7.x/bottts/svg?seed=robot5&backgroundColor=ffdfbf', 'https://api.dicebear.com/7.x/bottts/svg?seed=robot6&backgroundColor=69d2e7']; // 检查登录状态
   // 检查登录状态
   // 检查登录状态
-  useEffect(() => {checkLoginStatus();
-  }, []);
-  const checkLoginStatus = async () => {
-    if (!$w.auth.currentUser?.userId) {
+  // 检查登录状态
+  useEffect(() => {checkLoginStatus();}, []);const checkLoginStatus = async () => {if (!$w.auth.currentUser?.userId) {
       // 未登录，显示登录引导
       return;
     }
 
     // 已登录，加载用户资料
     // 已登录，加载用户资料
-    await loadUserProfile();};
-
+    // 已登录，加载用户资料
+    // 已登录，加载用户资料
+    await loadUserProfile();}; // 加载用户资料 - 使用数据源API
   // 加载用户资料 - 使用数据源API
   // 加载用户资料 - 使用数据源API
-  const loadUserProfile = async () => {try {
-      const result = await $w.cloud.callDataSource({
-        dataSourceName: 'user_profiles',
+  // 加载用户资料 - 使用数据源API
+  const loadUserProfile = async () => {try {const result = await $w.cloud.callDataSource({ dataSourceName: 'user_profiles',
         methodName: 'wedaGetRecordsV2',
         params: {
           filter: {
@@ -125,9 +123,9 @@ export default function Profile(props) {
 
         // 保存默认资料到数据库
         // 保存默认资料到数据库
-        await saveUserProfileToDB(defaultProfile);}
-    } catch (error) {
-      console.error('加载用户资料失败:', error);
+        // 保存默认资料到数据库
+        // 保存默认资料到数据库
+        await saveUserProfileToDB(defaultProfile);}} catch (error) {console.error('加载用户资料失败:', error);
       toast({
         title: '加载失败',
         description: '无法加载用户资料，请稍后重试',
@@ -138,10 +136,10 @@ export default function Profile(props) {
 
   // 保存用户资料到数据库 - 使用数据源API
   // 保存用户资料到数据库 - 使用数据源API
-  const saveUserProfileToDB = async (profile) => {try {
-      // 先查询是否已存在记录
-      const existingResult = await $w.cloud.callDataSource({
-        dataSourceName: 'user_profiles',
+  // 保存用户资料到数据库 - 使用数据源API
+  // 保存用户资料到数据库 - 使用数据源API
+  const saveUserProfileToDB = async (profile) => {try {// 先查询是否已存在记录
+      const existingResult = await $w.cloud.callDataSource({ dataSourceName: 'user_profiles',
         methodName: 'wedaGetRecordsV2',
         params: {
           filter: {
@@ -214,9 +212,9 @@ export default function Profile(props) {
 
   // 微信登录
   // 微信登录
-  const handleWeChatLogin = async () => {try {
-      const tcb = await $w.cloud.getCloudInstance();
-      tcb.auth().toDefaultLoginPage({
+  // 微信登录
+  // 微信登录
+  const handleWeChatLogin = async () => {try {const tcb = await $w.cloud.getCloudInstance();tcb.auth().toDefaultLoginPage({
         config_version: "env",
         redirect_uri: window.location.href,
         query: {
@@ -235,9 +233,9 @@ export default function Profile(props) {
 
   // 退出登录
   // 退出登录
-  const handleLogout = async () => {try {
-      setIsLoading(true);
-      const tcb = await $w.cloud.getCloudInstance();
+  // 退出登录
+  // 退出登录
+  const handleLogout = async () => {try {setIsLoading(true);const tcb = await $w.cloud.getCloudInstance();
       await tcb.auth().signOut();
       await tcb.auth().signInAnonymously();
       await $w.auth.getUserInfo({
@@ -251,9 +249,9 @@ export default function Profile(props) {
 
       // 重置用户资料
       // 重置用户资料
-      setUserProfile({ avatar: '',
-        nickname: '',
-        phone: '',
+      // 重置用户资料
+      // 重置用户资料
+      setUserProfile({ avatar: '', nickname: '', phone: '',
         email: '',
         bio: '' });
 
@@ -278,26 +276,26 @@ export default function Profile(props) {
 
   // 开始编辑
   // 开始编辑
-  const handleEdit = () => {setEditForm({
-      ...userProfile });
-
+  // 开始编辑
+  // 开始编辑
+  const handleEdit = () => {setEditForm({ ...userProfile });
     setIsEditing(true);
   };
 
   // 取消编辑
   // 取消编辑
-  const handleCancel = () => {setEditForm({
-      ...userProfile });
-
+  // 取消编辑
+  // 取消编辑
+  const handleCancel = () => {setEditForm({ ...userProfile });
     setIsEditing(false);
   };
 
   // 保存编辑
   // 保存编辑
+  // 保存编辑
+  // 保存编辑
   const handleSave = async () => {// 验证表单
-    if (!editForm.nickname.trim()) {
-      toast({
-        title: '验证失败',
+    if (!editForm.nickname.trim()) {toast({ title: '验证失败',
         description: '昵称不能为空',
         duration: 3000 });
 
@@ -348,17 +346,17 @@ export default function Profile(props) {
 
   // 选择头像
   // 选择头像
-  const handleAvatarSelect = (avatar) => {setEditForm({
-      ...editForm,
-      avatar });
+  // 选择头像
+  // 选择头像
+  const handleAvatarSelect = (avatar) => {setEditForm({ ...editForm, avatar });
 
   };
 
   // 处理表单输入
   // 处理表单输入
-  const handleInputChange = (field, value) => {setEditForm({
-      ...editForm,
-      [field]: value });
+  // 处理表单输入
+  // 处理表单输入
+  const handleInputChange = (field, value) => {setEditForm({ ...editForm, [field]: value });
 
   };
   const handleTabChange = (tabId) => {
@@ -374,9 +372,9 @@ export default function Profile(props) {
 
   // ... 保持已有的联系信息处理函数
   // ... 保持已有的联系信息处理函数
-  const handlePhoneCall = () => {const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    if (isMobile) {
-      window.location.href = `tel:${contactInfo.phone}`;
+  // ... 保持已有的联系信息处理函数
+  // ... 保持已有的联系信息处理函数
+  const handlePhoneCall = () => {const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);if (isMobile) {window.location.href = `tel:${contactInfo.phone}`;
     } else {
       navigator.clipboard.writeText(contactInfo.phone).then(() => {
         toast({
@@ -451,9 +449,9 @@ export default function Profile(props) {
 
   // 更新菜单项，移除帮助中心和给我评分
   // 更新菜单项，移除帮助中心和给我评分
-  const menuItems = [{ icon: Settings,
-    label: '系统设置',
-    description: '应用设置和偏好配置',
+  // 更新菜单项，移除帮助中心和给我评分
+  // 更新菜单项，移除帮助中心和给我评分
+  const menuItems = [{ icon: Settings, label: '系统设置', description: '应用设置和偏好配置',
     onClick: () => {
       toast({
         title: '系统设置',
@@ -485,6 +483,8 @@ export default function Profile(props) {
     } }];
 
 
+  // 如果用户未登录，显示登录引导
+  // 如果用户未登录，显示登录引导
   // 如果用户未登录，显示登录引导
   // 如果用户未登录，显示登录引导
   if (!$w.auth.currentUser?.userId) {return <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-16">
@@ -535,9 +535,7 @@ export default function Profile(props) {
         </div>
         
         <TabBar currentPage={activeTab} onPageChange={handleTabChange} />
-      </div>;
-  }
-  return <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-16">
+      </div>;}return <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-16">
       <LogoHeader />
       
       <div className="px-4 py-6 space-y-6">
@@ -715,7 +713,7 @@ export default function Profile(props) {
                 <div className="flex space-x-2">
                   <button onClick={handleEmailClick} className="bg-blue-600 text-white hover:bg-blue-700 px-3 py-2 rounded-lg font-medium transition-colors flex items-center space-x-1">
                     <Mail className="w-4 h-4" />
-                    <span>发送</span>
+                    <span></span>
                   </button>
                 </div>
               </div>
