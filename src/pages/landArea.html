@@ -1,0 +1,476 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>土地面积测量工具</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <div class="bg-green-600 text-white p-4">
+        <div class="flex items-center space-x-3">
+            <i data-lucide="map" class="w-6 h-6"></i>
+            <h1 class="text-xl font-bold">土地面积测量工具</h1>
+        </div>
+    </div>
+
+    <div class="p-4 space-y-4">
+        <!-- 实时位置信息 -->
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <i data-lucide="map-pin" class="w-5 h-5 mr-2 text-blue-600"></i>
+                当前位置
+            </h2>
+            
+            <div class="grid grid-cols-2 gap-4 mb-4">
+                <div class="bg-blue-50 rounded-lg p-4">
+                    <div class="text-sm text-gray-600 mb-1">经度</div>
+                    <div class="text-lg font-semibold text-blue-600" id="currentLng">0.000000</div>
+                </div>
+                <div class="bg-blue-50 rounded-lg p-4">
+                    <div class="text-sm text-gray-600 mb-1">纬度</div>
+                    <div class="text-lg font-semibold text-blue-600" id="currentLat">0.000000</div>
+                </div>
+                <div class="bg-green-50 rounded-lg p-4">
+                    <div class="text-sm text-gray-600 mb-1">精度</div>
+                    <div class="text-lg font-semibold text-green-600" id="currentAccuracy">0m</div>
+                </div>
+                <div class="bg-purple-50 rounded-lg p-4">
+                    <div class="text-sm text-gray-600 mb-1">状态</div>
+                    <div class="text-lg font-semibold text-purple-600" id="gpsStatus">等待定位</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 坐标输入 -->
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <i data-lucide="edit-3" class="w-5 h-5 mr-2 text-green-600"></i>
+                添加顶点坐标
+            </h2>
+            
+            <div class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">经度</label>
+                        <input type="number" id="inputLng" step="0.000001" placeholder="请输入经度" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">纬度</label>
+                        <input type="number" id="inputLat" step="0.000001" placeholder="请输入纬度" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                    </div>
+                </div>
+                
+                <div class="flex space-x-3">
+                    <button onclick="addManualPoint()" class="flex-1 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center">
+                        <i data-lucide="plus" class="w-4 h-4 mr-2"></i>
+                        手动添加
+                    </button>
+                    <button onclick="addGPSPoint()" class="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center">
+                        <i data-lucide="crosshair" class="w-4 h-4 mr-2"></i>
+                        GPS定位
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 顶点列表 -->
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <i data-lucide="list" class="w-5 h-5 mr-2 text-green-600"></i>
+                顶点坐标列表
+            </h2>
+            
+            <div id="pointsList" class="space-y-2 max-h-64 overflow-y-auto">
+                <div class="text-gray-500 text-center py-4">暂无顶点坐标</div>
+            </div>
+        </div>
+
+        <!-- 面积计算结果 -->
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <i data-lucide="calculator" class="w-5 h-5 mr-2 text-orange-600"></i>
+                面积计算结果
+            </h2>
+            
+            <div class="grid grid-cols-3 gap-4 mb-4">
+                <div class="bg-orange-50 rounded-lg p-4 text-center">
+                    <div class="text-2xl font-bold text-orange-600" id="areaM2">0.00</div>
+                    <div class="text-sm text-gray-600">平方米 (m²)</div>
+                </div>
+                <div class="bg-yellow-50 rounded-lg p-4 text-center">
+                    <div class="text-2xl font-bold text-yellow-600" id="areaHa">0.00</div>
+                    <div class="text-sm text-gray-600">公顷 (ha)</div>
+                </div>
+                <div class="bg-green-50 rounded-lg p-4 text-center">
+                    <div class="text-2xl font-bold text-green-600" id="areaMu">0.00</div>
+                    <div class="text-sm text-gray-600">亩</div>
+                </div>
+            </div>
+
+            <button onclick="calculateArea()" class="w-full bg-orange-600 text-white py-2 px-4 rounded-lg hover:bg-orange-700 transition-colors flex items-center justify-center">
+                <i data-lucide="calculator" class="w-4 h-4 mr-2"></i>
+                计算面积
+            </button>
+        </div>
+
+        <!-- 可视化预览 -->
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <i data-lucide="eye" class="w-5 h-5 mr-2 text-purple-600"></i>
+                可视化预览
+            </h2>
+            
+            <div class="bg-gray-100 rounded-lg p-4" style="height: 300px;">
+                <canvas id="previewCanvas" width="400" height="300" class="w-full h-full"></canvas>
+            </div>
+        </div>
+
+        <!-- 操作按钮 -->
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <div class="grid grid-cols-2 gap-3">
+                <button onclick="clearAll()" class="bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center">
+                    <i data-lucide="trash-2" class="w-4 h-4 mr-2"></i>
+                    清空数据
+                </button>
+                <button onclick="exportData()" class="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center">
+                    <i data-lucide="download" class="w-4 h-4 mr-2"></i>
+                    导出数据
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 初始化Lucide图标
+        lucide.createIcons();
+
+        // 顶点坐标数组
+        let points = [];
+
+        // 当前位置
+        let currentPosition = {
+            lng: 0,
+            lat: 0,
+            accuracy: 0
+        };
+
+        // 位置监听器
+        let watchId = null;
+
+        // 初始化GPS定位
+        function initGPS() {
+            if (navigator.geolocation) {
+                watchId = navigator.geolocation.watchPosition(
+                    function(position) {
+                        currentPosition.lng = position.coords.longitude;
+                        currentPosition.lat = position.coords.latitude;
+                        currentPosition.accuracy = position.coords.accuracy;
+                        
+                        document.getElementById('currentLng').textContent = currentPosition.lng.toFixed(6);
+                        document.getElementById('currentLat').textContent = currentPosition.lat.toFixed(6);
+                        document.getElementById('currentAccuracy').textContent = Math.round(currentPosition.accuracy) + 'm';
+                        document.getElementById('gpsStatus').textContent = '定位成功';
+                        document.getElementById('gpsStatus').className = 'text-lg font-semibold text-green-600';
+                    },
+                    function(error) {
+                        document.getElementById('gpsStatus').textContent = '定位失败';
+                        document.getElementById('gpsStatus').className = 'text-lg font-semibold text-red-600';
+                        console.error('GPS定位失败:', error);
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 5000,
+                        maximumAge: 0
+                    }
+                );
+            } else {
+                document.getElementById('gpsStatus').textContent = '不支持GPS';
+                document.getElementById('gpsStatus').className = 'text-lg font-semibold text-gray-600';
+            }
+        }
+
+        // 手动添加坐标点
+        function addManualPoint() {
+            const lng = parseFloat(document.getElementById('inputLng').value);
+            const lat = parseFloat(document.getElementById('inputLat').value);
+            
+            if (isNaN(lng) || isNaN(lat)) {
+                showToast('请输入有效的经纬度坐标', 'error');
+                return;
+            }
+            
+            if (lng < -180 || lng > 180 || lat < -90 || lat > 90) {
+                showToast('坐标超出有效范围', 'error');
+                return;
+            }
+            
+            addPoint(lng, lat, '手动输入');
+            
+            // 清空输入框
+            document.getElementById('inputLng').value = '';
+            document.getElementById('inputLat').value = '';
+        }
+
+        // GPS定位添加坐标点
+        function addGPSPoint() {
+            if (currentPosition.lng === 0 && currentPosition.lat === 0) {
+                showToast('GPS定位失败，无法获取当前位置', 'error');
+                return;
+            }
+            
+            addPoint(currentPosition.lng, currentPosition.lat, 'GPS定位');
+        }
+
+        // 添加坐标点
+        function addPoint(lng, lat, source) {
+            const point = {
+                id: Date.now(),
+                lng: lng,
+                lat: lat,
+                source: source,
+                time: new Date().toLocaleString('zh-CN')
+            };
+            
+            points.push(point);
+            updatePointsList();
+            updatePreview();
+            
+            showToast(`已添加顶点 ${points.length}`, 'success');
+        }
+
+        // 删除坐标点
+        function deletePoint(id) {
+            points = points.filter(p => p.id !== id);
+            updatePointsList();
+            updatePreview();
+            calculateArea(); // 重新计算面积
+            
+            showToast('已删除顶点', 'success');
+        }
+
+        // 更新顶点列表显示
+        function updatePointsList() {
+            const listContainer = document.getElementById('pointsList');
+            
+            if (points.length === 0) {
+                listContainer.innerHTML = '<div class="text-gray-500 text-center py-4">暂无顶点坐标</div>';
+                return;
+            }
+            
+            listContainer.innerHTML = points.map((point, index) => `
+                <div class="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                    <div class="flex justify-between items-start">
+                        <div class="flex-1">
+                            <div class="font-medium text-gray-900 mb-1">
+                                顶点 ${index + 1} (${point.source})
+                            </div>
+                            <div class="text-sm text-gray-600">
+                                经度: ${point.lng.toFixed(6)}<br>
+                                纬度: ${point.lat.toFixed(6)}<br>
+                                时间: ${point.time}
+                            </div>
+                        </div>
+                        <button onclick="deletePoint(${point.id})" 
+                                class="ml-2 text-red-600 hover:text-red-800 transition-colors">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+            
+            // 重新初始化图标
+            lucide.createIcons();
+        }
+
+        // 计算多边形面积（使用Shoelace公式）
+        function calculateArea() {
+            if (points.length < 3) {
+                showToast('至少需要3个顶点才能计算面积', 'error');
+                return;
+            }
+            
+            // 将经纬度转换为平面坐标（简化处理，使用墨卡托投影近似）
+            const projectedPoints = points.map(p => {
+                const x = p.lng * 111320 * Math.cos(p.lat * Math.PI / 180);
+                const y = p.lat * 110540;
+                return { x, y };
+            });
+            
+            // 使用Shoelace公式计算面积
+            let area = 0;
+            const n = projectedPoints.length;
+            
+            for (let i = 0; i < n; i++) {
+                const j = (i + 1) % n;
+                area += projectedPoints[i].x * projectedPoints[j].y;
+                area -= projectedPoints[j].x * projectedPoints[i].y;
+            }
+            
+            area = Math.abs(area) / 2; // 平方米
+            
+            // 更新显示
+            document.getElementById('areaM2').textContent = area.toFixed(2);
+            document.getElementById('areaHa').textContent = (area / 10000).toFixed(4);
+            document.getElementById('areaMu').textContent = (area / 666.67).toFixed(4);
+            
+            showToast('面积计算完成', 'success');
+        }
+
+        // 更新可视化预览
+        function updatePreview() {
+            const canvas = document.getElementById('previewCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            // 清空画布
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            if (points.length === 0) {
+                ctx.fillStyle = '#9CA3AF';
+                ctx.font = '14px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('暂无数据', canvas.width / 2, canvas.height / 2);
+                return;
+            }
+            
+            // 计算边界
+            const lngs = points.map(p => p.lng);
+            const lats = points.map(p => p.lat);
+            const minLng = Math.min(...lngs);
+            const maxLng = Math.max(...lngs);
+            const minLat = Math.min(...lats);
+            const maxLat = Math.max(...lats);
+            
+            const padding = 20;
+            const width = canvas.width - 2 * padding;
+            const height = canvas.height - 2 * padding;
+            
+            // 坐标转换函数
+            const transform = (lng, lat) => {
+                const x = padding + ((lng - minLng) / (maxLng - minLng || 1)) * width;
+                const y = padding + (1 - (lat - minLat) / (maxLat - minLat || 1)) * height;
+                return { x, y };
+            };
+            
+            // 绘制多边形
+            if (points.length >= 3) {
+                ctx.fillStyle = 'rgba(34, 197, 94, 0.2)';
+                ctx.strokeStyle = '#22C55E';
+                ctx.lineWidth = 2;
+                
+                ctx.beginPath();
+                const firstPoint = transform(points[0].lng, points[0].lat);
+                ctx.moveTo(firstPoint.x, firstPoint.y);
+                
+                for (let i = 1; i < points.length; i++) {
+                    const point = transform(points[i].lng, points[i].lat);
+                    ctx.lineTo(point.x, point.y);
+                }
+                
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+            }
+            
+            // 绘制顶点
+            points.forEach((point, index) => {
+                const { x, y } = transform(point.lng, point.lat);
+                
+                // 绘制点
+                ctx.fillStyle = '#3B82F6';
+                ctx.beginPath();
+                ctx.arc(x, y, 5, 0, 2 * Math.PI);
+                ctx.fill();
+                
+                // 绘制编号
+                ctx.fillStyle = '#1F2937';
+                ctx.font = '12px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(index + 1, x, y - 10);
+            });
+        }
+
+        // 清空所有数据
+        function clearAll() {
+            if (points.length === 0) {
+                showToast('暂无数据可清空', 'error');
+                return;
+            }
+            
+            if (confirm('确定要清空所有数据吗？')) {
+                points = [];
+                updatePointsList();
+                updatePreview();
+                
+                // 重置面积显示
+                document.getElementById('areaM2').textContent = '0.00';
+                document.getElementById('areaHa').textContent = '0.00';
+                document.getElementById('areaMu').textContent = '0.00';
+                
+                showToast('已清空所有数据', 'success');
+            }
+        }
+
+        // 导出数据
+        function exportData() {
+            if (points.length === 0) {
+                showToast('暂无数据可导出', 'error');
+                return;
+            }
+            
+            const data = {
+                exportTime: new Date().toLocaleString('zh-CN'),
+                points: points,
+                area: {
+                    m2: parseFloat(document.getElementById('areaM2').textContent),
+                    ha: parseFloat(document.getElementById('areaHa').textContent),
+                    mu: parseFloat(document.getElementById('areaMu').textContent)
+                }
+            };
+            
+            const jsonStr = JSON.stringify(data, null, 2);
+            const blob = new Blob([jsonStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `土地面积测量_${new Date().toLocaleDateString('zh-CN')}.json`;
+            link.click();
+            
+            URL.revokeObjectURL(url);
+            showToast('数据导出成功', 'success');
+        }
+
+        // 显示提示
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            const bgColor = type === 'success' ? 'bg-green-600' : type === 'error' ? 'bg-red-600' : 'bg-blue-600';
+            toast.className = `fixed top-4 right-4 ${bgColor} text-white px-4 py-2 rounded-lg shadow-lg z-50`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                document.body.removeChild(toast);
+            }, 2000);
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            initGPS();
+            updatePreview();
+        });
+
+        // 清理GPS监听器
+        window.addEventListener('beforeunload', function() {
+            if (watchId !== null) {
+                navigator.geolocation.clearWatch(watchId);
+            }
+        });
+    </script>
+</body>
+</html>
