@@ -142,12 +142,20 @@ export default function ImageQuantitativeAnalysis(props) {
     // 创建颜色掩码
     const mask = new Uint8ClampedArray(width * height);
     for (let i = 0; i < data.length; i += 4) {
-      const [h, s, v] = rgbToHsv(data[i], data[i + 1], data[i + 2]);
+      const r = data[i];
+      const g = data[i + 1];
+      const b = data[i + 2];
+      const [h, s, v] = rgbToHsv(r, g, b);
       const idx = i / 4;
 
-      // 改进的颜色检测：包含绿色和黄色范围
-      if (h >= hsvLow && h <= hsvHigh && s > 30 && v > 50 || h >= 10 && h <= 25 && s > 40 && v > 60) {
-        // 黄色范围
+      // 改进的颜色检测：
+      // 1. 绿色和黄色范围（叶片等）
+      // 2. 低亮度检测（黑色/深色对象）
+      // 3. 高对比度边缘检测
+      const isGreenYellow = h >= hsvLow && h <= hsvHigh && s > 30 && v > 50 || h >= 10 && h <= 25 && s > 40 && v > 60;
+      const isDark = v < 50 && s < 100; // 黑色/深色对象
+      const isHighContrast = (r < 50 || g < 50 || b < 50) && Math.max(r, g, b) - Math.min(r, g, b) > 30;
+      if (isGreenYellow || isDark || isHighContrast) {
         mask[idx] = 255;
       }
     }
@@ -258,7 +266,7 @@ export default function ImageQuantitativeAnalysis(props) {
     return object;
   };
 
-  // 计算OBB（有向包围框）
+  // 修正的OBB计算算法
   const calculateOBB = object => {
     const points = object.points;
     const n = points.length;
@@ -288,16 +296,21 @@ export default function ImageQuantitativeAnalysis(props) {
     // 计算主方向角度
     const angle = 0.5 * Math.atan2(2 * cxy, cxx - cyy);
 
-    // 旋转点并计算包围框
+    // 旋转所有点到主方向坐标系
     const cos = Math.cos(angle);
     const sin = Math.sin(angle);
+    const rotatedPoints = points.map(([x, y]) => {
+      const rx = cos * (x - cx) - sin * (y - cy);
+      const ry = sin * (x - cx) + cos * (y - cy);
+      return [rx, ry];
+    });
+
+    // 在旋转坐标系中计算AABB
     let minX = Infinity,
       maxX = -Infinity;
     let minY = Infinity,
       maxY = -Infinity;
-    points.forEach(([x, y]) => {
-      const rx = cos * (x - cx) - sin * (y - cy);
-      const ry = sin * (x - cx) + cos * (y - cy);
+    rotatedPoints.forEach(([rx, ry]) => {
       minX = Math.min(minX, rx);
       maxX = Math.max(maxX, rx);
       minY = Math.min(minY, ry);
@@ -306,11 +319,12 @@ export default function ImageQuantitativeAnalysis(props) {
     const width = maxX - minX;
     const height = maxY - minY;
 
-    // 计算OBB的四个角点
-    const corners = [[-width / 2, -height / 2], [width / 2, -height / 2], [width / 2, height / 2], [-width / 2, height / 2]].map(([x, y]) => {
-      const rx = cos * x - sin * y + cx;
-      const ry = sin * x + cos * y + cy;
-      return [rx, ry];
+    // 计算OBB的四个角点（在原始坐标系中）
+    const corners = [[minX, minY], [maxX, minY], [maxX, maxY], [minX, maxY]].map(([rx, ry]) => {
+      // 旋转回原始坐标系
+      const x = cos * rx + sin * ry + cx;
+      const y = -sin * rx + cos * ry + cy;
+      return [x, y];
     });
     return {
       corners,
