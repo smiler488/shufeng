@@ -23,7 +23,7 @@ export default function AgriWeather(props) {
     name: null
   });
 
-  // 选点方式标签页
+  // 选点方式标签页 - 修改为三种方式
   const [activeLocationTab, setActiveLocationTab] = useState('manual');
 
   // 手动输入坐标 - 确保初始值不为null
@@ -63,7 +63,10 @@ export default function AgriWeather(props) {
   // 初始化
   useEffect(() => {
     initializeDates();
-    initializeMap();
+    // 延迟初始化地图，确保DOM已加载
+    setTimeout(() => {
+      initializeMap();
+    }, 500);
     getCurrentLocation();
   }, []);
 
@@ -77,35 +80,153 @@ export default function AgriWeather(props) {
     });
   };
 
-  // 初始化地图
+  // 初始化地图 - 增强地图加载逻辑
   const initializeMap = () => {
-    if (typeof window !== 'undefined' && window.L) {
+    // 检查Leaflet是否已加载
+    if (typeof window === 'undefined' || !window.L) {
+      console.error('Leaflet未加载');
+      return;
+    }
+
+    // 检查地图容器是否存在
+    if (!mapRef.current) {
+      console.error('地图容器不存在');
+      return;
+    }
+
+    // 如果地图已存在，先销毁
+    if (mapInstanceRef.current) {
+      mapInstanceRef.current.remove();
+      mapInstanceRef.current = null;
+    }
+    try {
+      // 创建地图实例
+      const map = window.L.map(mapRef.current, {
+        center: [39.9042, 116.4074],
+        zoom: 5,
+        zoomControl: true
+      });
+
+      // 添加地图图层
+      window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors',
+        maxZoom: 18
+      }).addTo(map);
+
+      // 添加点击事件
+      map.on('click', handleMapClick);
+
+      // 保存地图实例
+      mapInstanceRef.current = map;
+
+      // 强制刷新地图
       setTimeout(() => {
-        if (!mapInstanceRef.current && mapRef.current) {
-          const map = window.L.map(mapRef.current).setView([39.9042, 116.4074], 5);
-          window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors'
-          }).addTo(map);
-          map.on('click', handleMapClick);
-          mapInstanceRef.current = map;
-        }
+        map.invalidateSize();
       }, 100);
+      console.log('地图初始化成功');
+    } catch (error) {
+      console.error('地图初始化失败:', error);
     }
   };
 
   // 处理地图点击
   const handleMapClick = e => {
+    if (!mapInstanceRef.current) return;
+
+    // 移除之前的标记
     if (markerRef.current) {
       mapInstanceRef.current.removeLayer(markerRef.current);
     }
+
+    // 添加新标记
     const marker = window.L.marker([e.latlng.lat, e.latlng.lng]).addTo(mapInstanceRef.current);
     markerRef.current = marker;
+
+    // 更新选中位置
     const newLocation = {
       lat: e.latlng.lat,
       lng: e.latlng.lng,
       name: '地图选择'
     };
     setSelectedLocation(newLocation);
+    toast({
+      title: '位置已选择',
+      description: `纬度: ${e.latlng.lat.toFixed(6)}, 经度: ${e.latlng.lng.toFixed(6)}`,
+      duration: 2000
+    });
+  };
+
+  // 搜索位置
+  const searchLocation = async () => {
+    if (!searchQuery || !searchQuery.trim()) {
+      toast({
+        title: '请输入搜索关键词',
+        description: '输入地名、地址或坐标',
+        duration: 3000
+      });
+      return;
+    }
+    setIsSearching(true);
+    try {
+      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&limit=5&addressdetails=1`);
+      const data = await response.json();
+      setSearchResults(data || []);
+      if (data && data.length === 0) {
+        toast({
+          title: '未找到结果',
+          description: '请尝试其他搜索关键词',
+          duration: 3000
+        });
+      }
+    } catch (error) {
+      console.error('搜索失败:', error);
+      toast({
+        title: '搜索失败',
+        description: '请检查网络连接后重试',
+        duration: 3000
+      });
+      setSearchResults([]);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  // 选择搜索结果并定位地图
+  const selectSearchResult = place => {
+    if (!place || !mapInstanceRef.current) return;
+    const lat = parseFloat(place.lat || '0');
+    const lng = parseFloat(place.lon || '0');
+    const name = place.display_name && place.display_name.split(',')[0] || '未知地点';
+    if (isNaN(lat) || isNaN(lng) || lat === 0 || lng === 0) {
+      toast({
+        title: '位置信息无效',
+        description: '请选择其他搜索结果',
+        duration: 3000
+      });
+      return;
+    }
+
+    // 移除之前的标记
+    if (markerRef.current) {
+      mapInstanceRef.current.removeLayer(markerRef.current);
+    }
+
+    // 添加临时标记
+    const marker = window.L.marker([lat, lng]).addTo(mapInstanceRef.current);
+    markerRef.current = marker;
+
+    // 定位地图到该位置
+    mapInstanceRef.current.setView([lat, lng], 12);
+
+    // 更新搜索结果，只显示选中的
+    setSearchResults([place]);
+
+    // 暂时不更新selectedLocation，等待用户在地图上精确选择
+    toast({
+      title: '已定位到搜索区域',
+      description: `${name} - 请在地图上点击选择精确位置`,
+      duration: 3000
+    });
   };
 
   // 获取当前位置
@@ -122,49 +243,40 @@ export default function AgriWeather(props) {
         };
         setSelectedLocation(newLocation);
         setGpsStatus(`${lat.toFixed(6)}, ${lng.toFixed(6)}`);
+
+        // 如果地图已加载，定位到当前位置
+        if (mapInstanceRef.current) {
+          mapInstanceRef.current.setView([lat, lng], 12);
+
+          // 移除之前的标记
+          if (markerRef.current) {
+            mapInstanceRef.current.removeLayer(markerRef.current);
+          }
+
+          // 添加当前位置标记
+          const marker = window.L.marker([lat, lng]).addTo(mapInstanceRef.current);
+          markerRef.current = marker;
+        }
       }, error => {
         setGpsStatus('定位失败');
         console.error('GPS定位失败:', error);
+        toast({
+          title: '定位失败',
+          description: '请检查定位权限或手动输入坐标',
+          duration: 3000
+        });
       }, {
         enableHighAccuracy: true,
         timeout: 10000
       });
     } else {
       setGpsStatus('不支持GPS定位');
-    }
-  };
-
-  // 搜索位置
-  const searchLocation = async () => {
-    if (!searchQuery || !searchQuery.trim()) return;
-    setIsSearching(true);
-    try {
-      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&limit=5`);
-      const data = await response.json();
-      setSearchResults(data || []);
-    } catch (error) {
-      console.error('搜索失败:', error);
       toast({
-        title: '搜索失败',
-        description: '请重试',
+        title: '不支持定位',
+        description: '请使用手动输入或地图选点',
         duration: 3000
       });
-      setSearchResults([]);
-    } finally {
-      setIsSearching(false);
     }
-  };
-
-  // 选择搜索结果
-  const selectSearchResult = place => {
-    if (!place) return;
-    const newLocation = {
-      lat: parseFloat(place.lat || '0'),
-      lng: parseFloat(place.lon || '0'),
-      name: place.display_name && place.display_name.split(',')[0] || '未知地点'
-    };
-    setSelectedLocation(newLocation);
-    setSearchResults([place]); // 只显示选中的结果
   };
 
   // 手动输入坐标变化 - 添加安全检查
@@ -204,6 +316,20 @@ export default function AgriWeather(props) {
             lng,
             name: '手动输入'
           });
+
+          // 如果地图已加载，定位到该位置
+          if (mapInstanceRef.current) {
+            mapInstanceRef.current.setView([lat, lng], 12);
+
+            // 移除之前的标记
+            if (markerRef.current) {
+              mapInstanceRef.current.removeLayer(markerRef.current);
+            }
+
+            // 添加新标记
+            const marker = window.L.marker([lat, lng]).addTo(mapInstanceRef.current);
+            markerRef.current = marker;
+          }
         }
         return currentCoords;
       });
@@ -502,7 +628,7 @@ export default function AgriWeather(props) {
             位置选择
           </h2>
           
-          {/* 选点方式标签页 */}
+          {/* 选点方式标签页 - 修改为三种方式 */}
           <div className="border-b border-gray-200 dark:border-gray-700 mb-4">
             <nav className="-mb-px flex space-x-8">
               {[{
@@ -511,9 +637,6 @@ export default function AgriWeather(props) {
             }, {
               id: 'map',
               label: '地图选点'
-            }, {
-              id: 'search',
-              label: '地名搜索'
             }, {
               id: 'gps',
               label: '当前定位'
@@ -539,28 +662,19 @@ export default function AgriWeather(props) {
               </div>
             </div>}
 
-          {/* 地图选点 */}
-          {activeLocationTab === 'map' && <div>
-              <div ref={mapRef} className="h-64 rounded-lg border border-gray-300 dark:border-gray-600" />
-              <div className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                点击地图选择位置：
-                {selectedLocation && selectedLocation.lat && selectedLocation.lng ? <span className="font-medium text-gray-900 dark:text-white">
-                    {selectedLocation.lat.toFixed(6)}, {selectedLocation.lng.toFixed(6)}
-                  </span> : <span className="font-medium">未选择</span>}
-              </div>
-            </div>}
-
-          {/* 地名搜索 */}
-          {activeLocationTab === 'search' && <div className="space-y-4">
+          {/* 地图选点 - 合并搜索和地图功能 */}
+          {activeLocationTab === 'map' && <div className="space-y-4">
+              {/* 搜索区域 */}
               <div className="flex space-x-2">
-                <input type="text" value={searchQuery && searchQuery || ''} onChange={e => setSearchQuery(e.target.value)} onKeyPress={e => e.key === 'Enter' && searchLocation()} placeholder="输入地名，如：北京、上海、广州" className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white" />
+                <input type="text" value={searchQuery && searchQuery || ''} onChange={e => setSearchQuery(e.target.value)} onKeyPress={e => e.key === 'Enter' && searchLocation()} placeholder="输入地名、地址或坐标进行搜索" className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white" />
                 <button onClick={searchLocation} disabled={isSearching} className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center">
                   <Search className="w-4 h-4 mr-2" />
-                  搜索
+                  {isSearching ? '搜索中...' : '搜索'}
                 </button>
               </div>
               
-              {searchResults && searchResults.length > 0 && <div className="space-y-2">
+              {/* 搜索结果 */}
+              {searchResults && searchResults.length > 0 && <div className="max-h-32 overflow-y-auto space-y-2">
                   {searchResults.map((place, index) => <div key={index} onClick={() => selectSearchResult(place)} className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
                       <div className="font-medium text-gray-900 dark:text-white">
                         {place && place.display_name && place.display_name.split(',')[0] || '未知地点'}
@@ -570,6 +684,17 @@ export default function AgriWeather(props) {
                       </div>
                     </div>)}
                 </div>}
+
+              {/* 地图容器 */}
+              <div>
+                <div className="mb-2 text-sm text-gray-600 dark:text-gray-400">
+                  点击地图选择精确位置
+                  {selectedLocation && selectedLocation.lat && selectedLocation.lng && <span className="ml-2 font-medium text-gray-900 dark:text-white">
+                      当前选择: {selectedLocation.lat.toFixed(6)}, {selectedLocation.lng.toFixed(6)}
+                    </span>}
+                </div>
+                <div ref={mapRef} className="h-80 rounded-lg border border-gray-300 dark:border-gray-600" />
+              </div>
             </div>}
 
           {/* 当前定位 */}
