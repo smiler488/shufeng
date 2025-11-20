@@ -1,7 +1,7 @@
 // @ts-ignore;
 import React, { useState, useEffect, useRef } from 'react';
 // @ts-ignore;
-import { Compass, Activity, Clock, Edit3, Save, Download, Database, MapPin, Sun } from 'lucide-react';
+import { Compass, Activity, Clock, Edit3, Save, Download, Database, MapPin, Sun, RotateCcw } from 'lucide-react';
 // @ts-ignore;
 import { useToast, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui';
 
@@ -45,6 +45,9 @@ export default function LeafAngle(props) {
 
   // 样品数量
   const [sampleQuantity, setSampleQuantity] = useState(1);
+
+  // 当前记录编号
+  const [currentRecordNumber, setCurrentRecordNumber] = useState(1);
 
   // 记录列表
   const [records, setRecords] = useState([]);
@@ -248,6 +251,16 @@ export default function LeafAngle(props) {
     }
   };
 
+  // 重置记录
+  const handleReset = () => {
+    setCurrentRecordNumber(1);
+    toast({
+      title: '重置成功',
+      description: '记录编号已重置为1',
+      duration: 2000
+    });
+  };
+
   // 记录数据
   const handleRecordData = () => {
     if (!sampleName.trim()) {
@@ -258,40 +271,52 @@ export default function LeafAngle(props) {
       });
       return;
     }
-    const baseSampleName = sampleName.trim();
-    const newRecords = [];
-
-    // 根据样品数量生成多条记录
-    for (let i = 1; i <= sampleQuantity; i++) {
-      const recordSampleName = sampleQuantity > 1 ? `${baseSampleName}-${i}` : baseSampleName;
-      const newRecord = {
-        id: Date.now() + i,
-        // 确保ID唯一
-        sampleName: recordSampleName,
-        baseName: baseSampleName,
-        number: i,
-        date: currentDateTime.date,
-        time: currentDateTime.time,
-        alpha: sensorData.alpha.toFixed(2),
-        beta: sensorData.beta.toFixed(2),
-        gamma: sensorData.gamma.toFixed(2),
-        solarElevation: solarPosition.elevation.toFixed(2),
-        solarAzimuth: solarPosition.azimuth.toFixed(2),
-        latitude: sensorData.latitude.toFixed(6),
-        longitude: sensorData.longitude.toFixed(6),
-        altitude: Math.round(sensorData.altitude)
-      };
-      newRecords.push(newRecord);
+    if (currentRecordNumber > sampleQuantity) {
+      toast({
+        title: '记录完成',
+        description: `已完成所有 ${sampleQuantity} 个样品的记录`,
+        duration: 3000
+      });
+      return;
     }
-    setRecords(prev => [...newRecords, ...prev]);
-    setSampleName('');
-    setSampleQuantity(1); // 重置为1
+    const baseSampleName = sampleName.trim();
+    const recordSampleName = sampleQuantity > 1 ? `${baseSampleName}-${currentRecordNumber}` : baseSampleName;
+    const newRecord = {
+      id: Date.now(),
+      sampleName: recordSampleName,
+      baseName: baseSampleName,
+      number: currentRecordNumber,
+      date: currentDateTime.date,
+      time: currentDateTime.time,
+      alpha: sensorData.alpha.toFixed(2),
+      beta: sensorData.beta.toFixed(2),
+      gamma: sensorData.gamma.toFixed(2),
+      solarElevation: solarPosition.elevation.toFixed(2),
+      solarAzimuth: solarPosition.azimuth.toFixed(2),
+      latitude: sensorData.latitude.toFixed(6),
+      longitude: sensorData.longitude.toFixed(6),
+      altitude: Math.round(sensorData.altitude)
+    };
+    setRecords(prev => [newRecord, ...prev]);
 
+    // 自动递增编号
+    setCurrentRecordNumber(prev => prev + 1);
     toast({
       title: '记录成功',
-      description: `已成功记录 ${sampleQuantity} 个样品的数据`,
+      description: `已记录 ${recordSampleName} (${currentRecordNumber}/${sampleQuantity})`,
       duration: 2000
     });
+
+    // 如果完成了所有记录，显示完成提示
+    if (currentRecordNumber >= sampleQuantity) {
+      setTimeout(() => {
+        toast({
+          title: '测量完成',
+          description: `已完成所有 ${sampleQuantity} 个样品的测量`,
+          duration: 3000
+        });
+      }, 1000);
+    }
   };
 
   // 下载CSV
@@ -326,6 +351,11 @@ export default function LeafAngle(props) {
       duration: 2000
     });
   };
+
+  // 当样品数量改变时重置当前记录编号
+  useEffect(() => {
+    setCurrentRecordNumber(1);
+  }, [sampleQuantity]);
 
   // 生成样品数量选项
   const quantityOptions = Array.from({
@@ -481,18 +511,32 @@ export default function LeafAngle(props) {
               </Select>
             </div>
 
+            {/* 当前记录状态 */}
             <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3">
-              <div className="text-sm text-blue-800 dark:text-blue-200">
-                {sampleQuantity > 1 ? `将创建 ${sampleQuantity} 条记录：${sampleName.trim() || '样品名称'}-1 到 ${sampleName.trim() || '样品名称'}-${sampleQuantity}` : '将创建 1 条记录'}
+              <div className="flex justify-between items-center">
+                <div className="text-sm text-blue-800 dark:text-blue-200">
+                  当前记录: <span className="font-semibold">{sampleName.trim() || '样品名称'}-{currentRecordNumber}</span>
+                </div>
+                <div className="text-sm text-blue-600 dark:text-blue-300">
+                  进度: {currentRecordNumber} / {sampleQuantity}
+                </div>
               </div>
+              {currentRecordNumber > sampleQuantity && <div className="text-sm text-red-600 dark:text-red-400 mt-1">
+                  已完成所有样品记录
+                </div>}
             </div>
 
-            <div className="flex space-x-3">
-              <button onClick={handleRecordData} className="flex-1 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center">
+            {/* 操作按钮 */}
+            <div className="grid grid-cols-3 gap-3">
+              <button onClick={handleRecordData} disabled={currentRecordNumber > sampleQuantity} className={`py-2 px-4 rounded-lg transition-colors flex items-center justify-center ${currentRecordNumber > sampleQuantity ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-green-600 text-white hover:bg-green-700'}`}>
                 <Save className="w-4 h-4 mr-2" />
                 记录数据
               </button>
-              <button onClick={handleDownloadCSV} className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center">
+              <button onClick={handleReset} className="bg-orange-600 text-white py-2 px-4 rounded-lg hover:bg-orange-700 transition-colors flex items-center justify-center">
+                <RotateCcw className="w-4 h-4 mr-2" />
+                重置编号
+              </button>
+              <button onClick={handleDownloadCSV} className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center">
                 <Download className="w-4 h-4 mr-2" />
                 下载CSV
               </button>
