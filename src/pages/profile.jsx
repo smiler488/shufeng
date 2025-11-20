@@ -312,17 +312,17 @@ export default function Profile(props) {
                     <Mail className="w-4 h-4" />
                     <span></span>
                   </button>
-                  <button onClick={() => {
-                  navigator.clipboard.writeText(contactInfo.email).then(() => {
-                    toast({
-                      title: '邮箱已复制',
-                      description: '邮箱地址已复制到剪贴板',
-                      duration: 3000 });
+                  
 
-                  });
-                }} className="bg-gray-600 text-white hover:bg-gray-700 px-3 py-2 rounded-lg font-medium transition-colors">
-                    <Mail className="w-4 h-4" />
-                  </button>
+
+
+
+
+
+
+
+
+
                 </div>
               </div>
             </div>
