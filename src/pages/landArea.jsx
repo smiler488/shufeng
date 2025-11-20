@@ -426,25 +426,25 @@ export default function LandArea(props) {
             <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
               <div className="text-sm text-gray-600 dark:text-gray-300 mb-1">经度</div>
               <div className="text-lg font-semibold text-blue-600">
-                {(currentPosition || {}).lng?.toFixed(6) || '0.000000'}
+                {currentPosition && currentPosition.lng ? currentPosition.lng.toFixed(6) : '0.000000'}
               </div>
             </div>
             <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
               <div className="text-sm text-gray-600 dark:text-gray-300 mb-1">纬度</div>
               <div className="text-lg font-semibold text-blue-600">
-                {(currentPosition || {}).lat?.toFixed(6) || '0.000000'}
+                {currentPosition && currentPosition.lat ? currentPosition.lat.toFixed(6) : '0.000000'}
               </div>
             </div>
             <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-4">
               <div className="text-sm text-gray-600 dark:text-gray-300 mb-1">精度</div>
               <div className="text-lg font-semibold text-green-600">
-                {Math.round((currentPosition || {}).accuracy || 0)}m
+                {currentPosition && currentPosition.accuracy ? Math.round(currentPosition.accuracy) + 'm' : '0m'}
               </div>
             </div>
             <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4">
               <div className="text-sm text-gray-600 dark:text-gray-300 mb-1">状态</div>
-              <div className={`text-lg font-semibold ${(currentPosition || {}).status === '定位成功' ? 'text-green-600' : (currentPosition || {}).status === '定位失败' ? 'text-red-600' : 'text-gray-600'}`}>
-                {(currentPosition || {}).status || '未知'}
+              <div className={`text-lg font-semibold ${currentPosition && currentPosition.status === '定位成功' ? 'text-green-600' : currentPosition && currentPosition.status === '定位失败' ? 'text-red-600' : 'text-gray-600'}`}>
+                {currentPosition && currentPosition.status ? currentPosition.status : '未知'}
               </div>
             </div>
           </div>
@@ -463,19 +463,41 @@ export default function LandArea(props) {
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   经度
                 </label>
-                <input type="number" value={(inputCoords || {}).lng || ''} onChange={e => setInputCoords(prev => ({
-                ...(prev || {}),
-                lng: e.target.value
-              }))} step="0.000001" placeholder="请输入经度" className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:text-white" />
+                <input type="number" value={inputCoords && inputCoords.lng ? inputCoords.lng : ''} onChange={e => {
+                const newValue = e.target.value;
+                setInputCoords(prev => {
+                  if (!prev) {
+                    return {
+                      lng: newValue,
+                      lat: ''
+                    };
+                  }
+                  return {
+                    ...prev,
+                    lng: newValue
+                  };
+                });
+              }} step="0.000001" placeholder="请输入经度" className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:text-white" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   纬度
                 </label>
-                <input type="number" value={(inputCoords || {}).lat || ''} onChange={e => setInputCoords(prev => ({
-                ...(prev || {}),
-                lat: e.target.value
-              }))} step="0.000001" placeholder="请输入纬度" className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:text-white" />
+                <input type="number" value={inputCoords && inputCoords.lat ? inputCoords.lat : ''} onChange={e => {
+                const newValue = e.target.value;
+                setInputCoords(prev => {
+                  if (!prev) {
+                    return {
+                      lng: '',
+                      lat: newValue
+                    };
+                  }
+                  return {
+                    ...prev,
+                    lat: newValue
+                  };
+                });
+              }} step="0.000001" placeholder="请输入纬度" className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:text-white" />
               </div>
             </div>
             
@@ -500,7 +522,7 @@ export default function LandArea(props) {
           </h2>
           
           <div className="space-y-2 max-h-64 overflow-y-auto">
-            {!(points && points.length > 0) ? <div className="text-gray-500 dark:text-gray-400 text-center py-4">
+            {!points || points.length === 0 ? <div className="text-gray-500 dark:text-gray-400 text-center py-4">
                 暂无顶点坐标
               </div> : points.map((point, index) => <div key={point.id} className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 border border-gray-200 dark:border-gray-600">
                 <div className="flex justify-between items-start">
@@ -532,19 +554,19 @@ export default function LandArea(props) {
           <div className="grid grid-cols-3 gap-4 mb-4">
             <div className="bg-orange-50 dark:bg-orange-900/20 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold text-orange-600">
-                {(areaResult || {}).m2?.toFixed(2) || '0.00'}
+                {areaResult && areaResult.m2 ? areaResult.m2.toFixed(2) : '0.00'}
               </div>
               <div className="text-sm text-gray-600 dark:text-gray-300">平方米 (m²)</div>
             </div>
             <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold text-yellow-600">
-                {(areaResult || {}).ha?.toFixed(4) || '0.0000'}
+                {areaResult && areaResult.ha ? areaResult.ha.toFixed(4) : '0.0000'}
               </div>
               <div className="text-sm text-gray-600 dark:text-gray-300">公顷 (ha)</div>
             </div>
             <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold text-green-600">
-                {(areaResult || {}).mu?.toFixed(4) || '0.0000'}
+                {areaResult && areaResult.mu ? areaResult.mu.toFixed(4) : '0.0000'}
               </div>
               <div className="text-sm text-gray-600 dark:text-gray-300">亩</div>
             </div>
