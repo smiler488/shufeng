@@ -1,7 +1,7 @@
 // @ts-ignore;
 import React, { useState } from 'react';
 // @ts-ignore;
-import { Search, TrendingUp, BarChart3, Calculator, Image, Activity, Star, Clock, Users, ChevronRight, Grid, List } from 'lucide-react';
+import { Search, TrendingUp, BarChart3, Calculator, Image, Activity, Star, ChevronRight, Grid, List } from 'lucide-react';
 // @ts-ignore;
 import { useToast } from '@/components/ui';
 
@@ -31,7 +31,7 @@ export default function Hub(props) {
     }
   };
 
-  // 工具数据 - 只保留实际存在的4个工具
+  // 工具数据 - 移除了estimatedTime和users字段
   const tools = [{
     id: 'leafAngle',
     name: '叶倾角测量',
@@ -39,9 +39,7 @@ export default function Hub(props) {
     category: 'measurement',
     icon: TrendingUp,
     difficulty: '中级',
-    estimatedTime: '10分钟',
     rating: 4.8,
-    users: 1200,
     tags: ['图像处理', '植物学', '测量'],
     color: 'from-green-400 to-green-600'
   }, {
@@ -51,9 +49,7 @@ export default function Hub(props) {
     category: 'measurement',
     icon: Calculator,
     difficulty: '初级',
-    estimatedTime: '5分钟',
     rating: 4.6,
-    users: 850,
     tags: ['GPS', '地图', '面积计算'],
     color: 'from-blue-400 to-blue-600'
   }, {
@@ -63,9 +59,7 @@ export default function Hub(props) {
     category: 'data',
     icon: Activity,
     difficulty: '中级',
-    estimatedTime: '15分钟',
     rating: 4.7,
-    users: 920,
     tags: ['气象', '农业', '数据分析'],
     color: 'from-orange-400 to-orange-600'
   }, {
@@ -75,14 +69,12 @@ export default function Hub(props) {
     category: 'measurement',
     icon: Image,
     difficulty: '高级',
-    estimatedTime: '15分钟',
     rating: 4.9,
-    users: 650,
     tags: ['图像分析', '生物样本', '量化'],
     color: 'from-purple-400 to-purple-600'
   }];
 
-  // 分类数据 - 根据实际工具调整
+  // 分类数据
   const categories = [{
     id: 'all',
     name: '全部工具',
@@ -118,7 +110,7 @@ export default function Hub(props) {
     });
   };
 
-  // 渲染工具卡片
+  // 渲染工具卡片 - 移除了时间和用户信息显示
   const renderToolCard = tool => {
     const Icon = tool.icon;
     return <div key={tool.id} onClick={() => handleToolClick(tool.id)} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer overflow-hidden group">
@@ -150,14 +142,9 @@ export default function Hub(props) {
           
           <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
             <div className="flex items-center space-x-3">
-              <div className="flex items-center space-x-1">
-                <Clock className="w-4 h-4" />
-                <span>{tool.estimatedTime}</span>
-              </div>
-              <div className="flex items-center space-x-1">
-                <Users className="w-4 h-4" />
-                <span>{tool.users}</span>
-              </div>
+              <span className="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 text-xs rounded-full">
+                {tool.difficulty}
+              </span>
             </div>
             <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </div>
@@ -165,7 +152,7 @@ export default function Hub(props) {
       </div>;
   };
 
-  // 渲染列表视图
+  // 渲染列表视图 - 移除了时间和用户信息显示
   const renderListView = tool => {
     const Icon = tool.icon;
     return <div key={tool.id} onClick={() => handleToolClick(tool.id)} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer p-4 group">
@@ -197,14 +184,9 @@ export default function Hub(props) {
               </div>
               
               <div className="flex items-center space-x-3 text-sm text-gray-500 dark:text-gray-400">
-                <div className="flex items-center space-x-1">
-                  <Clock className="w-4 h-4" />
-                  <span>{tool.estimatedTime}</span>
-                </div>
-                <div className="flex items-center space-x-1">
-                  <Users className="w-4 h-4" />
-                  <span>{tool.users}</span>
-                </div>
+                <span className="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 text-xs rounded-full">
+                  {tool.difficulty}
+                </span>
               </div>
             </div>
           </div>
