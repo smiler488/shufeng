@@ -1,62 +1,60 @@
 // @ts-ignore;
 import React, { useState, useEffect } from 'react';
 // @ts-ignore;
-import { User, Settings, HelpCircle, Phone, Mail, MapPin, Navigation, Globe, MessageCircle, ChevronRight, Shield, FileText, Star, LogOut, Award, Building, Camera, Edit2, Save, X, Upload } from 'lucide-react';
-// @ts-ignore;
+import { User, Settings, HelpCircle, Phone, Mail, MapPin, Navigation, Globe, MessageCircle, ChevronRight, Shield, FileText, Star, LogOut, Award, Building, Camera, Edit2, Save, X, Upload } from 'lucide-react'; // @ts-ignore;
 import { useToast } from '@/components/ui';
-
 import { LogoHeader } from '@/components/LogoHeader';
 import { TabBar } from '@/components/TabBar';
 export default function Profile(props) {
   const {
-    $w
-  } = props;
+    $w } =
+  props;
   const {
-    toast
-  } = useToast();
+    toast } =
+  useToast();
   const [activeTab, setActiveTab] = useState('profile');
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   // 用户资料状态
-  const [userProfile, setUserProfile] = useState({
-    avatar: '',
+  // 用户资料状态
+  const [userProfile, setUserProfile] = useState({ avatar: '',
     nickname: '',
     phone: '',
     email: '',
-    bio: ''
-  });
+    bio: '' });
+
 
   // 编辑表单状态
-  const [editForm, setEditForm] = useState({
-    avatar: '',
+  // 编辑表单状态
+  const [editForm, setEditForm] = useState({ avatar: '',
     nickname: '',
     phone: '',
     email: '',
-    bio: ''
-  });
+    bio: '' });
+
   const contactInfo = {
     phone: '400-1866090',
     email: 'info@shu-feng.com.cn',
     website: 'https://www.shu-feng.com.cn/',
     address: '上海市中国(上海)自由贸易试验区临港新片区云汉路979号2楼',
     workHours: '周一至周五 9:00-18:00',
-    emergencySupport: '7×24小时技术支持'
-  };
+    emergencySupport: '7×24小时技术支持' };
+
   const companyInfo = {
     name: '黍峰生物Agent',
     title: '光合&表型解决方案',
     description: '国家高新技术企业，专注于植物光合表型研究领域',
     established: '2020年',
-    certification: '国家高新技术企业认证'
-  };
+    certification: '国家高新技术企业认证' };
+
 
   // 机器人头像选项 - 使用机器人风格的头像
+  // 机器人头像选项 - 使用机器人风格的头像
   const defaultAvatars = ['https://api.dicebear.com/7.x/bottts/svg?seed=robot1&backgroundColor=b6e3f4', 'https://api.dicebear.com/7.x/bottts/svg?seed=robot2&backgroundColor=c0aede', 'https://api.dicebear.com/7.x/bottts/svg?seed=robot3&backgroundColor=d1d4f9', 'https://api.dicebear.com/7.x/bottts/svg?seed=robot4&backgroundColor=ffd5dc', 'https://api.dicebear.com/7.x/bottts/svg?seed=robot5&backgroundColor=ffdfbf', 'https://api.dicebear.com/7.x/bottts/svg?seed=robot6&backgroundColor=69d2e7'];
-
   // 检查登录状态
-  useEffect(() => {
-    checkLoginStatus();
+  // 检查登录状态
+  useEffect(() => {checkLoginStatus();
   }, []);
   const checkLoginStatus = async () => {
     if (!$w.auth.currentUser?.userId) {
@@ -65,12 +63,12 @@ export default function Profile(props) {
     }
 
     // 已登录，加载用户资料
-    await loadUserProfile();
-  };
+    // 已登录，加载用户资料
+    await loadUserProfile();};
 
   // 加载用户资料 - 使用数据源API
-  const loadUserProfile = async () => {
-    try {
+  // 加载用户资料 - 使用数据源API
+  const loadUserProfile = async () => {try {
       const result = await $w.cloud.callDataSource({
         dataSourceName: 'user_profiles',
         methodName: 'wedaGetRecordsV2',
@@ -79,17 +77,17 @@ export default function Profile(props) {
             where: {
               $and: [{
                 userId: {
-                  $eq: $w.auth.currentUser.userId
-                }
-              }]
-            }
-          },
+                  $eq: $w.auth.currentUser.userId } }] } },
+
+
+
+
           select: {
-            $master: true
-          },
-          pageSize: 1
-        }
-      });
+            $master: true },
+
+          pageSize: 1 } });
+
+
       if (result.records && result.records.length > 0) {
         const profile = result.records[0];
         setUserProfile({
@@ -97,15 +95,15 @@ export default function Profile(props) {
           nickname: profile.nickname || $w.auth.currentUser.name || '用户',
           phone: profile.phone || '',
           email: profile.email || '',
-          bio: profile.bio || ''
-        });
+          bio: profile.bio || '' });
+
         setEditForm({
           avatar: profile.avatar || defaultAvatars[0],
           nickname: profile.nickname || $w.auth.currentUser.name || '用户',
           phone: profile.phone || '',
           email: profile.email || '',
-          bio: profile.bio || ''
-        });
+          bio: profile.bio || '' });
+
       } else {
         // 创建默认资料
         const defaultProfile = {
@@ -114,33 +112,33 @@ export default function Profile(props) {
           nickname: $w.auth.currentUser.name || '用户',
           phone: '',
           email: '',
-          bio: ''
-        };
+          bio: '' };
+
         setUserProfile({
           avatar: defaultProfile.avatar,
           nickname: defaultProfile.nickname,
           phone: defaultProfile.phone,
           email: defaultProfile.email,
-          bio: defaultProfile.bio
-        });
+          bio: defaultProfile.bio });
+
         setEditForm(defaultProfile);
 
         // 保存默认资料到数据库
-        await saveUserProfileToDB(defaultProfile);
-      }
+        // 保存默认资料到数据库
+        await saveUserProfileToDB(defaultProfile);}
     } catch (error) {
       console.error('加载用户资料失败:', error);
       toast({
         title: '加载失败',
         description: '无法加载用户资料，请稍后重试',
-        duration: 3000
-      });
+        duration: 3000 });
+
     }
   };
 
   // 保存用户资料到数据库 - 使用数据源API
-  const saveUserProfileToDB = async profile => {
-    try {
+  // 保存用户资料到数据库 - 使用数据源API
+  const saveUserProfileToDB = async (profile) => {try {
       // 先查询是否已存在记录
       const existingResult = await $w.cloud.callDataSource({
         dataSourceName: 'user_profiles',
@@ -150,17 +148,17 @@ export default function Profile(props) {
             where: {
               $and: [{
                 userId: {
-                  $eq: $w.auth.currentUser.userId
-                }
-              }]
-            }
-          },
+                  $eq: $w.auth.currentUser.userId } }] } },
+
+
+
+
           select: {
-            $master: true
-          },
-          pageSize: 1
-        }
-      });
+            $master: true },
+
+          pageSize: 1 } });
+
+
       if (existingResult.records && existingResult.records.length > 0) {
         // 更新现有记录
         const updateResult = await $w.cloud.callDataSource({
@@ -172,19 +170,19 @@ export default function Profile(props) {
               nickname: profile.nickname,
               phone: profile.phone,
               email: profile.email,
-              bio: profile.bio
-            },
+              bio: profile.bio },
+
             filter: {
               where: {
                 $and: [{
                   userId: {
-                    $eq: $w.auth.currentUser.userId
-                  }
-                }]
-              }
-            }
-          }
-        });
+                    $eq: $w.auth.currentUser.userId } }] } } } });
+
+
+
+
+
+
         if (updateResult.count === 0) {
           throw new Error('更新失败，记录不存在');
         }
@@ -200,10 +198,10 @@ export default function Profile(props) {
               nickname: profile.nickname,
               phone: profile.phone,
               email: profile.email,
-              bio: profile.bio
-            }
-          }
-        });
+              bio: profile.bio } } });
+
+
+
         if (!createResult.id) {
           throw new Error('创建失败');
         }
@@ -215,168 +213,168 @@ export default function Profile(props) {
   };
 
   // 微信登录
-  const handleWeChatLogin = async () => {
-    try {
+  // 微信登录
+  const handleWeChatLogin = async () => {try {
       const tcb = await $w.cloud.getCloudInstance();
       tcb.auth().toDefaultLoginPage({
         config_version: "env",
         redirect_uri: window.location.href,
         query: {
-          s_domain: $w.utils.resolveStaticResourceUrl("/").replace(/^https?:\/\//, "").split("/")[0]
-        }
-      });
+          s_domain: $w.utils.resolveStaticResourceUrl("/").replace(/^https?:\/\//, "").split("/")[0] } });
+
+
     } catch (error) {
       console.error('微信登录失败:', error);
       toast({
         title: '登录失败',
         description: '微信登录失败，请稍后重试',
-        duration: 3000
-      });
+        duration: 3000 });
+
     }
   };
 
   // 退出登录
-  const handleLogout = async () => {
-    try {
+  // 退出登录
+  const handleLogout = async () => {try {
       setIsLoading(true);
       const tcb = await $w.cloud.getCloudInstance();
       await tcb.auth().signOut();
       await tcb.auth().signInAnonymously();
       await $w.auth.getUserInfo({
-        force: true
-      });
+        force: true });
+
       toast({
         title: '退出成功',
         description: '您已成功退出登录',
-        duration: 2000
-      });
+        duration: 2000 });
+
 
       // 重置用户资料
-      setUserProfile({
-        avatar: '',
+      // 重置用户资料
+      setUserProfile({ avatar: '',
         nickname: '',
         phone: '',
         email: '',
-        bio: ''
-      });
+        bio: '' });
+
       setEditForm({
         avatar: '',
         nickname: '',
         phone: '',
         email: '',
-        bio: ''
-      });
+        bio: '' });
+
     } catch (error) {
       console.error('退出登录失败:', error);
       toast({
         title: '退出失败',
         description: '退出登录失败，请稍后重试',
-        duration: 3000
-      });
+        duration: 3000 });
+
     } finally {
       setIsLoading(false);
     }
   };
 
   // 开始编辑
-  const handleEdit = () => {
-    setEditForm({
-      ...userProfile
-    });
+  // 开始编辑
+  const handleEdit = () => {setEditForm({
+      ...userProfile });
+
     setIsEditing(true);
   };
 
   // 取消编辑
-  const handleCancel = () => {
-    setEditForm({
-      ...userProfile
-    });
+  // 取消编辑
+  const handleCancel = () => {setEditForm({
+      ...userProfile });
+
     setIsEditing(false);
   };
 
   // 保存编辑
-  const handleSave = async () => {
-    // 验证表单
+  // 保存编辑
+  const handleSave = async () => {// 验证表单
     if (!editForm.nickname.trim()) {
       toast({
         title: '验证失败',
         description: '昵称不能为空',
-        duration: 3000
-      });
+        duration: 3000 });
+
       return;
     }
     if (editForm.phone && !/^1[3-9]\d{9}$/.test(editForm.phone)) {
       toast({
         title: '验证失败',
         description: '请输入正确的手机号码',
-        duration: 3000
-      });
+        duration: 3000 });
+
       return;
     }
     if (editForm.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(editForm.email)) {
       toast({
         title: '验证失败',
         description: '请输入正确的邮箱地址',
-        duration: 3000
-      });
+        duration: 3000 });
+
       return;
     }
     try {
       setIsLoading(true);
       await saveUserProfileToDB({
         userId: $w.auth.currentUser.userId,
-        ...editForm
-      });
+        ...editForm });
+
       setUserProfile({
-        ...editForm
-      });
+        ...editForm });
+
       setIsEditing(false);
       toast({
         title: '保存成功',
         description: '个人资料已更新',
-        duration: 2000
-      });
+        duration: 2000 });
+
     } catch (error) {
       console.error('保存失败:', error);
       toast({
         title: '保存失败',
         description: '保存个人资料失败，请稍后重试',
-        duration: 3000
-      });
+        duration: 3000 });
+
     } finally {
       setIsLoading(false);
     }
   };
 
   // 选择头像
-  const handleAvatarSelect = avatar => {
-    setEditForm({
+  // 选择头像
+  const handleAvatarSelect = (avatar) => {setEditForm({
       ...editForm,
-      avatar
-    });
+      avatar });
+
   };
 
   // 处理表单输入
-  const handleInputChange = (field, value) => {
-    setEditForm({
+  // 处理表单输入
+  const handleInputChange = (field, value) => {setEditForm({
       ...editForm,
-      [field]: value
-    });
+      [field]: value });
+
   };
-  const handleTabChange = tabId => {
+  const handleTabChange = (tabId) => {
     if (tabId === 'profile') {
       setActiveTab(tabId);
     } else {
       $w.utils.navigateTo({
         pageId: tabId,
-        params: {}
-      });
+        params: {} });
+
     }
   };
 
   // ... 保持已有的联系信息处理函数
-  const handlePhoneCall = () => {
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  // ... 保持已有的联系信息处理函数
+  const handlePhoneCall = () => {const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     if (isMobile) {
       window.location.href = `tel:${contactInfo.phone}`;
     } else {
@@ -384,14 +382,14 @@ export default function Profile(props) {
         toast({
           title: '电话号码已复制',
           description: `电话号码 ${contactInfo.phone} 已复制到剪贴板，请使用手机拨打`,
-          duration: 3000
-        });
+          duration: 3000 });
+
       }).catch(() => {
         toast({
           title: '联系电话',
           description: contactInfo.phone,
-          duration: 5000
-        });
+          duration: 5000 });
+
       });
     }
   };
@@ -417,22 +415,22 @@ export default function Profile(props) {
     toast({
       title: '地图导航',
       description: '正在为您打开地图导航',
-      duration: 2000
-    });
+      duration: 2000 });
+
   };
   const handleAddressCopy = () => {
     navigator.clipboard.writeText(contactInfo.address).then(() => {
       toast({
         title: '地址已复制',
         description: '公司地址已复制到剪贴板',
-        duration: 3000
-      });
+        duration: 3000 });
+
     }).catch(() => {
       toast({
         title: '公司地址',
         description: contactInfo.address,
-        duration: 5000
-      });
+        duration: 5000 });
+
     });
   };
   const handleWebsiteCopy = () => {
@@ -440,30 +438,30 @@ export default function Profile(props) {
       toast({
         title: '官网地址已复制',
         description: '公司官网地址已复制到剪贴板',
-        duration: 3000
-      });
+        duration: 3000 });
+
     }).catch(() => {
       toast({
         title: '公司官网',
         description: contactInfo.website,
-        duration: 5000
-      });
+        duration: 5000 });
+
     });
   };
 
   // 更新菜单项，移除帮助中心和给我评分
-  const menuItems = [{
-    icon: Settings,
+  // 更新菜单项，移除帮助中心和给我评分
+  const menuItems = [{ icon: Settings,
     label: '系统设置',
     description: '应用设置和偏好配置',
     onClick: () => {
       toast({
         title: '系统设置',
         description: '系统设置功能正在开发中',
-        duration: 2000
-      });
-    }
-  }, {
+        duration: 2000 });
+
+    } },
+  {
     icon: Shield,
     label: '隐私政策',
     description: '查看隐私保护政策',
@@ -471,10 +469,10 @@ export default function Profile(props) {
       toast({
         title: '隐私政策',
         description: '隐私政策功能正在开发中',
-        duration: 2000
-      });
-    }
-  }, {
+        duration: 2000 });
+
+    } },
+  {
     icon: FileText,
     label: '用户协议',
     description: '查看用户服务协议',
@@ -482,14 +480,14 @@ export default function Profile(props) {
       toast({
         title: '用户协议',
         description: '用户协议功能正在开发中',
-        duration: 2000
-      });
-    }
-  }];
+        duration: 2000 });
+
+    } }];
+
 
   // 如果用户未登录，显示登录引导
-  if (!$w.auth.currentUser?.userId) {
-    return <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-16">
+  // 如果用户未登录，显示登录引导
+  if (!$w.auth.currentUser?.userId) {return <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-16">
         <LogoHeader />
         
         <div className="px-4 py-6">
@@ -612,7 +610,7 @@ export default function Profile(props) {
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 昵称 *
               </label>
-              <input type="text" value={editForm.nickname} onChange={e => handleInputChange('nickname', e.target.value)} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:text-white" placeholder="请输入昵称" maxLength={20} />
+              <input type="text" value={editForm.nickname} onChange={(e) => handleInputChange('nickname', e.target.value)} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:text-white" placeholder="请输入昵称" maxLength={20} />
             </div>
             
             {/* 手机号 */}
@@ -620,7 +618,7 @@ export default function Profile(props) {
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 手机号
               </label>
-              <input type="tel" value={editForm.phone} onChange={e => handleInputChange('phone', e.target.value)} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:text-white" placeholder="请输入手机号" maxLength={11} />
+              <input type="tel" value={editForm.phone} onChange={(e) => handleInputChange('phone', e.target.value)} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:text-white" placeholder="请输入手机号" maxLength={11} />
             </div>
             
             {/* 邮箱 */}
@@ -628,7 +626,7 @@ export default function Profile(props) {
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 邮箱
               </label>
-              <input type="email" value={editForm.email} onChange={e => handleInputChange('email', e.target.value)} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:text-white" placeholder="请输入邮箱" />
+              <input type="email" value={editForm.email} onChange={(e) => handleInputChange('email', e.target.value)} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:text-white" placeholder="请输入邮箱" />
             </div>
             
             {/* 个人简介 */}
@@ -636,7 +634,7 @@ export default function Profile(props) {
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 个人简介
               </label>
-              <textarea value={editForm.bio} onChange={e => handleInputChange('bio', e.target.value)} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:text-white" placeholder="介绍一下自己..." rows={3} maxLength={100} />
+              <textarea value={editForm.bio} onChange={(e) => handleInputChange('bio', e.target.value)} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:text-white" placeholder="介绍一下自己..." rows={3} maxLength={100} />
             </div>
           </div>}
 
@@ -697,7 +695,7 @@ export default function Profile(props) {
                 </div>
                 <button onClick={handlePhoneCall} className="bg-green-600 text-white hover:bg-green-700 px-3 py-2 rounded-lg font-medium transition-colors flex items-center space-x-1">
                   <Phone className="w-4 h-4" />
-                  <span>拨打</span>
+                  <span></span>
                 </button>
               </div>
             </div>
@@ -785,8 +783,8 @@ export default function Profile(props) {
                 toast({
                   title: '在线客服',
                   description: '客服功能正在开发中，请暂时使用电话联系',
-                  duration: 3000
-                });
+                  duration: 3000 });
+
               }} className="bg-green-600 text-white hover:bg-green-700 px-3 py-2 rounded-lg font-medium transition-colors flex items-center space-x-1">
                   <MessageCircle className="w-4 h-4" />
                   <span>咨询</span>
