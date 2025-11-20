@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 // @ts-ignore;
 import { Compass, Activity, Clock, Edit3, Save, Download, Database, MapPin, Sun } from 'lucide-react';
 // @ts-ignore;
-import { useToast } from '@/components/ui';
+import { useToast, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui';
 
 import { LogoHeader } from '@/components/LogoHeader';
 import { TabBar } from '@/components/TabBar';
@@ -42,6 +42,9 @@ export default function LeafAngle(props) {
 
   // 样品名称
   const [sampleName, setSampleName] = useState('');
+
+  // 样品数量
+  const [sampleQuantity, setSampleQuantity] = useState(1);
 
   // 记录列表
   const [records, setRecords] = useState([]);
@@ -255,25 +258,38 @@ export default function LeafAngle(props) {
       });
       return;
     }
-    const newRecord = {
-      id: Date.now(),
-      sampleName: sampleName.trim(),
-      date: currentDateTime.date,
-      time: currentDateTime.time,
-      alpha: sensorData.alpha.toFixed(2),
-      beta: sensorData.beta.toFixed(2),
-      gamma: sensorData.gamma.toFixed(2),
-      solarElevation: solarPosition.elevation.toFixed(2),
-      solarAzimuth: solarPosition.azimuth.toFixed(2),
-      latitude: sensorData.latitude.toFixed(6),
-      longitude: sensorData.longitude.toFixed(6),
-      altitude: Math.round(sensorData.altitude)
-    };
-    setRecords(prev => [newRecord, ...prev]);
+    const baseSampleName = sampleName.trim();
+    const newRecords = [];
+
+    // 根据样品数量生成多条记录
+    for (let i = 1; i <= sampleQuantity; i++) {
+      const recordSampleName = sampleQuantity > 1 ? `${baseSampleName}-${i}` : baseSampleName;
+      const newRecord = {
+        id: Date.now() + i,
+        // 确保ID唯一
+        sampleName: recordSampleName,
+        baseName: baseSampleName,
+        number: i,
+        date: currentDateTime.date,
+        time: currentDateTime.time,
+        alpha: sensorData.alpha.toFixed(2),
+        beta: sensorData.beta.toFixed(2),
+        gamma: sensorData.gamma.toFixed(2),
+        solarElevation: solarPosition.elevation.toFixed(2),
+        solarAzimuth: solarPosition.azimuth.toFixed(2),
+        latitude: sensorData.latitude.toFixed(6),
+        longitude: sensorData.longitude.toFixed(6),
+        altitude: Math.round(sensorData.altitude)
+      };
+      newRecords.push(newRecord);
+    }
+    setRecords(prev => [...newRecords, ...prev]);
     setSampleName('');
+    setSampleQuantity(1); // 重置为1
+
     toast({
       title: '记录成功',
-      description: '数据已成功记录',
+      description: `已成功记录 ${sampleQuantity} 个样品的数据`,
       duration: 2000
     });
   };
@@ -288,8 +304,8 @@ export default function LeafAngle(props) {
       });
       return;
     }
-    const headers = ['样品名称', '日期', '时间', 'Alpha(度)', 'Beta(度)', 'Gamma(度)', '太阳高度角(度)', '太阳方位角(度)', '纬度', '经度', '海拔(米)'];
-    const csvContent = [headers.join(','), ...records.map(record => [record.sampleName, record.date, record.time, record.alpha, record.beta, record.gamma, record.solarElevation, record.solarAzimuth, record.latitude, record.longitude, record.altitude].join(','))].join('\n');
+    const headers = ['样品名称', '样品编号', '日期', '时间', 'Alpha(度)', 'Beta(度)', 'Gamma(度)', '太阳高度角(度)', '太阳方位角(度)', '纬度', '经度', '海拔(米)'];
+    const csvContent = [headers.join(','), ...records.map(record => [record.sampleName, record.number || '', record.date, record.time, record.alpha, record.beta, record.gamma, record.solarElevation, record.solarAzimuth, record.latitude, record.longitude, record.altitude].join(','))].join('\n');
 
     // 添加BOM以支持中文
     const BOM = '\uFEFF';
@@ -310,6 +326,11 @@ export default function LeafAngle(props) {
       duration: 2000
     });
   };
+
+  // 生成样品数量选项
+  const quantityOptions = Array.from({
+    length: 100
+  }, (_, i) => i + 1);
   return <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-16">
       <LogoHeader />
       
@@ -443,6 +464,29 @@ export default function LeafAngle(props) {
               </label>
               <input type="text" value={sampleName} onChange={e => setSampleName(e.target.value)} placeholder="请输入样品名称" className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:text-white" onKeyPress={e => e.key === 'Enter' && handleRecordData()} />
             </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                样品数量
+              </label>
+              <Select value={sampleQuantity.toString()} onValueChange={value => setSampleQuantity(parseInt(value))}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="选择样品数量" />
+                </SelectTrigger>
+                <SelectContent>
+                  {quantityOptions.map(num => <SelectItem key={num} value={num.toString()}>
+                      {num}
+                    </SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3">
+              <div className="text-sm text-blue-800 dark:text-blue-200">
+                {sampleQuantity > 1 ? `将创建 ${sampleQuantity} 条记录：${sampleName.trim() || '样品名称'}-1 到 ${sampleName.trim() || '样品名称'}-${sampleQuantity}` : '将创建 1 条记录'}
+              </div>
+            </div>
+
             <div className="flex space-x-3">
               <button onClick={handleRecordData} className="flex-1 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center">
                 <Save className="w-4 h-4 mr-2" />
