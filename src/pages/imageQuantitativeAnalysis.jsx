@@ -32,8 +32,8 @@ export default function ImageQuantitativeAnalysis(props) {
   const [refSize, setRefSize] = useState(25.0);
   const [minArea, setMinArea] = useState(500);
   const [maxArea, setMaxArea] = useState(50000);
-  const [hsvLow, setHsvLow] = useState(35);
-  const [hsvHigh, setHsvHigh] = useState(85);
+  const [hsvLow, setHsvLow] = useState(20);
+  const [hsvHigh, setHsvHigh] = useState(60);
 
   // Canvas引用
   const canvasRef = useRef(null);
@@ -106,42 +106,73 @@ export default function ImageQuantitativeAnalysis(props) {
     setAnnotatedImage(null);
   };
 
-  // 简化的边缘检测和对象识别
+  // RGB转HSV
+  const rgbToHsv = (r, g, b) => {
+    r /= 255;
+    g /= 255;
+    b /= 255;
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    const diff = max - min;
+    let h = 0;
+    let s = max === 0 ? 0 : diff / max;
+    let v = max;
+    if (diff !== 0) {
+      switch (max) {
+        case r:
+          h = ((g - b) / diff + (g < b ? 6 : 0)) / 6;
+          break;
+        case g:
+          h = ((b - r) / diff + 2) / 6;
+          break;
+        case b:
+          h = ((r - g) / diff + 4) / 6;
+          break;
+      }
+    }
+    return [Math.round(h * 179), Math.round(s * 255), Math.round(v * 255)];
+  };
+
+  // 改进的对象检测算法
   const detectObjects = imageData => {
     const width = imageData.width;
     const height = imageData.height;
     const data = imageData.data;
 
-    // 转换为灰度图
-    const grayData = new Uint8ClampedArray(width * height);
+    // 创建颜色掩码
+    const mask = new Uint8ClampedArray(width * height);
     for (let i = 0; i < data.length; i += 4) {
-      const gray = data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114;
-      grayData[i / 4] = gray;
+      const [h, s, v] = rgbToHsv(data[i], data[i + 1], data[i + 2]);
+      const idx = i / 4;
+
+      // 改进的颜色检测：包含绿色和黄色范围
+      if (h >= hsvLow && h <= hsvHigh && s > 30 && v > 50 || h >= 10 && h <= 25 && s > 40 && v > 60) {
+        // 黄色范围
+        mask[idx] = 255;
+      }
     }
 
-    // 简单的阈值分割
-    const threshold = 128;
-    const binaryData = new Uint8ClampedArray(width * height);
-    for (let i = 0; i < grayData.length; i++) {
-      binaryData[i] = grayData[i] < threshold ? 255 : 0;
-    }
+    // 形态学操作：去除小噪点
+    const cleanedMask = morphologicalCleanup(mask, width, height);
 
-    // 查找连通区域（简化版）
+    // 查找连通区域
     const objects = [];
     const visited = new Array(width * height).fill(false);
-    for (let y = 0; y < height; y++) {
-      for (let x = 0; x < width; x++) {
+    for (let y = 1; y < height - 1; y++) {
+      for (let x = 1; x < width - 1; x++) {
         const idx = y * width + x;
-        if (binaryData[idx] === 255 && !visited[idx]) {
-          const object = floodFill(binaryData, visited, x, y, width, height);
-          if (object.area >= minArea && object.area <= maxArea) {
+        if (cleanedMask[idx] === 255 && !visited[idx]) {
+          const object = floodFill(cleanedMask, visited, x, y, width, height);
+
+          // 过滤掉边缘对象和过小/过大的对象
+          if (object.area >= minArea && object.area <= maxArea && object.minX > 5 && object.minY > 5 && object.maxX < width - 5 && object.maxY < height - 5) {
             objects.push(object);
           }
         }
       }
     }
 
-    // 按左上角位置排序，找到第一个作为参考对象
+    // 按左上角位置排序
     objects.sort((a, b) => {
       const aScore = a.minY * 1000 + a.minX;
       const bScore = b.minY * 1000 + b.minX;
@@ -150,8 +181,46 @@ export default function ImageQuantitativeAnalysis(props) {
     return objects.slice(0, expectedCount);
   };
 
+  // 形态学清理
+  const morphologicalCleanup = (mask, width, height) => {
+    const result = new Uint8ClampedArray(mask);
+
+    // 腐蚀操作，去除小噪点
+    for (let y = 1; y < height - 1; y++) {
+      for (let x = 1; x < width - 1; x++) {
+        const idx = y * width + x;
+        let count = 0;
+        for (let dy = -1; dy <= 1; dy++) {
+          for (let dx = -1; dx <= 1; dx++) {
+            if (mask[(y + dy) * width + (x + dx)] === 255) count++;
+          }
+        }
+        result[idx] = count >= 5 ? 255 : 0;
+      }
+    }
+
+    // 膨胀操作，恢复对象大小
+    const dilated = new Uint8ClampedArray(result);
+    for (let y = 1; y < height - 1; y++) {
+      for (let x = 1; x < width - 1; x++) {
+        const idx = y * width + x;
+        let hasNeighbor = false;
+        for (let dy = -1; dy <= 1; dy++) {
+          for (let dx = -1; dx <= 1; dx++) {
+            if (result[(y + dy) * width + (x + dx)] === 255) {
+              hasNeighbor = true;
+              break;
+            }
+          }
+        }
+        dilated[idx] = hasNeighbor ? 255 : 0;
+      }
+    }
+    return dilated;
+  };
+
   // 洪水填充算法
-  const floodFill = (binaryData, visited, startX, startY, width, height) => {
+  const floodFill = (mask, visited, startX, startY, width, height) => {
     const stack = [[startX, startY]];
     const object = {
       points: [],
@@ -159,27 +228,101 @@ export default function ImageQuantitativeAnalysis(props) {
       minY: startY,
       maxX: startX,
       maxY: startY,
-      area: 0
+      area: 0,
+      centerX: 0,
+      centerY: 0
     };
     while (stack.length > 0) {
       const [x, y] = stack.pop();
       const idx = y * width + x;
-      if (x < 0 || x >= width || y < 0 || y >= height || visited[idx] || binaryData[idx] !== 255) {
+      if (x < 0 || x >= width || y < 0 || y >= height || visited[idx] || mask[idx] !== 255) {
         continue;
       }
       visited[idx] = true;
       object.points.push([x, y]);
       object.area++;
+      object.centerX += x;
+      object.centerY += y;
       object.minX = Math.min(object.minX, x);
       object.minY = Math.min(object.minY, y);
       object.maxX = Math.max(object.maxX, x);
       object.maxY = Math.max(object.maxY, y);
       stack.push([x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]);
     }
+
+    // 计算质心
+    if (object.area > 0) {
+      object.centerX = Math.round(object.centerX / object.area);
+      object.centerY = Math.round(object.centerY / object.area);
+    }
     return object;
   };
 
-  // 绘制标注 - 使用最小包围框
+  // 计算OBB（有向包围框）
+  const calculateOBB = object => {
+    const points = object.points;
+    const n = points.length;
+
+    // 计算质心
+    let cx = 0,
+      cy = 0;
+    points.forEach(([x, y]) => {
+      cx += x;
+      cy += y;
+    });
+    cx /= n;
+    cy /= n;
+
+    // 计算协方差矩阵
+    let cxx = 0,
+      cyy = 0,
+      cxy = 0;
+    points.forEach(([x, y]) => {
+      const dx = x - cx;
+      const dy = y - cy;
+      cxx += dx * dx;
+      cyy += dy * dy;
+      cxy += dx * dy;
+    });
+
+    // 计算主方向角度
+    const angle = 0.5 * Math.atan2(2 * cxy, cxx - cyy);
+
+    // 旋转点并计算包围框
+    const cos = Math.cos(angle);
+    const sin = Math.sin(angle);
+    let minX = Infinity,
+      maxX = -Infinity;
+    let minY = Infinity,
+      maxY = -Infinity;
+    points.forEach(([x, y]) => {
+      const rx = cos * (x - cx) - sin * (y - cy);
+      const ry = sin * (x - cx) + cos * (y - cy);
+      minX = Math.min(minX, rx);
+      maxX = Math.max(maxX, rx);
+      minY = Math.min(minY, ry);
+      maxY = Math.max(maxY, ry);
+    });
+    const width = maxX - minX;
+    const height = maxY - minY;
+
+    // 计算OBB的四个角点
+    const corners = [[-width / 2, -height / 2], [width / 2, -height / 2], [width / 2, height / 2], [-width / 2, height / 2]].map(([x, y]) => {
+      const rx = cos * x - sin * y + cx;
+      const ry = sin * x + cos * y + cy;
+      return [rx, ry];
+    });
+    return {
+      corners,
+      angle: angle * 180 / Math.PI,
+      centerX: cx,
+      centerY: cy,
+      width: width,
+      height: height
+    };
+  };
+
+  // 绘制OBB标注
   const drawAnnotations = (objects, canvas, ctx) => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(imageRef.current, 0, 0, canvas.width, canvas.height);
@@ -190,24 +333,36 @@ export default function ImageQuantitativeAnalysis(props) {
     ctx.font = 'bold 14px Arial';
     ctx.fillStyle = '#FF0000';
     objects.forEach((object, index) => {
-      // 绘制最小包围框
-      ctx.strokeRect(object.minX, object.minY, object.maxX - object.minX, object.maxY - object.minY);
+      // 计算OBB
+      const obb = calculateOBB(object);
+
+      // 绘制OBB
+      ctx.beginPath();
+      obb.corners.forEach((corner, i) => {
+        if (i === 0) {
+          ctx.moveTo(corner[0], corner[1]);
+        } else {
+          ctx.lineTo(corner[0], corner[1]);
+        }
+      });
+      ctx.closePath();
+      ctx.stroke();
 
       // 绘制标签
-      const labelX = object.minX;
-      const labelY = object.minY - 5;
+      const labelX = obb.centerX - 15;
+      const labelY = obb.centerY - Math.max(obb.width, obb.height) / 2 - 10;
       if (index === 0) {
         // 第一个对象标记为参考对象
         ctx.fillStyle = 'rgba(255, 0, 0, 0.8)';
-        ctx.fillRect(labelX - 20, labelY - 20, 40, 20);
+        ctx.fillRect(labelX - 5, labelY - 20, 40, 20);
         ctx.fillStyle = '#FFFFFF';
-        ctx.fillText('REF', labelX - 15, labelY - 5);
+        ctx.fillText('REF', labelX, labelY - 5);
       } else {
         // 其余对象标记为样本编号
         ctx.fillStyle = 'rgba(255, 0, 0, 0.8)';
-        ctx.fillRect(labelX - 15, labelY - 20, 30, 20);
+        ctx.fillRect(labelX - 5, labelY - 20, 30, 20);
         ctx.fillStyle = '#FFFFFF';
-        ctx.fillText(`S${index}`, labelX - 10, labelY - 5);
+        ctx.fillText(`S${index}`, labelX, labelY - 5);
       }
       ctx.fillStyle = '#FF0000';
     });
@@ -267,14 +422,14 @@ export default function ImageQuantitativeAnalysis(props) {
 
       // 生成分析结果
       const results = objects.map((object, index) => {
-        const pixelRatio = refSize / Math.max(object.maxX - object.minX, object.maxY - object.minY);
-        const lengthMM = ((object.maxX - object.minX) * pixelRatio).toFixed(2);
-        const widthMM = ((object.maxY - object.minY) * pixelRatio).toFixed(2);
+        const obb = calculateOBB(object);
+        const pixelRatio = refSize / Math.max(obb.width, obb.height);
+        const lengthMM = (Math.max(obb.width, obb.height) * pixelRatio).toFixed(2);
+        const widthMM = (Math.min(obb.width, obb.height) * pixelRatio).toFixed(2);
         const areaMM2 = (object.area * pixelRatio * pixelRatio).toFixed(2);
-        const perimeterMM = (Math.sqrt(object.area) * 4 * pixelRatio).toFixed(2);
-        const aspectRatio = (lengthMM / widthMM).toFixed(2);
-        const circularity = (4 * Math.PI * object.area / Math.pow(Math.sqrt(object.area) * 4, 2)).toFixed(3);
-        const angleDeg = (Math.random() * 180).toFixed(1);
+        const perimeterMM = (2 * (obb.width + obb.height) * pixelRatio).toFixed(2);
+        const aspectRatio = (Math.max(obb.width, obb.height) / Math.min(obb.width, obb.height)).toFixed(2);
+        const circularity = (4 * Math.PI * object.area / Math.pow(2 * Math.sqrt(object.area), 2)).toFixed(3);
         return {
           label: index === 0 ? 'REF' : `S${index}`,
           length_mm: lengthMM,
@@ -283,9 +438,9 @@ export default function ImageQuantitativeAnalysis(props) {
           perimeter_mm: perimeterMM,
           aspect_ratio: aspectRatio,
           circularity: circularity,
-          angle_deg: angleDeg,
-          centerX: Math.round((object.minX + object.maxX) / 2),
-          centerY: Math.round((object.minY + object.maxY) / 2),
+          angle_deg: Math.abs(obb.angle).toFixed(1),
+          centerX: Math.round(obb.centerX),
+          centerY: Math.round(obb.centerY),
           meanR: Math.floor(Math.random() * 100 + 100),
           meanG: Math.floor(Math.random() * 100 + 150),
           meanB: Math.floor(Math.random() * 50 + 50),
@@ -298,7 +453,7 @@ export default function ImageQuantitativeAnalysis(props) {
       });
       setAnalysisResults({
         components: results,
-        pixelRatio: refSize / Math.max(objects[0].maxX - objects[0].minX, objects[0].maxY - objects[0].minY),
+        pixelRatio: refSize / Math.max(calculateOBB(objects[0]).width, calculateOBB(objects[0]).height),
         objectCount: objects.length
       });
       toast({
