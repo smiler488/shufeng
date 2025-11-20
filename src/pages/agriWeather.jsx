@@ -16,7 +16,7 @@ export default function AgriWeather(props) {
   } = useToast();
   const [activeTab, setActiveTab] = useState('agriWeather');
 
-  // 位置选择状态
+  // 位置选择状态 - 添加默认值防止null引用
   const [selectedLocation, setSelectedLocation] = useState({
     lat: null,
     lng: null,
@@ -26,13 +26,13 @@ export default function AgriWeather(props) {
   // 选点方式标签页
   const [activeLocationTab, setActiveLocationTab] = useState('manual');
 
-  // 手动输入坐标
+  // 手动输入坐标 - 确保初始值不为null
   const [manualCoords, setManualCoords] = useState({
     lat: '',
     lng: ''
   });
 
-  // 日期范围
+  // 日期范围 - 确保初始值不为null
   const [dateRange, setDateRange] = useState({
     startDate: '',
     endDate: ''
@@ -165,14 +165,30 @@ export default function AgriWeather(props) {
     setSearchResults([place]); // 只显示选中的结果
   };
 
-  // 手动输入坐标变化
+  // 手动输入坐标变化 - 添加安全检查
   const handleManualCoordChange = (field, value) => {
-    setManualCoords(prev => ({
-      ...prev,
-      [field]: value
-    }));
-    const lat = field === 'lat' ? parseFloat(value) : parseFloat(manualCoords.lat);
-    const lng = field === 'lng' ? parseFloat(value) : parseFloat(manualCoords.lng);
+    // 确保manualCoords存在
+    if (!manualCoords) {
+      setManualCoords({
+        lat: '',
+        lng: ''
+      });
+      return;
+    }
+    setManualCoords(prev => {
+      if (!prev) {
+        return {
+          lat: field === 'lat' ? value : '',
+          lng: field === 'lng' ? value : ''
+        };
+      }
+      return {
+        ...prev,
+        [field]: value
+      };
+    });
+    const lat = field === 'lat' ? parseFloat(value || '0') : parseFloat(manualCoords && manualCoords.lat || '0');
+    const lng = field === 'lng' ? parseFloat(value || '0') : parseFloat(manualCoords && manualCoords.lng || '0');
     if (!isNaN(lat) && !isNaN(lng)) {
       setSelectedLocation({
         lat,
@@ -184,7 +200,7 @@ export default function AgriWeather(props) {
 
   // 获取气象数据
   const fetchWeatherData = async () => {
-    if (!selectedLocation.lat || !selectedLocation.lng) {
+    if (!selectedLocation || !selectedLocation.lat || !selectedLocation.lng) {
       toast({
         title: '请先选择位置',
         description: '需要选择经纬度位置',
@@ -192,7 +208,7 @@ export default function AgriWeather(props) {
       });
       return;
     }
-    if (!dateRange.startDate || !dateRange.endDate) {
+    if (!dateRange || !dateRange.startDate || !dateRange.endDate) {
       toast({
         title: '请选择日期范围',
         description: '需要选择开始和结束日期',
@@ -299,7 +315,7 @@ export default function AgriWeather(props) {
 
   // 导出CSV
   const exportToCSV = () => {
-    if (weatherData.length === 0) {
+    if (!weatherData || weatherData.length === 0) {
       toast({
         title: '没有数据可导出',
         description: '请先获取气象数据',
@@ -346,7 +362,7 @@ export default function AgriWeather(props) {
     });
 
     // 添加文件头信息
-    const header = [`农业气象数据`, `位置: ${selectedLocation.name} (${selectedLocation.lat.toFixed(4)}, ${selectedLocation.lng.toFixed(4)})`, `日期范围: ${dateRange.startDate} 至 ${dateRange.endDate}`, `数据源: NASA POWER`, `生成时间: ${new Date().toLocaleString('zh-CN')}`, '', ''].join('\n');
+    const header = [`农业气象数据`, `位置: ${selectedLocation && selectedLocation.name || '未知'} (${selectedLocation && selectedLocation.lat ? selectedLocation.lat.toFixed(4) : '0.0000'}, ${selectedLocation && selectedLocation.lng ? selectedLocation.lng.toFixed(4) : '0.0000'})`, `日期范围: ${dateRange && dateRange.startDate || ''} 至 ${dateRange && dateRange.endDate || ''}`, `数据源: NASA POWER`, `生成时间: ${new Date().toLocaleString('zh-CN')}`, '', ''].join('\n');
     csvContent = header + csvContent;
 
     // 下载文件
@@ -356,7 +372,7 @@ export default function AgriWeather(props) {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.setAttribute('href', url);
-    link.setAttribute('download', `农业气象数据_${selectedLocation.name}_${new Date().toISOString().split('T')[0]}.csv`);
+    link.setAttribute('download', `农业气象数据_${selectedLocation && selectedLocation.name || '未知'}_${new Date().toISOString().split('T')[0]}.csv`);
     link.style.visibility = 'hidden';
     document.body.appendChild(link);
     link.click();
@@ -476,13 +492,13 @@ export default function AgriWeather(props) {
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   纬度
                 </label>
-                <input type="number" value={manualCoords.lat} onChange={e => handleManualCoordChange('lat', e.target.value)} step="0.000001" placeholder="例: 39.9042" className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white" />
+                <input type="number" value={manualCoords && manualCoords.lat || ''} onChange={e => handleManualCoordChange('lat', e.target.value)} step="0.000001" placeholder="例: 39.9042" className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   经度
                 </label>
-                <input type="number" value={manualCoords.lng} onChange={e => handleManualCoordChange('lng', e.target.value)} step="0.000001" placeholder="例: 116.4074" className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white" />
+                <input type="number" value={manualCoords && manualCoords.lng || ''} onChange={e => handleManualCoordChange('lng', e.target.value)} step="0.000001" placeholder="例: 116.4074" className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white" />
               </div>
             </div>}
 
@@ -491,7 +507,7 @@ export default function AgriWeather(props) {
               <div ref={mapRef} className="h-64 rounded-lg border border-gray-300 dark:border-gray-600" />
               <div className="mt-2 text-sm text-gray-600 dark:text-gray-400">
                 点击地图选择位置：
-                {selectedLocation.lat && selectedLocation.lng ? <span className="font-medium text-gray-900 dark:text-white">
+                {selectedLocation && selectedLocation.lat && selectedLocation.lng ? <span className="font-medium text-gray-900 dark:text-white">
                     {selectedLocation.lat.toFixed(6)}, {selectedLocation.lng.toFixed(6)}
                   </span> : <span className="font-medium">未选择</span>}
               </div>
@@ -500,20 +516,20 @@ export default function AgriWeather(props) {
           {/* 地名搜索 */}
           {activeLocationTab === 'search' && <div className="space-y-4">
               <div className="flex space-x-2">
-                <input type="text" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} onKeyPress={e => e.key === 'Enter' && searchLocation()} placeholder="输入地名，如：北京、上海、广州" className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white" />
+                <input type="text" value={searchQuery || ''} onChange={e => setSearchQuery(e.target.value)} onKeyPress={e => e.key === 'Enter' && searchLocation()} placeholder="输入地名，如：北京、上海、广州" className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white" />
                 <button onClick={searchLocation} disabled={isSearching} className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center">
                   <Search className="w-4 h-4 mr-2" />
                   搜索
                 </button>
               </div>
               
-              {searchResults.length > 0 && <div className="space-y-2">
+              {searchResults && searchResults.length > 0 && <div className="space-y-2">
                   {searchResults.map((place, index) => <div key={index} onClick={() => selectSearchResult(place)} className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
                       <div className="font-medium text-gray-900 dark:text-white">
-                        {place.display_name.split(',')[0]}
+                        {place && place.display_name && place.display_name.split(',')[0] || '未知地点'}
                       </div>
                       <div className="text-sm text-gray-600 dark:text-gray-400">
-                        {place.display_name}
+                        {place && place.display_name || '无描述'}
                       </div>
                     </div>)}
                 </div>}
@@ -525,7 +541,7 @@ export default function AgriWeather(props) {
                 <div>
                   <div className="text-sm text-gray-600 dark:text-gray-300 mb-1">当前位置</div>
                   <div className="font-medium text-gray-900 dark:text-white">
-                    {gpsStatus}
+                    {gpsStatus || '未知'}
                   </div>
                 </div>
                 <button onClick={getCurrentLocation} className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center">
@@ -548,19 +564,35 @@ export default function AgriWeather(props) {
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 开始日期
               </label>
-              <input type="date" value={dateRange.startDate} onChange={e => setDateRange(prev => ({
-              ...prev,
-              startDate: e.target.value
-            }))} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:text-white" />
+              <input type="date" value={dateRange && dateRange.startDate || ''} onChange={e => setDateRange(prev => {
+              if (!prev) {
+                return {
+                  startDate: e.target.value,
+                  endDate: ''
+                };
+              }
+              return {
+                ...prev,
+                startDate: e.target.value
+              };
+            })} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:text-white" />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 结束日期
               </label>
-              <input type="date" value={dateRange.endDate} onChange={e => setDateRange(prev => ({
-              ...prev,
-              endDate: e.target.value
-            }))} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:text-white" />
+              <input type="date" value={dateRange && dateRange.endDate || ''} onChange={e => setDateRange(prev => {
+              if (!prev) {
+                return {
+                  startDate: '',
+                  endDate: e.target.value
+                };
+              }
+              return {
+                ...prev,
+                endDate: e.target.value
+              };
+            })} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:text-white" />
             </div>
           </div>
         </div>
@@ -579,13 +611,13 @@ export default function AgriWeather(props) {
                 <div>
                   <span className="font-medium text-gray-900 dark:text-white">位置：</span>
                   <span className="text-gray-700 dark:text-gray-300">
-                    {selectedLocation.lat && selectedLocation.lng ? `${selectedLocation.name} (${selectedLocation.lat.toFixed(4)}, ${selectedLocation.lng.toFixed(4)})` : '未选择'}
+                    {selectedLocation && selectedLocation.lat && selectedLocation.lng ? `${selectedLocation.name || '未知'} (${selectedLocation.lat.toFixed(4)}, ${selectedLocation.lng.toFixed(4)})` : '未选择'}
                   </span>
                 </div>
                 <div>
                   <span className="font-medium text-gray-900 dark:text-white">日期范围：</span>
                   <span className="text-gray-700 dark:text-gray-300">
-                    {dateRange.startDate && dateRange.endDate ? `${dateRange.startDate} 至 ${dateRange.endDate}` : '未选择'}
+                    {dateRange && dateRange.startDate && dateRange.endDate ? `${dateRange.startDate} 至 ${dateRange.endDate}` : '未选择'}
                   </span>
                 </div>
               </div>
@@ -631,7 +663,7 @@ export default function AgriWeather(props) {
                   </tr>
                 </thead>
                 <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                  {weatherData.slice(0, 100).map((row, index) => <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                  {weatherData && weatherData.length > 0 && weatherData.slice(0, 100).map((row, index) => <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                       {tableColumns.map(col => <td key={col.key} className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                           {formatCellValue(row[col.key], col.key)}
                         </td>)}
@@ -642,7 +674,7 @@ export default function AgriWeather(props) {
 
             <div className="mt-4 flex items-center justify-between">
               <div className="text-sm text-gray-600 dark:text-gray-400">
-                共 <span className="font-medium text-gray-900 dark:text-white">{weatherData.length}</span> 行数据，显示前100行
+                共 <span className="font-medium text-gray-900 dark:text-white">{weatherData && weatherData.length || 0}</span> 行数据，显示前100行
               </div>
               <button onClick={exportToCSV} className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center">
                 <FileDown className="w-4 h-4 mr-2" />
