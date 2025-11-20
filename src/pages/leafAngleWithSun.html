@@ -1,0 +1,378 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>叶片角度测量工具</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <div class="bg-green-600 text-white p-4">
+        <div class="flex items-center space-x-3">
+            <i data-lucide="compass" class="w-6 h-6"></i>
+            <h1 class="text-xl font-bold">叶片角度测量工具</h1>
+        </div>
+    </div>
+
+    <div class="p-4 space-y-4">
+        <!-- 实时数据卡片 -->
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <i data-lucide="activity" class="w-5 h-5 mr-2 text-green-600"></i>
+                实时传感器数据
+            </h2>
+            
+            <div class="grid grid-cols-3 gap-4 mb-4">
+                <div class="bg-gray-50 rounded-lg p-4 text-center">
+                    <div class="text-2xl font-bold text-green-600" id="alpha">0.00°</div>
+                    <div class="text-sm text-gray-600">Alpha (Z轴)</div>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-4 text-center">
+                    <div class="text-2xl font-bold text-blue-600" id="beta">0.00°</div>
+                    <div class="text-sm text-gray-600">Beta (X轴)</div>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-4 text-center">
+                    <div class="text-2xl font-bold text-purple-600" id="gamma">0.00°</div>
+                    <div class="text-sm text-gray-600">Gamma (Y轴)</div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div class="bg-blue-50 rounded-lg p-4">
+                    <div class="text-sm text-gray-600 mb-1">经度</div>
+                    <div class="text-lg font-semibold text-blue-600" id="longitude">0.000000</div>
+                </div>
+                <div class="bg-blue-50 rounded-lg p-4">
+                    <div class="text-sm text-gray-600 mb-1">纬度</div>
+                    <div class="text-lg font-semibold text-blue-600" id="latitude">0.000000</div>
+                </div>
+                <div class="bg-green-50 rounded-lg p-4">
+                    <div class="text-sm text-gray-600 mb-1">海拔</div>
+                    <div class="text-lg font-semibold text-green-600" id="altitude">0m</div>
+                </div>
+                <div class="bg-purple-50 rounded-lg p-4">
+                    <div class="text-sm text-gray-600 mb-1">精度</div>
+                    <div class="text-lg font-semibold text-purple-600" id="accuracy">0m</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 太阳位置信息 -->
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <i data-lucide="sun" class="w-5 h-5 mr-2 text-orange-500"></i>
+                太阳位置信息
+            </h2>
+            
+            <div class="grid grid-cols-2 gap-4 mb-4">
+                <div class="bg-orange-50 rounded-lg p-4 text-center">
+                    <div class="text-2xl font-bold text-orange-600" id="solarElevation">0.00°</div>
+                    <div class="text-sm text-gray-600">太阳高度角</div>
+                </div>
+                <div class="bg-yellow-50 rounded-lg p-4 text-center">
+                    <div class="text-2xl font-bold text-yellow-600" id="solarAzimuth">0.00°</div>
+                    <div class="text-sm text-gray-600">太阳方位角</div>
+                </div>
+            </div>
+
+            <div class="bg-gray-50 rounded-lg p-3">
+                <div class="text-sm text-gray-600 mb-1">计算时间</div>
+                <div class="text-sm font-semibold text-gray-900" id="solarCalcTime">2024-01-01 12:00:00</div>
+            </div>
+        </div>
+
+        <!-- 时间信息 -->
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <i data-lucide="clock" class="w-5 h-5 mr-2 text-green-600"></i>
+                时间信息
+            </h2>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <div class="text-sm text-gray-600 mb-1">日期</div>
+                    <div class="text-lg font-semibold text-gray-900" id="date">2024-01-01</div>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <div class="text-sm text-gray-600 mb-1">时间</div>
+                    <div class="text-lg font-semibold text-gray-900" id="time">12:00:00</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 样品输入和操作 -->
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <i data-lucide="edit-3" class="w-5 h-5 mr-2 text-green-600"></i>
+                样品信息
+            </h2>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">样品名称</label>
+                    <input type="text" id="sampleName" placeholder="请输入样品名称" 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                </div>
+                <div class="flex space-x-3">
+                    <button onclick="recordData()" class="flex-1 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center">
+                        <i data-lucide="save" class="w-4 h-4 mr-2"></i>
+                        记录数据
+                    </button>
+                    <button onclick="downloadCSV()" class="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center">
+                        <i data-lucide="download" class="w-4 h-4 mr-2"></i>
+                        下载CSV
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 历史记录 -->
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <i data-lucide="database" class="w-5 h-5 mr-2 text-green-600"></i>
+                测量记录
+            </h2>
+            <div id="recordsList" class="space-y-2 max-h-64 overflow-y-auto">
+                <div class="text-gray-500 text-center py-4">暂无记录</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 初始化Lucide图标
+        lucide.createIcons();
+
+        // 数据记录数组
+        let records = [];
+
+        // 太阳位置计算函数
+        function calculateSolarPosition(latitude, longitude, date) {
+            // 将纬度转换为弧度
+            const latRad = latitude * Math.PI / 180;
+            
+            // 计算儒略日
+            const a = Math.floor((14 - (date.getMonth() + 1)) / 12);
+            const y = date.getFullYear() + 4800 - a;
+            const m = (date.getMonth() + 1) + 12 * a - 3;
+            const julianDay = date.getDate() + Math.floor((153 * m + 2) / 5) + 365 * y + Math.floor(y / 4) - Math.floor(y / 100) + Math.floor(y / 400) - 32045;
+            
+            // 计算自2000年1月1日12:00 UTC以来的天数
+            const n = julianDay - 2451545.0;
+            
+            // 计算平太阳时
+            const Jstar = n - longitude / 360;
+            
+            // 计算平太阳近点角
+            const M = (357.5291 + 0.98560028 * Jstar) % 360;
+            const MRad = M * Math.PI / 180;
+            
+            // 计算中心差
+            const C = 1.9148 * Math.sin(MRad) + 0.0200 * Math.sin(2 * MRad) + 0.0003 * Math.sin(3 * MRad);
+            
+            // 计算黄经
+            const lambda = (M + C + 180 + 102.9372) % 360;
+            const lambdaRad = lambda * Math.PI / 180;
+            
+            // 计算赤纬
+            const delta = Math.asin(Math.sin(lambdaRad) * Math.sin(23.45 * Math.PI / 180));
+            
+            // 计算时角
+            const omega0 = Math.acos(-Math.tan(latRad) * Math.tan(delta));
+            
+            // 获取当前时间的小时数
+            const hours = date.getHours() + date.getMinutes() / 60 + date.getSeconds() / 3600;
+            
+            // 计算时角（弧度）
+            const omega = (hours - 12) * 15 * Math.PI / 180;
+            
+            // 计算太阳高度角
+            const elevationRad = Math.asin(
+                Math.sin(latRad) * Math.sin(delta) + 
+                Math.cos(latRad) * Math.cos(delta) * Math.cos(omega)
+            );
+            const elevation = elevationRad * 180 / Math.PI;
+            
+            // 计算太阳方位角
+            const azimuthRad = Math.atan2(
+                -Math.sin(omega),
+                Math.tan(delta) * Math.cos(latRad) - Math.sin(latRad) * Math.cos(omega)
+            );
+            let azimuth = azimuthRad * 180 / Math.PI;
+            azimuth = (azimuth + 360) % 360; // 确保角度在0-360度范围内
+            
+            return {
+                elevation: elevation,
+                azimuth: azimuth
+            };
+        }
+
+        // 更新时间
+        function updateDateTime() {
+            const now = new Date();
+            document.getElementById('date').textContent = now.toLocaleDateString('zh-CN');
+            document.getElementById('time').textContent = now.toLocaleTimeString('zh-CN');
+            
+            // 更新太阳位置
+            updateSolarPosition(now);
+        }
+
+        // 更新太阳位置
+        function updateSolarPosition(date) {
+            const latitude = parseFloat(document.getElementById('latitude').textContent);
+            const longitude = parseFloat(document.getElementById('longitude').textContent);
+            
+            if (latitude !== 0 && longitude !== 0) {
+                const solarPos = calculateSolarPosition(latitude, longitude, date);
+                document.getElementById('solarElevation').textContent = solarPos.elevation.toFixed(2) + '°';
+                document.getElementById('solarAzimuth').textContent = solarPos.azimuth.toFixed(2) + '°';
+                document.getElementById('solarCalcTime').textContent = date.toLocaleString('zh-CN');
+            }
+        }
+
+        // 请求传感器权限并开始监听
+        function initSensors() {
+            // 陀螺仪
+            if (window.DeviceOrientationEvent) {
+                window.addEventListener('deviceorientation', function(event) {
+                    document.getElementById('alpha').textContent = event.alpha ? event.alpha.toFixed(2) + '°' : '0.00°';
+                    document.getElementById('beta').textContent = event.beta ? event.beta.toFixed(2) + '°' : '0.00°';
+                    document.getElementById('gamma').textContent = event.gamma ? event.gamma.toFixed(2) + '°' : '0.00°';
+                });
+            }
+
+            // 地理位置
+            if (navigator.geolocation) {
+                navigator.geolocation.watchPosition(function(position) {
+                    document.getElementById('latitude').textContent = position.coords.latitude.toFixed(6);
+                    document.getElementById('longitude').textContent = position.coords.longitude.toFixed(6);
+                    document.getElementById('altitude').textContent = Math.round(position.coords.altitude || 0) + 'm';
+                    document.getElementById('accuracy').textContent = Math.round(position.coords.accuracy) + 'm';
+                    
+                    // 位置更新后重新计算太阳位置
+                    updateSolarPosition(new Date());
+                }, function(error) {
+                    console.error('位置获取失败:', error);
+                });
+            }
+        }
+
+        // 记录数据
+        function recordData() {
+            const sampleName = document.getElementById('sampleName').value.trim();
+            if (!sampleName) {
+                alert('请输入样品名称');
+                return;
+            }
+
+            const now = new Date();
+            const record = {
+                id: Date.now(),
+                sampleName: sampleName,
+                date: now.toLocaleDateString('zh-CN'),
+                time: now.toLocaleTimeString('zh-CN'),
+                alpha: document.getElementById('alpha').textContent,
+                beta: document.getElementById('beta').textContent,
+                gamma: document.getElementById('gamma').textContent,
+                latitude: document.getElementById('latitude').textContent,
+                longitude: document.getElementById('longitude').textContent,
+                altitude: document.getElementById('altitude').textContent,
+                solarElevation: document.getElementById('solarElevation').textContent,
+                solarAzimuth: document.getElementById('solarAzimuth').textContent
+            };
+
+            records.push(record);
+            updateRecordsList();
+            
+            // 清空输入框
+            document.getElementById('sampleName').value = '';
+            
+            // 显示成功提示
+            showToast('数据记录成功');
+        }
+
+        // 更新记录列表
+        function updateRecordsList() {
+            const listContainer = document.getElementById('recordsList');
+            if (records.length === 0) {
+                listContainer.innerHTML = '<div class="text-gray-500 text-center py-4">暂无记录</div>';
+                return;
+            }
+
+            listContainer.innerHTML = records.map(record => `
+                <div class="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                    <div class="flex justify-between items-start mb-2">
+                        <div class="font-medium text-gray-900">${record.sampleName}</div>
+                        <div class="text-xs text-gray-500">${record.date} ${record.time}</div>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2 text-xs mb-1">
+                        <div>α: ${record.alpha}</div>
+                        <div>β: ${record.beta}</div>
+                        <div>γ: ${record.gamma}</div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 text-xs mb-1">
+                        <div class="text-orange-600">太阳高度: ${record.solarElevation}</div>
+                        <div class="text-yellow-600">太阳方位: ${record.solarAzimuth}</div>
+                    </div>
+                    <div class="text-xs text-gray-600">
+                        位置: ${record.latitude}, ${record.longitude} | 海拔: ${record.altitude}
+                    </div>
+                </div>
+            `).reverse().join('');
+        }
+
+        // 下载CSV
+        function downloadCSV() {
+            if (records.length === 0) {
+                alert('暂无数据可下载');
+                return;
+            }
+
+            const headers = ['样品名称', '日期', '时间', 'Alpha(°)', 'Beta(°)', 'Gamma(°)', '太阳高度角(°)', '太阳方位角(°)', '纬度', '经度', '海拔(米)'];
+            const csvContent = [
+                headers.join(','),
+                ...records.map(record => [
+                    record.sampleName,
+                    record.date,
+                    record.time,
+                    record.alpha.replace('°', ''),
+                    record.beta.replace('°', ''),
+                    record.gamma.replace('°', ''),
+                    record.solarElevation.replace('°', ''),
+                    record.solarAzimuth.replace('°', ''),
+                    record.latitude,
+                    record.longitude,
+                    record.altitude.replace('m', '')
+                ].join(','))
+            ].join('\n');
+
+            const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `叶片角度测量_${new Date().toLocaleDateString('zh-CN')}.csv`;
+            link.click();
+            
+            showToast('CSV文件下载成功');
+        }
+
+        // 显示提示
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg z-50';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                document.body.removeChild(toast);
+            }, 2000);
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            updateDateTime();
+            setInterval(updateDateTime, 1000);
+            initSensors();
+        });
+    </script>
+</body>
+</html>

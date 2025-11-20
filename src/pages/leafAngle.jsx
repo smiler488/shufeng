@@ -1,7 +1,7 @@
 // @ts-ignore;
 import React, { useState, useEffect, useRef } from 'react';
 // @ts-ignore;
-import { Compass, Activity, Clock, Edit3, Save, Download, Database, MapPin } from 'lucide-react';
+import { Compass, Activity, Clock, Edit3, Save, Download, Database, MapPin, Sun } from 'lucide-react';
 // @ts-ignore;
 import { useToast } from '@/components/ui';
 
@@ -27,6 +27,13 @@ export default function LeafAngle(props) {
     accuracy: 0
   });
 
+  // 太阳位置数据状态
+  const [solarPosition, setSolarPosition] = useState({
+    elevation: 0,
+    azimuth: 0,
+    lastCalcTime: ''
+  });
+
   // 时间状态
   const [currentDateTime, setCurrentDateTime] = useState({
     date: '',
@@ -42,6 +49,85 @@ export default function LeafAngle(props) {
   // 位置监听器引用
   const watchIdRef = useRef(null);
 
+  // 太阳位置计算函数
+  const calculateSolarPosition = (latitude, longitude, date) => {
+    try {
+      // 将纬度转换为弧度
+      const latRad = latitude * Math.PI / 180;
+
+      // 计算儒略日
+      const a = Math.floor((14 - (date.getMonth() + 1)) / 12);
+      const y = date.getFullYear() + 4800 - a;
+      const m = date.getMonth() + 1 + 12 * a - 3;
+      const julianDay = date.getDate() + Math.floor((153 * m + 2) / 5) + 365 * y + Math.floor(y / 4) - Math.floor(y / 100) + Math.floor(y / 400) - 32045;
+
+      // 计算自2000年1月1日12:00 UTC以来的天数
+      const n = julianDay - 2451545.0;
+
+      // 计算平太阳时
+      const Jstar = n - longitude / 360;
+
+      // 计算平太阳近点角
+      const M = (357.5291 + 0.98560028 * Jstar) % 360;
+      const MRad = M * Math.PI / 180;
+
+      // 计算中心差
+      const C = 1.9148 * Math.sin(MRad) + 0.0200 * Math.sin(2 * MRad) + 0.0003 * Math.sin(3 * MRad);
+
+      // 计算黄经
+      const lambda = (M + C + 180 + 102.9372) % 360;
+      const lambdaRad = lambda * Math.PI / 180;
+
+      // 计算赤纬
+      const delta = Math.asin(Math.sin(lambdaRad) * Math.sin(23.45 * Math.PI / 180));
+
+      // 计算时角
+      const omega0 = Math.acos(-Math.tan(latRad) * Math.tan(delta));
+
+      // 获取当前时间的小时数
+      const hours = date.getHours() + date.getMinutes() / 60 + date.getSeconds() / 3600;
+
+      // 计算时角（弧度）
+      const omega = (hours - 12) * 15 * Math.PI / 180;
+
+      // 计算太阳高度角
+      const elevationRad = Math.asin(Math.sin(latRad) * Math.sin(delta) + Math.cos(latRad) * Math.cos(delta) * Math.cos(omega));
+      const elevation = elevationRad * 180 / Math.PI;
+
+      // 计算太阳方位角
+      const azimuthRad = Math.atan2(-Math.sin(omega), Math.tan(delta) * Math.cos(latRad) - Math.sin(latRad) * Math.cos(omega));
+      let azimuth = azimuthRad * 180 / Math.PI;
+      azimuth = (azimuth + 360) % 360; // 确保角度在0-360度范围内
+
+      return {
+        elevation: elevation,
+        azimuth: azimuth
+      };
+    } catch (error) {
+      console.error('太阳位置计算错误:', error);
+      return {
+        elevation: 0,
+        azimuth: 0
+      };
+    }
+  };
+
+  // 更新太阳位置
+  const updateSolarPosition = date => {
+    const {
+      latitude,
+      longitude
+    } = sensorData;
+    if (latitude !== 0 && longitude !== 0) {
+      const solarPos = calculateSolarPosition(latitude, longitude, date);
+      setSolarPosition({
+        elevation: solarPos.elevation,
+        azimuth: solarPos.azimuth,
+        lastCalcTime: date.toLocaleString('zh-CN')
+      });
+    }
+  };
+
   // 更新时间
   useEffect(() => {
     const updateDateTime = () => {
@@ -50,11 +136,14 @@ export default function LeafAngle(props) {
         date: now.toLocaleDateString('zh-CN'),
         time: now.toLocaleTimeString('zh-CN')
       });
+
+      // 更新太阳位置
+      updateSolarPosition(now);
     };
     updateDateTime();
     const interval = setInterval(updateDateTime, 1000);
     return () => clearInterval(interval);
-  }, []);
+  }, [sensorData.latitude, sensorData.longitude]);
 
   // 初始化传感器
   useEffect(() => {
@@ -174,6 +263,8 @@ export default function LeafAngle(props) {
       alpha: sensorData.alpha.toFixed(2),
       beta: sensorData.beta.toFixed(2),
       gamma: sensorData.gamma.toFixed(2),
+      solarElevation: solarPosition.elevation.toFixed(2),
+      solarAzimuth: solarPosition.azimuth.toFixed(2),
       latitude: sensorData.latitude.toFixed(6),
       longitude: sensorData.longitude.toFixed(6),
       altitude: Math.round(sensorData.altitude)
@@ -197,8 +288,8 @@ export default function LeafAngle(props) {
       });
       return;
     }
-    const headers = ['样品名称', '日期', '时间', 'Alpha(度)', 'Beta(度)', 'Gamma(度)', '纬度', '经度', '海拔(米)'];
-    const csvContent = [headers.join(','), ...records.map(record => [record.sampleName, record.date, record.time, record.alpha, record.beta, record.gamma, record.latitude, record.longitude, record.altitude].join(','))].join('\n');
+    const headers = ['样品名称', '日期', '时间', 'Alpha(度)', 'Beta(度)', 'Gamma(度)', '太阳高度角(度)', '太阳方位角(度)', '纬度', '经度', '海拔(米)'];
+    const csvContent = [headers.join(','), ...records.map(record => [record.sampleName, record.date, record.time, record.alpha, record.beta, record.gamma, record.solarElevation, record.solarAzimuth, record.latitude, record.longitude, record.altitude].join(','))].join('\n');
 
     // 添加BOM以支持中文
     const BOM = '\uFEFF';
@@ -287,6 +378,36 @@ export default function LeafAngle(props) {
           </div>
         </div>
 
+        {/* 太阳位置信息 */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+            <Sun className="w-5 h-5 mr-2 text-orange-500" />
+            太阳位置信息
+          </h2>
+          
+          <div className="grid grid-cols-2 gap-4 mb-4">
+            <div className="bg-orange-50 dark:bg-orange-900/20 rounded-lg p-4 text-center">
+              <div className="text-2xl font-bold text-orange-600">
+                {solarPosition.elevation.toFixed(2)}°
+              </div>
+              <div className="text-sm text-gray-600 dark:text-gray-300">太阳高度角</div>
+            </div>
+            <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-lg p-4 text-center">
+              <div className="text-2xl font-bold text-yellow-600">
+                {solarPosition.azimuth.toFixed(2)}°
+              </div>
+              <div className="text-sm text-gray-600 dark:text-gray-300">太阳方位角</div>
+            </div>
+          </div>
+
+          <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
+            <div className="text-sm text-gray-600 dark:text-gray-300 mb-1">计算时间</div>
+            <div className="text-sm font-semibold text-gray-900 dark:text-white">
+              {solarPosition.lastCalcTime || '等待位置数据...'}
+            </div>
+          </div>
+        </div>
+
         {/* 时间信息 */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
@@ -353,10 +474,14 @@ export default function LeafAngle(props) {
                       {record.date} {record.time}
                     </div>
                   </div>
-                  <div className="grid grid-cols-3 gap-2 text-xs">
+                  <div className="grid grid-cols-3 gap-2 text-xs mb-1">
                     <div>α: {record.alpha}°</div>
                     <div>β: {record.beta}°</div>
                     <div>γ: {record.gamma}°</div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 text-xs mb-1">
+                    <div className="text-orange-600">太阳高度: {record.solarElevation}°</div>
+                    <div className="text-yellow-600">太阳方位: {record.solarAzimuth}°</div>
                   </div>
                   <div className="text-xs text-gray-600 dark:text-gray-300 mt-1 flex items-center">
                     <MapPin className="w-3 h-3 mr-1" />
