@@ -2,9 +2,7 @@
 import React, { useState } from 'react';
 // @ts-ignore;
 import { User, Settings, HelpCircle, Phone, Mail, MapPin, Navigation, Globe, MessageCircle, ChevronRight, Shield, FileText, Star, LogOut, Award, Building } from 'lucide-react'; // @ts-ignore;
-import { useToast } from '@/components/ui';import { LogoHeader } from '@/components/LogoHeader';import { TabBar } from '@/components/TabBar';export default function Profile(props) {const {
-    $w } =
-  props;
+import { useToast } from '@/components/ui';import { LogoHeader } from '@/components/LogoHeader';import { TabBar } from '@/components/TabBar';export default function Profile(props) {const { $w } = props;
   const {
     toast } =
   useToast();
@@ -288,7 +286,7 @@ import { useToast } from '@/components/ui';import { LogoHeader } from '@/compone
                 </div>
                 <button onClick={handlePhoneCall} className="bg-green-600 text-white hover:bg-green-700 px-3 py-2 rounded-lg font-medium transition-colors flex items-center space-x-1">
                   <Phone className="w-4 h-4" />
-                  <span>拨打</span>
+                  <span></span>
                 </button>
               </div>
             </div>
