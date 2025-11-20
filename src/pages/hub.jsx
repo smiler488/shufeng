@@ -33,20 +33,30 @@ export default function Hub(props) {
     description: '植物叶片角度精确测量工具',
     icon: Ruler,
     color: 'bg-green-500',
-    category: '测量工具'
+    category: '测量工具',
+    pageId: 'leafAngle' // 添加页面ID用于跳转
   }, {
     id: 2,
     name: '土地面积测量',
     description: '农田土地面积快速计算',
     icon: Map,
     color: 'bg-blue-500',
-    category: '测量工具'
+    category: '测量工具',
+    pageId: 'landArea' // 添加页面ID用于跳转
   }];
   const handleToolClick = tool => {
-    toast({
-      title: '工具启动',
-      description: `正在打开${tool.name}...`
-    });
+    // 直接跳转到对应页面，而不是显示提示
+    if (tool.pageId) {
+      $w.utils.navigateTo({
+        pageId: tool.pageId,
+        params: {}
+      });
+    } else {
+      toast({
+        title: '工具启动',
+        description: `正在打开${tool.name}...`
+      });
+    }
   };
   return <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-16">
           <LogoHeader />
