@@ -1,0 +1,639 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>农业气象分析工具</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <div class="bg-blue-600 text-white p-4">
+        <div class="flex items-center space-x-3">
+            <i data-lucide="cloud" class="w-6 h-6"></i>
+            <h1 class="text-xl font-bold">农业气象分析工具</h1>
+        </div>
+    </div>
+
+    <div class="p-4 space-y-4">
+        <!-- 位置选择 -->
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <i data-lucide="map-pin" class="w-5 h-5 mr-2 text-blue-600"></i>
+                位置选择
+            </h2>
+            
+            <!-- 选点方式标签页 -->
+            <div class="border-b border-gray-200 mb-4">
+                <nav class="-mb-px flex space-x-8">
+                    <button onclick="switchTab('manual')" class="tab-btn active py-2 px-1 border-b-2 border-blue-500 font-medium text-sm text-blue-600" data-tab="manual">
+                        手动输入
+                    </button>
+                    <button onclick="switchTab('map')" class="tab-btn py-2 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300" data-tab="map">
+                        地图选点
+                    </button>
+                    <button onclick="switchTab('search')" class="tab-btn py-2 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300" data-tab="search">
+                        地名搜索
+                    </button>
+                    <button onclick="switchTab('gps')" class="tab-btn py-2 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300" data-tab="gps">
+                        当前定位
+                    </button>
+                </nav>
+            </div>
+
+            <!-- 手动输入 -->
+            <div id="manual-tab" class="tab-content">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">纬度</label>
+                        <input type="number" id="manual-lat" step="0.000001" placeholder="例: 39.9042" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">经度</label>
+                        <input type="number" id="manual-lng" step="0.000001" placeholder="例: 116.4074" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 地图选点 -->
+            <div id="map-tab" class="tab-content hidden">
+                <div id="map" class="h-64 rounded-lg border border-gray-300"></div>
+                <div class="mt-2 text-sm text-gray-600">
+                    点击地图选择位置：<span id="map-coords" class="font-medium">未选择</span>
+                </div>
+            </div>
+
+            <!-- 地名搜索 -->
+            <div id="search-tab" class="tab-content hidden">
+                <div class="flex space-x-2">
+                    <input type="text" id="search-input" placeholder="输入地名，如：北京、上海、广州" 
+                           class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <button onclick="searchLocation()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                        搜索
+                    </button>
+                </div>
+                <div id="search-results" class="mt-2 space-y-2"></div>
+            </div>
+
+            <!-- 当前定位 -->
+            <div id="gps-tab" class="tab-content hidden">
+                <div class="bg-blue-50 rounded-lg p-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="text-sm text-gray-600 mb-1">当前位置</div>
+                            <div id="gps-coords" class="font-medium text-gray-900">获取中...</div>
+                        </div>
+                        <button onclick="getCurrentLocation()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center">
+                            <i data-lucide="crosshair" class="w-4 h-4 mr-2"></i>
+                            重新定位
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 日期范围选择 -->
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <i data-lucide="calendar" class="w-5 h-5 mr-2 text-green-600"></i>
+                日期范围选择
+            </h2>
+            
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">开始日期</label>
+                    <input type="date" id="start-date" 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">结束日期</label>
+                    <input type="date" id="end-date" 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                </div>
+            </div>
+        </div>
+
+        <!-- 数据获取控制 -->
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <i data-lucide="download" class="w-5 h-5 mr-2 text-orange-600"></i>
+                数据获取
+            </h2>
+            
+            <div class="space-y-4">
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <div class="text-sm text-gray-600 mb-2">当前配置</div>
+                    <div class="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                            <span class="font-medium">位置：</span>
+                            <span id="selected-location">未选择</span>
+                        </div>
+                        <div>
+                            <span class="font-medium">日期范围：</span>
+                            <span id="selected-dates">未选择</span>
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="fetchWeatherData()" class="w-full bg-orange-600 text-white py-3 px-4 rounded-lg hover:bg-orange-700 transition-colors flex items-center justify-center font-medium">
+                    <i data-lucide="cloud-download" class="w-5 h-5 mr-2"></i>
+                    获取NASA气象数据
+                </button>
+
+                <!-- 进度显示 -->
+                <div id="progress-container" class="hidden">
+                    <div class="bg-blue-50 rounded-lg p-4">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-sm font-medium text-blue-900">获取进度</span>
+                            <span id="progress-text" class="text-sm text-blue-700">0%</span>
+                        </div>
+                        <div class="w-full bg-blue-200 rounded-full h-2">
+                            <div id="progress-bar" class="bg-blue-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                        </div>
+                        <div id="status-message" class="mt-2 text-sm text-blue-700"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 数据预览 -->
+        <div id="data-preview" class="bg-white rounded-lg shadow-sm p-6 hidden">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <i data-lucide="table" class="w-5 h-5 mr-2 text-purple-600"></i>
+                数据预览（前100行）
+            </h2>
+            
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr id="table-header">
+                            <!-- 动态生成表头 -->
+                        </tr>
+                    </thead>
+                    <tbody id="table-body" class="bg-white divide-y divide-gray-200">
+                        <!-- 动态生成表格内容 -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mt-4 flex items-center justify-between">
+                <div class="text-sm text-gray-600">
+                    共 <span id="total-rows" class="font-medium">0</span> 行数据，显示前100行
+                </div>
+                <button onclick="exportToCSV()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center">
+                    <i data-lucide="file-down" class="w-4 h-4 mr-2"></i>
+                    导出CSV
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 初始化Lucide图标
+        lucide.createIcons();
+
+        // 全局变量
+        let selectedLocation = { lat: null, lng: null, name: null };
+        let map = null;
+        let marker = null;
+        let weatherData = [];
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeDates();
+            initializeMap();
+            getCurrentLocation();
+        });
+
+        // 初始化日期
+        function initializeDates() {
+            const today = new Date();
+            const lastYear = new Date(today.getFullYear() - 1, today.getMonth(), today.getDate());
+            
+            document.getElementById('start-date').value = lastYear.toISOString().split('T')[0];
+            document.getElementById('end-date').value = today.toISOString().split('T')[0];
+            
+            updateSelectedInfo();
+        }
+
+        // 初始化地图
+        function initializeMap() {
+            map = L.map('map').setView([39.9042, 116.4074], 5);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+
+            map.on('click', function(e) {
+                if (marker) {
+                    map.removeLayer(marker);
+                }
+                
+                marker = L.marker([e.latlng.lat, e.latlng.lng]).addTo(map);
+                selectedLocation = { lat: e.latlng.lat, lng: e.latlng.lng, name: '地图选择' };
+                
+                document.getElementById('map-coords').textContent = 
+                    `${e.latlng.lat.toFixed(6)}, ${e.latlng.lng.toFixed(6)}`;
+                updateSelectedInfo();
+            });
+        }
+
+        // 切换标签页
+        function switchTab(tabName) {
+            // 更新标签按钮状态
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                if (btn.dataset.tab === tabName) {
+                    btn.classList.add('border-blue-500', 'text-blue-600');
+                    btn.classList.remove('border-transparent', 'text-gray-500');
+                } else {
+                    btn.classList.remove('border-blue-500', 'text-blue-600');
+                    btn.classList.add('border-transparent', 'text-gray-500');
+                }
+            });
+
+            // 显示对应内容
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            document.getElementById(`${tabName}-tab`).classList.remove('hidden');
+
+            // 特殊处理地图标签
+            if (tabName === 'map' && map) {
+                setTimeout(() => map.invalidateSize(), 100);
+            }
+        }
+
+        // 获取当前位置
+        function getCurrentLocation() {
+            const coordsElement = document.getElementById('gps-coords');
+            coordsElement.textContent = '获取中...';
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    position => {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+                        selectedLocation = { lat, lng, name: '当前位置' };
+                        
+                        coordsElement.textContent = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+                        updateSelectedInfo();
+                    },
+                    error => {
+                        coordsElement.textContent = '定位失败';
+                        console.error('GPS定位失败:', error);
+                    },
+                    { enableHighAccuracy: true, timeout: 10000 }
+                );
+            } else {
+                coordsElement.textContent = '不支持GPS定位';
+            }
+        }
+
+        // 搜索位置
+        function searchLocation() {
+            const query = document.getElementById('search-input').value;
+            if (!query) return;
+
+            // 使用Nominatim API搜索地名
+            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5`)
+                .then(response => response.json())
+                .then(data => {
+                    const resultsContainer = document.getElementById('search-results');
+                    resultsContainer.innerHTML = '';
+
+                    if (data.length === 0) {
+                        resultsContainer.innerHTML = '<div class="text-sm text-gray-500">未找到相关位置</div>';
+                        return;
+                    }
+
+                    data.forEach(place => {
+                        const div = document.createElement('div');
+                        div.className = 'bg-gray-50 rounded-lg p-3 cursor-pointer hover:bg-gray-100 transition-colors';
+                        div.innerHTML = `
+                            <div class="font-medium text-gray-900">${place.display_name.split(',')[0]}</div>
+                            <div class="text-sm text-gray-600">${place.display_name}</div>
+                        `;
+                        div.onclick = () => selectSearchResult(place);
+                        resultsContainer.appendChild(div);
+                    });
+                })
+                .catch(error => {
+                    console.error('搜索失败:', error);
+                    document.getElementById('search-results').innerHTML = 
+                        '<div class="text-sm text-red-600">搜索失败，请重试</div>';
+                });
+        }
+
+        // 选择搜索结果
+        function selectSearchResult(place) {
+            selectedLocation = {
+                lat: parseFloat(place.lat),
+                lng: parseFloat(place.lon),
+                name: place.display_name.split(',')[0]
+            };
+            
+            document.getElementById('search-results').innerHTML = 
+                `<div class="text-sm text-green-600">已选择：${selectedLocation.name}</div>`;
+            updateSelectedInfo();
+        }
+
+        // 手动输入坐标
+        document.getElementById('manual-lat').addEventListener('input', updateManualLocation);
+        document.getElementById('manual-lng').addEventListener('input', updateManualLocation);
+
+        function updateManualLocation() {
+            const lat = parseFloat(document.getElementById('manual-lat').value);
+            const lng = parseFloat(document.getElementById('manual-lng').value);
+            
+            if (!isNaN(lat) && !isNaN(lng)) {
+                selectedLocation = { lat, lng, name: '手动输入' };
+                updateSelectedInfo();
+            }
+        }
+
+        // 更新选中信息
+        function updateSelectedInfo() {
+            const locationElement = document.getElementById('selected-location');
+            const datesElement = document.getElementById('selected-dates');
+
+            if (selectedLocation.lat && selectedLocation.lng) {
+                locationElement.textContent = 
+                    `${selectedLocation.name} (${selectedLocation.lat.toFixed(4)}, ${selectedLocation.lng.toFixed(4)})`;
+            } else {
+                locationElement.textContent = '未选择';
+            }
+
+            const startDate = document.getElementById('start-date').value;
+            const endDate = document.getElementById('end-date').value;
+            
+            if (startDate && endDate) {
+                datesElement.textContent = `${startDate} 至 ${endDate}`;
+            } else {
+                datesElement.textContent = '未选择';
+            }
+        }
+
+        // 获取气象数据
+        async function fetchWeatherData() {
+            if (!selectedLocation.lat || !selectedLocation.lng) {
+                showToast('请先选择位置', 'error');
+                return;
+            }
+
+            const startDate = document.getElementById('start-date').value;
+            const endDate = document.getElementById('end-date').value;
+            
+            if (!startDate || !endDate) {
+                showToast('请选择日期范围', 'error');
+                return;
+            }
+
+            // 显示进度
+            const progressContainer = document.getElementById('progress-container');
+            progressContainer.classList.remove('hidden');
+            updateProgress(0, '开始获取数据...');
+
+            try {
+                // NASA POWER API调用
+                const server = "https://power.larc.nasa.gov/api/temporal/daily/point";
+                const powerVariables = [
+                    "TOA_SW_DWN",
+                    "ALLSKY_SFC_SW_DWN", 
+                    "T2M",
+                    "T2M_MIN",
+                    "T2M_MAX",
+                    "T2MDEW",
+                    "WS2M",
+                    "PRECTOTCORR"
+                ];
+
+                const params = new URLSearchParams({
+                    request: "execute",
+                    parameters: powerVariables.join(","),
+                    latitude: selectedLocation.lat,
+                    longitude: selectedLocation.lng,
+                    start: startDate.replace(/-/g, ''),
+                    end: endDate.replace(/-/g, ''),
+                    community: "AG",
+                    format: "JSON",
+                    user: "anonymous"
+                });
+
+                updateProgress(20, '连接NASA服务器...');
+                
+                const response = await fetch(`${server}?${params}`);
+                
+                updateProgress(40, '下载数据中...');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                
+                updateProgress(60, '处理数据中...');
+                
+                // 处理数据
+                weatherData = processWeatherData(data);
+                
+                updateProgress(80, '生成预览...');
+                
+                // 显示数据预览
+                displayDataPreview();
+                
+                updateProgress(100, '完成！');
+                
+                setTimeout(() => {
+                    progressContainer.classList.add('hidden');
+                }, 2000);
+
+                showToast('数据获取成功！', 'success');
+
+            } catch (error) {
+                console.error('获取数据失败:', error);
+                showToast('获取数据失败：' + error.message, 'error');
+                progressContainer.classList.add('hidden');
+            }
+        }
+
+        // 处理气象数据
+        function processWeatherData(data) {
+            const fillValue = parseFloat(data.header.fill_value);
+            const variables = [
+                "TOA_SW_DWN",
+                "ALLSKY_SFC_SW_DWN",
+                "T2M", 
+                "T2M_MIN",
+                "T2M_MAX",
+                "T2MDEW",
+                "WS2M",
+                "PRECTOTCORR"
+            ];
+
+            const processedData = [];
+            const dates = Object.keys(data.properties.parameter[variables[0]]);
+
+            dates.forEach(date => {
+                const row = { date: formatDate(date) };
+                
+                variables.forEach(varName => {
+                    const value = data.properties.parameter[varName][date];
+                    row[varName] = value === fillValue ? null : parseFloat(value);
+                });
+
+                // 计算派生数据
+                if (row.T2MDEW !== null) {
+                    row.VAP = calculateVaporPressure(row.T2MDEW);
+                }
+                
+                processedData.push(row);
+            });
+
+            return processedData;
+        }
+
+        // 计算水汽压
+        function calculateVaporPressure(tdew) {
+            if (tdew < -95.0 || tdew > 65.0) return null;
+            const tmp = (17.27 * tdew) / (tdew + 237.3);
+            return 0.6108 * Math.exp(tmp);
+        }
+
+        // 格式化日期
+        function formatDate(dateStr) {
+            const year = dateStr.substring(0, 4);
+            const month = dateStr.substring(4, 6);
+            const day = dateStr.substring(6, 8);
+            return `${year}-${month}-${day}`;
+        }
+
+        // 显示数据预览
+        function displayDataPreview() {
+            const previewContainer = document.getElementById('data-preview');
+            previewContainer.classList.remove('hidden');
+
+            // 生成表头
+            const headerRow = document.getElementById('table-header');
+            const columns = [
+                { key: 'date', label: '日期' },
+                { key: 'ALLSKY_SFC_SW_DWN', label: '太阳辐射(MJ/m²/day)' },
+                { key: 'T2M', label: '平均温度(°C)' },
+                { key: 'T2M_MIN', label: '最低温度(°C)' },
+                { key: 'T2M_MAX', label: '最高温度(°C)' },
+                { key: 'T2MDEW', label: '露点温度(°C)' },
+                { key: 'VAP', label: '水汽压(kPa)' },
+                { key: 'WS2M', label: '风速(m/s)' },
+                { key: 'PRECTOTCORR', label: '降水量(mm/day)' }
+            ];
+
+            headerRow.innerHTML = columns.map(col => 
+                `<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">${col.label}</th>`
+            ).join('');
+
+            // 生成表格内容（前100行）
+            const tbody = document.getElementById('table-body');
+            const previewData = weatherData.slice(0, 100);
+            
+            tbody.innerHTML = previewData.map(row => 
+                `<tr class="hover:bg-gray-50">
+                    ${columns.map(col => 
+                        `<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            ${row[col.key] !== null ? row[col.key].toFixed(2) : '-'}
+                        </td>`
+                    ).join('')}
+                </tr>`
+            ).join('');
+
+            // 更新总行数
+            document.getElementById('total-rows').textContent = weatherData.length;
+        }
+
+        // 导出CSV
+        function exportToCSV() {
+            if (weatherData.length === 0) {
+                showToast('没有数据可导出', 'error');
+                return;
+            }
+
+            const columns = [
+                { key: 'date', label: '日期' },
+                { key: 'ALLSKY_SFC_SW_DWN', label: '太阳辐射(MJ/m2/day)' },
+                { key: 'T2M', label: '平均温度(C)' },
+                { key: 'T2M_MIN', label: '最低温度(C)' },
+                { key: 'T2M_MAX', label: '最高温度(C)' },
+                { key: 'T2MDEW', label: '露点温度(C)' },
+                { key: 'VAP', label: '水汽压(kPa)' },
+                { key: 'WS2M', label: '风速(m/s)' },
+                { key: 'PRECTOTCORR', label: '降水量(mm/day)' }
+            ];
+
+            // 生成CSV内容
+            let csvContent = columns.map(col => col.label).join(',') + '\n';
+            
+            weatherData.forEach(row => {
+                csvContent += columns.map(col => {
+                    const value = row[col.key];
+                    return value !== null ? value.toFixed(2) : '';
+                }).join(',') + '\n';
+            });
+
+            // 添加文件头信息
+            const header = [
+                `农业气象数据`,
+                `位置: ${selectedLocation.name} (${selectedLocation.lat.toFixed(4)}, ${selectedLocation.lng.toFixed(4)})`,
+                `日期范围: ${document.getElementById('start-date').value} 至 ${document.getElementById('end-date').value}`,
+                `数据源: NASA POWER`,
+                `生成时间: ${new Date().toLocaleString('zh-CN')}`,
+                '',
+                ''
+            ].join('\n');
+
+            csvContent = header + csvContent;
+
+            // 下载文件
+            const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            
+            link.setAttribute('href', url);
+            link.setAttribute('download', `农业气象数据_${selectedLocation.name}_${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            showToast('CSV文件导出成功！', 'success');
+        }
+
+        // 更新进度
+        function updateProgress(percent, message) {
+            document.getElementById('progress-bar').style.width = percent + '%';
+            document.getElementById('progress-text').textContent = percent + '%';
+            document.getElementById('status-message').textContent = message;
+        }
+
+        // 显示提示
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            const bgColor = type === 'success' ? 'bg-green-600' : type === 'error' ? 'bg-red-600' : 'bg-blue-600';
+            toast.className = `fixed top-4 right-4 ${bgColor} text-white px-4 py-2 rounded-lg shadow-lg z-50`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                document.body.removeChild(toast);
+            }, 3000);
+        }
+
+        // 监听日期变化
+        document.getElementById('start-date').addEventListener('change', updateSelectedInfo);
+        document.getElementById('end-date').addEventListener('change', updateSelectedInfo);
+    </script>
+</body>
+</html>
