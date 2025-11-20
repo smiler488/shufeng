@@ -1,7 +1,7 @@
 // @ts-ignore;
 import React, { useState } from 'react';
 // @ts-ignore;
-import { User, Mail, Phone, MapPin, Calendar, Settings, LogOut, Edit, Camera, Bell, Shield, HelpCircle, ChevronRight, Star, Clock, Award, BookOpen } from 'lucide-react';
+import { User, Mail, Phone, MapPin, Calendar, Settings, LogOut, Edit, Camera, Bell, Shield, HelpCircle, ChevronRight, Star, Clock, Award, BookOpen, Bot } from 'lucide-react';
 // @ts-ignore;
 import { useToast } from '@/components/ui';
 
@@ -23,7 +23,7 @@ export default function Profile(props) {
     location: '北京市海淀区',
     bio: '专注于农业科研和数据分析，致力于提高农业生产效率。',
     joinDate: '2023-01-15',
-    avatar: 'https://picsum.photos/seed/user123/200/200.jpg'
+    avatar: 'https://picsum.photos/seed/robot-avatar/200/200.jpg'
   });
 
   // 处理标签页切换
@@ -62,14 +62,17 @@ export default function Profile(props) {
 
   // 处理头像上传
   const handleAvatarUpload = () => {
-    // 模拟头像上传
-    const newAvatar = `https://picsum.photos/seed/user${Date.now()}/200/200.jpg`;
+    // 生成机器人风格的头像
+    const robotSeeds = ['robot1', 'robot2', 'robot3', 'android', 'cyborg', 'mech', 'bot-avatar', 'ai-robot', 'tech-robot', 'future-bot'];
+    const randomSeed = robotSeeds[Math.floor(Math.random() * robotSeeds.length)];
+    const newAvatar = `https://picsum.photos/seed/${randomSeed}/200/200.jpg`;
     setUserInfo(prev => ({
       ...prev,
       avatar: newAvatar
     }));
     toast({
       title: '头像更新成功',
+      description: '已切换到新的机器人头像',
       duration: 2000
     });
   };
@@ -139,6 +142,10 @@ export default function Profile(props) {
           {/* 背景装饰 */}
           <div className="h-32 bg-gradient-to-r from-blue-500 to-purple-600 relative">
             <div className="absolute inset-0 bg-black/20" />
+            {/* 添加机器人图标装饰 */}
+            <div className="absolute top-4 right-4 text-white/20">
+              <Bot className="w-16 h-16" />
+            </div>
           </div>
           
           {/* 用户头像和基本信息 */}
@@ -149,6 +156,10 @@ export default function Profile(props) {
                 <button onClick={handleAvatarUpload} className="absolute bottom-0 right-0 bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700 transition-colors">
                   <Camera className="w-4 h-4" />
                 </button>
+                {/* 机器人标识 */}
+                <div className="absolute -top-1 -right-1 bg-green-500 text-white p-1 rounded-full">
+                  <Bot className="w-3 h-3" />
+                </div>
               </div>
               
               <div className="ml-4 mb-2 flex-1">
@@ -156,7 +167,10 @@ export default function Profile(props) {
                     <input type="text" value={userInfo.name} onChange={e => handleInputChange('name', e.target.value)} className="text-xl font-bold text-gray-900 dark:text-white bg-transparent border-b border-gray-300 dark:border-gray-600 focus:border-blue-500 outline-none" />
                     <input type="email" value={userInfo.email} onChange={e => handleInputChange('email', e.target.value)} className="text-sm text-gray-600 dark:text-gray-300 bg-transparent border-b border-gray-300 dark:border-gray-600 focus:border-blue-500 outline-none" />
                   </div> : <div>
-                    <h1 className="text-xl font-bold text-gray-900 dark:text-white">{userInfo.name}</h1>
+                    <h1 className="text-xl font-bold text-gray-900 dark:text-white flex items-center space-x-2">
+                      <span>{userInfo.name}</span>
+                      <Bot className="w-5 h-5 text-blue-600" />
+                    </h1>
                     <p className="text-sm text-gray-600 dark:text-gray-300">{userInfo.email}</p>
                   </div>}
               </div>
