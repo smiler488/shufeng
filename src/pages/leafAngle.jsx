@@ -271,6 +271,8 @@ export default function LeafAngle(props) {
       });
       return;
     }
+
+    // 检查是否已完成所有样品记录
     if (currentRecordNumber > sampleQuantity) {
       toast({
         title: '记录完成',
@@ -297,18 +299,23 @@ export default function LeafAngle(props) {
       longitude: sensorData.longitude.toFixed(6),
       altitude: Math.round(sensorData.altitude)
     };
+
+    // 添加新记录到列表开头
     setRecords(prev => [newRecord, ...prev]);
 
-    // 自动递增编号
-    setCurrentRecordNumber(prev => prev + 1);
+    // 显示成功提示
     toast({
       title: '记录成功',
-      description: `已记录 ${recordSampleName} (${currentRecordNumber}/${sampleQuantity})`,
+      description: `已记录 ${recordSampleName}`,
       duration: 2000
     });
 
-    // 如果完成了所有记录，显示完成提示
-    if (currentRecordNumber >= sampleQuantity) {
+    // 检查是否还有未记录的样品
+    if (currentRecordNumber < sampleQuantity) {
+      // 递增编号准备下一次记录
+      setCurrentRecordNumber(prev => prev + 1);
+    } else {
+      // 已完成所有样品记录
       setTimeout(() => {
         toast({
           title: '测量完成',
@@ -512,23 +519,20 @@ export default function LeafAngle(props) {
             </div>
 
             {/* 当前记录状态 */}
-            <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3">
+            <div className={`rounded-lg p-3 ${currentRecordNumber > sampleQuantity ? 'bg-red-50 dark:bg-red-900/20' : 'bg-blue-50 dark:bg-blue-900/20'}`}>
               <div className="flex justify-between items-center">
-                <div className="text-sm text-blue-800 dark:text-blue-200">
-                  当前记录: <span className="font-semibold">{sampleName.trim() || '样品名称'}-{currentRecordNumber}</span>
+                <div className={`text-sm ${currentRecordNumber > sampleQuantity ? 'text-red-800 dark:text-red-200' : 'text-blue-800 dark:text-blue-200'}`}>
+                  {currentRecordNumber <= sampleQuantity ? `即将记录: ${sampleName.trim() || '样品名称'}-${currentRecordNumber}` : '已完成所有样品记录'}
                 </div>
-                <div className="text-sm text-blue-600 dark:text-blue-300">
-                  进度: {currentRecordNumber} / {sampleQuantity}
+                <div className={`text-sm ${currentRecordNumber > sampleQuantity ? 'text-red-600 dark:text-red-400' : 'text-blue-600 dark:text-blue-300'}`}>
+                  进度: {Math.min(currentRecordNumber, sampleQuantity)} / {sampleQuantity}
                 </div>
               </div>
-              {currentRecordNumber > sampleQuantity && <div className="text-sm text-red-600 dark:text-red-400 mt-1">
-                  已完成所有样品记录
-                </div>}
             </div>
 
             {/* 操作按钮 */}
             <div className="grid grid-cols-3 gap-3">
-              <button onClick={handleRecordData} disabled={currentRecordNumber > sampleQuantity} className={`py-2 px-4 rounded-lg transition-colors flex items-center justify-center ${currentRecordNumber > sampleQuantity ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-green-600 text-white hover:bg-green-700'}`}>
+              <button onClick={handleRecordData} disabled={currentRecordNumber > sampleQuantity || !sampleName.trim()} className={`py-2 px-4 rounded-lg transition-colors flex items-center justify-center ${currentRecordNumber > sampleQuantity || !sampleName.trim() ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-green-600 text-white hover:bg-green-700'}`}>
                 <Save className="w-4 h-4 mr-2" />
                 记录数据
               </button>
