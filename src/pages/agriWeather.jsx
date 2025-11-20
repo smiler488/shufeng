@@ -136,12 +136,12 @@ export default function AgriWeather(props) {
 
   // 搜索位置
   const searchLocation = async () => {
-    if (!searchQuery.trim()) return;
+    if (!searchQuery || !searchQuery.trim()) return;
     setIsSearching(true);
     try {
       const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&limit=5`);
       const data = await response.json();
-      setSearchResults(data);
+      setSearchResults(data || []);
     } catch (error) {
       console.error('搜索失败:', error);
       toast({
@@ -149,6 +149,7 @@ export default function AgriWeather(props) {
         description: '请重试',
         duration: 3000
       });
+      setSearchResults([]);
     } finally {
       setIsSearching(false);
     }
@@ -156,10 +157,11 @@ export default function AgriWeather(props) {
 
   // 选择搜索结果
   const selectSearchResult = place => {
+    if (!place) return;
     const newLocation = {
-      lat: parseFloat(place.lat),
-      lng: parseFloat(place.lon),
-      name: place.display_name.split(',')[0]
+      lat: parseFloat(place.lat || '0'),
+      lng: parseFloat(place.lon || '0'),
+      name: place.display_name && place.display_name.split(',')[0] || '未知地点'
     };
     setSelectedLocation(newLocation);
     setSearchResults([place]); // 只显示选中的结果
@@ -175,27 +177,37 @@ export default function AgriWeather(props) {
       });
       return;
     }
+
+    // 安全更新状态
     setManualCoords(prev => {
       if (!prev) {
         return {
-          lat: field === 'lat' ? value : '',
-          lng: field === 'lng' ? value : ''
+          lat: field === 'lat' ? value || '' : '',
+          lng: field === 'lng' ? value || '' : ''
         };
       }
       return {
         ...prev,
-        [field]: value
+        [field]: value || ''
       };
     });
-    const lat = field === 'lat' ? parseFloat(value || '0') : parseFloat(manualCoords && manualCoords.lat || '0');
-    const lng = field === 'lng' ? parseFloat(value || '0') : parseFloat(manualCoords && manualCoords.lng || '0');
-    if (!isNaN(lat) && !isNaN(lng)) {
-      setSelectedLocation({
-        lat,
-        lng,
-        name: '手动输入'
+
+    // 延迟计算位置，避免状态更新冲突
+    setTimeout(() => {
+      setManualCoords(currentCoords => {
+        if (!currentCoords) return currentCoords;
+        const lat = field === 'lat' ? parseFloat(value || '0') : parseFloat(currentCoords.lat || '0');
+        const lng = field === 'lng' ? parseFloat(value || '0') : parseFloat(currentCoords.lng || '0');
+        if (!isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0) {
+          setSelectedLocation({
+            lat,
+            lng,
+            name: '手动输入'
+          });
+        }
+        return currentCoords;
       });
-    }
+    }, 0);
   };
 
   // 获取气象数据
@@ -227,8 +239,8 @@ export default function AgriWeather(props) {
         parameters: powerVariables.join(","),
         latitude: selectedLocation.lat,
         longitude: selectedLocation.lng,
-        start: dateRange.startDate.replace(/-/g, ''),
-        end: dateRange.endDate.replace(/-/g, ''),
+        start: (dateRange.startDate || '').replace(/-/g, ''),
+        end: (dateRange.endDate || '').replace(/-/g, ''),
         community: "AG",
         format: "JSON",
         user: "anonymous"
@@ -276,17 +288,33 @@ export default function AgriWeather(props) {
 
   // 处理气象数据
   const processWeatherData = data => {
-    const fillValue = parseFloat(data.header.fill_value);
+    if (!data || !data.header || !data.properties || !data.properties.parameter) {
+      console.error('无效的NASA数据格式');
+      return [];
+    }
+    const fillValue = parseFloat(data.header.fill_value || '-999');
     const variables = ["TOA_SW_DWN", "ALLSKY_SFC_SW_DWN", "T2M", "T2M_MIN", "T2M_MAX", "T2MDEW", "WS2M", "PRECTOTCORR"];
     const processedData = [];
-    const dates = Object.keys(data.properties.parameter[variables[0]]);
+
+    // 安全获取第一个变量的日期
+    const firstVar = variables[0];
+    if (!data.properties.parameter[firstVar]) {
+      console.error('无法获取日期数据');
+      return [];
+    }
+    const dates = Object.keys(data.properties.parameter[firstVar]);
     dates.forEach(date => {
       const row = {
         date: formatDate(date)
       };
       variables.forEach(varName => {
-        const value = data.properties.parameter[varName][date];
-        row[varName] = value === fillValue ? null : parseFloat(value);
+        const paramData = data.properties.parameter[varName];
+        if (paramData && paramData[date]) {
+          const value = paramData[date];
+          row[varName] = value === fillValue ? null : parseFloat(value);
+        } else {
+          row[varName] = null;
+        }
       });
 
       // 计算派生数据
@@ -300,13 +328,16 @@ export default function AgriWeather(props) {
 
   // 计算水汽压
   const calculateVaporPressure = tdew => {
-    if (tdew < -95.0 || tdew > 65.0) return null;
+    if (tdew === null || tdew === undefined || tdew < -95.0 || tdew > 65.0) return null;
     const tmp = 17.27 * tdew / (tdew + 237.3);
     return 0.6108 * Math.exp(tmp);
   };
 
   // 格式化日期
   const formatDate = dateStr => {
+    if (!dateStr || typeof dateStr !== 'string' || dateStr.length < 8) {
+      return '未知日期';
+    }
     const year = dateStr.substring(0, 4);
     const month = dateStr.substring(4, 6);
     const day = dateStr.substring(6, 8);
@@ -355,14 +386,20 @@ export default function AgriWeather(props) {
     // 生成CSV内容
     let csvContent = columns.map(col => col.label).join(',') + '\n';
     weatherData.forEach(row => {
+      if (!row) return;
       csvContent += columns.map(col => {
         const value = row[col.key];
-        return value !== null ? value.toFixed(2) : '';
+        return value !== null && value !== undefined ? value.toFixed(2) : '';
       }).join(',') + '\n';
     });
 
     // 添加文件头信息
-    const header = [`农业气象数据`, `位置: ${selectedLocation && selectedLocation.name || '未知'} (${selectedLocation && selectedLocation.lat ? selectedLocation.lat.toFixed(4) : '0.0000'}, ${selectedLocation && selectedLocation.lng ? selectedLocation.lng.toFixed(4) : '0.0000'})`, `日期范围: ${dateRange && dateRange.startDate || ''} 至 ${dateRange && dateRange.endDate || ''}`, `数据源: NASA POWER`, `生成时间: ${new Date().toLocaleString('zh-CN')}`, '', ''].join('\n');
+    const locationName = selectedLocation && selectedLocation.name || '未知';
+    const lat = selectedLocation && selectedLocation.lat ? selectedLocation.lat.toFixed(4) : '0.0000';
+    const lng = selectedLocation && selectedLocation.lng ? selectedLocation.lng.toFixed(4) : '0.0000';
+    const startDate = dateRange && dateRange.startDate || '';
+    const endDate = dateRange && dateRange.endDate || '';
+    const header = [`农业气象数据`, `位置: ${locationName} (${lat}, ${lng})`, `日期范围: ${startDate} 至 ${endDate}`, `数据源: NASA POWER`, `生成时间: ${new Date().toLocaleString('zh-CN')}`, '', ''].join('\n');
     csvContent = header + csvContent;
 
     // 下载文件
@@ -372,7 +409,7 @@ export default function AgriWeather(props) {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.setAttribute('href', url);
-    link.setAttribute('download', `农业气象数据_${selectedLocation && selectedLocation.name || '未知'}_${new Date().toISOString().split('T')[0]}.csv`);
+    link.setAttribute('download', `农业气象数据_${locationName}_${new Date().toISOString().split('T')[0]}.csv`);
     link.style.visibility = 'hidden';
     document.body.appendChild(link);
     link.click();
@@ -516,7 +553,7 @@ export default function AgriWeather(props) {
           {/* 地名搜索 */}
           {activeLocationTab === 'search' && <div className="space-y-4">
               <div className="flex space-x-2">
-                <input type="text" value={searchQuery || ''} onChange={e => setSearchQuery(e.target.value)} onKeyPress={e => e.key === 'Enter' && searchLocation()} placeholder="输入地名，如：北京、上海、广州" className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white" />
+                <input type="text" value={searchQuery && searchQuery || ''} onChange={e => setSearchQuery(e.target.value)} onKeyPress={e => e.key === 'Enter' && searchLocation()} placeholder="输入地名，如：北京、上海、广州" className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white" />
                 <button onClick={searchLocation} disabled={isSearching} className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center">
                   <Search className="w-4 h-4 mr-2" />
                   搜索
@@ -541,7 +578,7 @@ export default function AgriWeather(props) {
                 <div>
                   <div className="text-sm text-gray-600 dark:text-gray-300 mb-1">当前位置</div>
                   <div className="font-medium text-gray-900 dark:text-white">
-                    {gpsStatus || '未知'}
+                    {gpsStatus && gpsStatus || '未知'}
                   </div>
                 </div>
                 <button onClick={getCurrentLocation} className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center">
@@ -564,35 +601,41 @@ export default function AgriWeather(props) {
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 开始日期
               </label>
-              <input type="date" value={dateRange && dateRange.startDate || ''} onChange={e => setDateRange(prev => {
-              if (!prev) {
+              <input type="date" value={dateRange && dateRange.startDate || ''} onChange={e => {
+              const newValue = e.target.value || '';
+              setDateRange(prev => {
+                if (!prev) {
+                  return {
+                    startDate: newValue,
+                    endDate: ''
+                  };
+                }
                 return {
-                  startDate: e.target.value,
-                  endDate: ''
+                  ...prev,
+                  startDate: newValue
                 };
-              }
-              return {
-                ...prev,
-                startDate: e.target.value
-              };
-            })} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:text-white" />
+              });
+            }} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:text-white" />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 结束日期
               </label>
-              <input type="date" value={dateRange && dateRange.endDate || ''} onChange={e => setDateRange(prev => {
-              if (!prev) {
+              <input type="date" value={dateRange && dateRange.endDate || ''} onChange={e => {
+              const newValue = e.target.value || '';
+              setDateRange(prev => {
+                if (!prev) {
+                  return {
+                    startDate: '',
+                    endDate: newValue
+                  };
+                }
                 return {
-                  startDate: '',
-                  endDate: e.target.value
+                  ...prev,
+                  endDate: newValue
                 };
-              }
-              return {
-                ...prev,
-                endDate: e.target.value
-              };
-            })} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:text-white" />
+              });
+            }} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:text-white" />
             </div>
           </div>
         </div>
@@ -665,7 +708,7 @@ export default function AgriWeather(props) {
                 <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                   {weatherData && weatherData.length > 0 && weatherData.slice(0, 100).map((row, index) => <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                       {tableColumns.map(col => <td key={col.key} className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                          {formatCellValue(row[col.key], col.key)}
+                          {formatCellValue(row && row[col.key], col.key)}
                         </td>)}
                     </tr>)}
                 </tbody>
