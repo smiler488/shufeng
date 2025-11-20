@@ -54,8 +54,8 @@ export default function Profile(props) {
     products: 14
   };
 
-  // 默认头像选项
-  const defaultAvatars = ['https://api.dicebear.com/7.x/avataaars/svg?seed=1', 'https://api.dicebear.com/7.x/avataaars/svg?seed=2', 'https://api.dicebear.com/7.x/avataaars/svg?seed=3', 'https://api.dicebear.com/7.x/avataaars/svg?seed=4', 'https://api.dicebear.com/7.x/avataaars/svg?seed=5', 'https://api.dicebear.com/7.x/avataaars/svg?seed=6'];
+  // 机器人头像选项 - 使用机器人风格的头像
+  const defaultAvatars = ['https://api.dicebear.com/7.x/bottts/svg?seed=robot1&backgroundColor=b6e3f4', 'https://api.dicebear.com/7.x/bottts/svg?seed=robot2&backgroundColor=c0aede', 'https://api.dicebear.com/7.x/bottts/svg?seed=robot3&backgroundColor=d1d4f9', 'https://api.dicebear.com/7.x/bottts/svg?seed=robot4&backgroundColor=ffd5dc', 'https://api.dicebear.com/7.x/bottts/svg?seed=robot5&backgroundColor=ffdfbf', 'https://api.dicebear.com/7.x/bottts/svg?seed=robot6&backgroundColor=69d2e7'];
 
   // 检查登录状态
   useEffect(() => {
@@ -618,7 +618,7 @@ export default function Profile(props) {
               </label>
               <div className="grid grid-cols-6 gap-3">
                 {defaultAvatars.map((avatar, index) => <button key={index} onClick={() => handleAvatarSelect(avatar)} className={`relative rounded-lg overflow-hidden border-2 transition-all ${editForm.avatar === avatar ? 'border-green-500 ring-2 ring-green-200' : 'border-gray-200 dark:border-gray-600'}`}>
-                    <img src={avatar} alt={`头像${index + 1}`} className="w-full h-full object-cover aspect-square" />
+                    <img src={avatar} alt={`机器人头像${index + 1}`} className="w-full h-full object-cover aspect-square" />
                     {editForm.avatar === avatar && <div className="absolute inset-0 bg-green-500/20 flex items-center justify-center">
                         <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
                           <span className="text-white text-xs">✓</span>
