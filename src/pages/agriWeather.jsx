@@ -59,14 +59,51 @@ export default function AgriWeather(props) {
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const markerRef = useRef(null);
+  const [mapLoading, setMapLoading] = useState(true);
+  const [mapError, setMapError] = useState(false);
+
+  // 动态加载Leaflet库
+  useEffect(() => {
+    loadLeafletLibrary();
+  }, []);
+
+  // 加载Leaflet库
+  const loadLeafletLibrary = () => {
+    if (typeof window !== 'undefined' && !window.L) {
+      // 加载Leaflet CSS
+      const leafletCss = document.createElement('link');
+      leafletCss.rel = 'stylesheet';
+      leafletCss.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+      document.head.appendChild(leafletCss);
+
+      // 加载Leaflet JS
+      const leafletScript = document.createElement('script');
+      leafletScript.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+      leafletScript.onload = () => {
+        console.log('Leaflet库加载成功');
+        setMapLoading(false);
+        // 延迟初始化地图，确保DOM已准备好
+        setTimeout(() => {
+          initializeMap();
+        }, 100);
+      };
+      leafletScript.onerror = () => {
+        console.error('Leaflet库加载失败');
+        setMapError(true);
+        setMapLoading(false);
+      };
+      document.head.appendChild(leafletScript);
+    } else if (window.L) {
+      setMapLoading(false);
+      setTimeout(() => {
+        initializeMap();
+      }, 100);
+    }
+  };
 
   // 初始化
   useEffect(() => {
     initializeDates();
-    // 延迟初始化地图，确保DOM已加载
-    setTimeout(() => {
-      initializeMap();
-    }, 500);
     getCurrentLocation();
   }, []);
 
@@ -85,6 +122,7 @@ export default function AgriWeather(props) {
     // 检查Leaflet是否已加载
     if (typeof window === 'undefined' || !window.L) {
       console.error('Leaflet未加载');
+      setMapError(true);
       return;
     }
 
@@ -119,15 +157,30 @@ export default function AgriWeather(props) {
       // 保存地图实例
       mapInstanceRef.current = map;
 
-      // 强制刷新地图
+      // 强制刷新地图尺寸
       setTimeout(() => {
         map.invalidateSize();
-      }, 100);
+      }, 200);
       console.log('地图初始化成功');
+      setMapError(false);
     } catch (error) {
       console.error('地图初始化失败:', error);
+      setMapError(true);
     }
   };
+
+  // 当切换到地图标签页时，重新初始化地图
+  useEffect(() => {
+    if (activeLocationTab === 'map' && !mapLoading && !mapError) {
+      setTimeout(() => {
+        if (mapInstanceRef.current) {
+          mapInstanceRef.current.invalidateSize();
+        } else {
+          initializeMap();
+        }
+      }, 100);
+    }
+  }, [activeLocationTab, mapLoading, mapError]);
 
   // 处理地图点击
   const handleMapClick = e => {
@@ -693,7 +746,36 @@ export default function AgriWeather(props) {
                       当前选择: {selectedLocation.lat.toFixed(6)}, {selectedLocation.lng.toFixed(6)}
                     </span>}
                 </div>
-                <div ref={mapRef} className="h-80 rounded-lg border border-gray-300 dark:border-gray-600" />
+                
+                {/* 地图加载状态 */}
+                {mapLoading && <div className="h-80 bg-gray-100 dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600 flex items-center justify-center">
+                    <div className="text-center">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+                      <div className="text-sm text-gray-600 dark:text-gray-400">地图加载中...</div>
+                    </div>
+                  </div>}
+                
+                {/* 地图错误状态 */}
+                {mapError && <div className="h-80 bg-gray-100 dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600 flex items-center justify-center">
+                    <div className="text-center">
+                      <div className="text-red-500 mb-2">
+                        <svg className="w-8 h-8 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      </div>
+                      <div className="text-sm text-gray-600 dark:text-gray-400 mb-2">地图加载失败</div>
+                      <button onClick={() => {
+                  setMapError(false);
+                  setMapLoading(true);
+                  loadLeafletLibrary();
+                }} className="text-blue-600 hover:text-blue-700 text-sm">
+                        重试
+                      </button>
+                    </div>
+                  </div>}
+                
+                {/* 地图正常显示 */}
+                {!mapLoading && !mapError && <div ref={mapRef} className="h-80 rounded-lg border border-gray-300 dark:border-gray-600" />}
               </div>
             </div>}
 
