@@ -5,6 +5,7 @@ import PRODUCTS from '../pages/products.jsx';
 import LEAFANGLE from '../pages/leafAngle.jsx';
 import LANDAREA from '../pages/landArea.jsx';
 import AGRIWEATHER from '../pages/agriWeather.jsx';
+import IMAGEQUANTITATIVEANALYSIS from '../pages/imageQuantitativeAnalysis.jsx';
 export const routers = [{
   id: "home",
   component: HOME
@@ -26,4 +27,7 @@ export const routers = [{
 }, {
   id: "agriWeather",
   component: AGRIWEATHER
+}, {
+  id: "imageQuantitativeAnalysis",
+  component: IMAGEQUANTITATIVEANALYSIS
 }]
