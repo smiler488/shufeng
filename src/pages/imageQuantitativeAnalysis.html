@@ -1,10 +1,10 @@
-
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>图像量化分析工具</title>
+    <title>图像通用量化分析 (OTSU + OBB)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -12,186 +12,118 @@
             border: 2px dashed #cbd5e1;
             transition: all 0.3s ease;
         }
+
         .upload-area:hover {
             border-color: #3b82f6;
             background-color: #f0f9ff;
         }
-        .upload-area.dragover {
-            border-color: #3b82f6;
-            background-color: #dbeafe;
-        }
-        .result-table {
-            max-height: 400px;
-            overflow-y: auto;
-        }
-        .annotation-overlay {
-            position: relative;
-            display: inline-block;
-        }
-        .annotation-overlay img {
-            max-width: 100%;
-            height: auto;
-        }
+
         .loading-spinner {
             border: 3px solid #f3f4f6;
             border-top: 3px solid #3b82f6;
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
+            width: 30px;
+            height: 30px;
             animation: spin 1s linear infinite;
         }
+
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
     </style>
 </head>
-<body class="bg-gray-50">
+
+<body class="bg-gray-50 text-gray-800">
     <!-- Header -->
-    <header class="bg-white shadow-sm border-b">
+    <header class="bg-white shadow-sm border-b sticky top-0 z-10">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <div class="flex items-center">
-                    <i class="fas fa-microscope text-blue-600 text-2xl mr-3"></i>
-                    <h1 class="text-xl font-bold text-gray-900">图像量化分析工具</h1>
+                    <i class="fas fa-chart-pie text-blue-600 text-2xl mr-3"></i>
+                    <h1 class="text-xl font-bold text-gray-900">图像通用量化分析</h1>
                 </div>
-                <div class="flex items-center space-x-4">
-                    <button class="text-gray-500 hover:text-gray-700">
-                        <i class="fas fa-question-circle"></i>
-                    </button>
-                </div>
+                <span class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">Web 预览版</span>
             </div>
         </div>
     </header>
 
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
             <!-- 左侧控制面板 -->
             <div class="lg:col-span-1 space-y-6">
                 <!-- 图像上传 -->
                 <div class="bg-white rounded-lg shadow p-6">
-                    <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                        <i class="fas fa-upload text-blue-600 mr-2"></i>
-                        图像上传
+                    <h2 class="text-lg font-semibold mb-4 flex items-center">
+                        <i class="fas fa-upload text-blue-600 mr-2"></i> 图像源
                     </h2>
-                    <div id="uploadArea" class="upload-area rounded-lg p-8 text-center cursor-pointer">
-                        <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-3"></i>
-                        <p class="text-gray-600 mb-2">拖拽图像到此处或点击选择</p>
-                        <p class="text-sm text-gray-500">支持 JPG, PNG, GIF 格式</p>
+                    <div id="uploadArea" class="upload-area rounded-lg p-8 text-center cursor-pointer relative">
+                        <div id="uploadPlaceholder">
+                            <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-3"></i>
+                            <p class="text-gray-600 mb-1">点击上传或拖拽图像</p>
+                            <p class="text-xs text-gray-400">建议使用白背景拍摄</p>
+                        </div>
+                        <img id="previewImg" class="hidden w-full rounded-lg object-contain max-h-64 mx-auto">
                         <input type="file" id="fileInput" class="hidden" accept="image/*">
                     </div>
-                    <div id="imagePreview" class="mt-4 hidden">
-                        <img id="previewImg" class="w-full rounded-lg" alt="预览图像">
-                        <button id="removeImage" class="mt-2 text-red-600 hover:text-red-700 text-sm">
-                            <i class="fas fa-trash mr-1"></i>移除图像
-                        </button>
-                    </div>
+
+                    <!-- 移除按钮 -->
+                    <button id="removeBtn"
+                        class="hidden w-full mt-3 text-red-500 text-sm hover:bg-red-50 py-2 rounded transition">
+                        <i class="fas fa-trash mr-1"></i> 移除图像
+                    </button>
                 </div>
 
-                <!-- 分析参数 -->
+                <!-- 参数设置 -->
                 <div class="bg-white rounded-lg shadow p-6">
-                    <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                        <i class="fas fa-sliders-h text-green-600 mr-2"></i>
-                        分析参数
+                    <h2 class="text-lg font-semibold mb-4 flex items-center">
+                        <i class="fas fa-sliders-h text-gray-600 mr-2"></i> 参考物设置 (REF)
                     </h2>
-                    
+                    <p class="text-xs text-gray-400 mb-4">系统自动将左上角第一个物体识别为参考物</p>
+
                     <div class="space-y-4">
-                        <!-- 样本类型 -->
+                        <!-- 参考形状 -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">样本类型</label>
-                            <select id="sampleType" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                <option value="leaves">叶片</option>
-                                <option value="seeds-grains">种子/谷物</option>
-                            </select>
-                        </div>
-
-                        <!-- 预期数量 -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                预期数量: <span id="expectedCountValue">5</span>
-                            </label>
-                            <input type="range" id="expectedCount" min="1" max="50" value="5" class="w-full">
-                        </div>
-
-                        <!-- 参考对象模式 -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">参考对象模式</label>
-                            <select id="refMode" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                <option value="auto">自动检测</option>
-                                <option value="coin">硬币</option>
-                                <option value="square">方形卡片</option>
-                            </select>
-                        </div>
-
-                        <!-- 参考对象尺寸 -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                参考对象尺寸 (mm): <span id="refSizeValue">25.0</span>
-                            </label>
-                            <input type="range" id="refSize" min="1" max="100" value="25" step="0.1" class="w-full">
-                        </div>
-
-                        <!-- 面积范围 -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                最小面积 (px²): <span id="minAreaValue">500</span>
-                            </label>
-                            <input type="range" id="minArea" min="10" max="5000" value="500" step="10" class="w-full">
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                最大面积 (px²): <span id="maxAreaValue">50000</span>
-                            </label>
-                            <input type="range" id="maxArea" min="1000" max="200000" value="50000" step="1000" class="w-full">
-                        </div>
-
-                        <!-- HSV范围（仅叶片） -->
-                        <div id="hsvControls">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">HSV色调范围</label>
-                            <div class="grid grid-cols-2 gap-2">
-                                <div>
-                                    <label class="text-xs text-gray-600">下限: <span id="hsvLowValue">35</span></label>
-                                    <input type="range" id="hsvLow" min="0" max="179" value="35" class="w-full">
-                                </div>
-                                <div>
-                                    <label class="text-xs text-gray-600">上限: <span id="hsvHighValue">85</span></label>
-                                    <input type="range" id="hsvHigh" min="0" max="179" value="85" class="w-full">
-                                </div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">参考形状</label>
+                            <div class="flex bg-gray-100 rounded p-1">
+                                <button id="btnSquare"
+                                    class="flex-1 py-1.5 text-sm rounded bg-white shadow text-blue-600 font-medium transition">正方形</button>
+                                <button id="btnCircle"
+                                    class="flex-1 py-1.5 text-sm rounded text-gray-500 transition">圆形</button>
                             </div>
                         </div>
-                    </div>
-                </div>
 
-                <!-- 操作按钮 -->
-                <div class="bg-white rounded-lg shadow p-6">
-                    <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                        <i class="fas fa-play-circle text-orange-600 mr-2"></i>
-                        操作控制
-                    </h2>
-                    
-                    <div class="space-y-3">
-                        <button id="analyzeBtn" class="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center font-medium disabled:opacity-50">
-                            <i class="fas fa-search mr-2"></i>
-                            开始分析
-                        </button>
-                        
-                        <button id="resetBtn" class="w-full bg-gray-600 text-white py-3 px-4 rounded-lg hover:bg-gray-700 transition-colors flex items-center justify-center font-medium">
-                            <i class="fas fa-redo mr-2"></i>
-                            重置
-                        </button>
+                        <!-- 尺寸 -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <span id="sizeLabel">边长</span> (mm)
+                            </label>
+                            <input type="number" id="refSizeInput" value="20"
+                                class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none transition">
+                        </div>
+
+                        <!-- 灵敏度 -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                最小面积过滤 (px)
+                            </label>
+                            <input type="range" id="sensitivityInput" min="10" max="500" value="50" class="w-full">
+                            <div class="text-right text-xs text-gray-400" id="sensitivityValue">50</div>
+                        </div>
                     </div>
 
-                    <!-- 交互校正模式 -->
-                    <div class="mt-4">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">交互校正模式</label>
-                        <select id="correctionMode" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                            <option value="none">无</option>
-                            <option value="set-ref">设置参考对象</option>
-                            <option value="toggle-sample">切换样本选择</option>
-                        </select>
-                        <p class="text-xs text-gray-500 mt-1">点击标注图像进行交互校正</p>
-                    </div>
+                    <!-- 分析按钮 -->
+                    <button id="analyzeBtn" disabled
+                        class="w-full mt-6 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center font-medium shadow-lg shadow-blue-100">
+                        <span id="btnText"><i class="fas fa-search mr-2"></i> 开始智能分析</span>
+                        <div id="btnLoader" class="loading-spinner hidden"></div>
+                    </button>
                 </div>
             </div>
 
@@ -199,95 +131,51 @@
             <div class="lg:col-span-2 space-y-6">
                 <!-- 标注图像 -->
                 <div class="bg-white rounded-lg shadow p-6">
-                    <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                        <i class="fas fa-image text-purple-600 mr-2"></i>
-                        标注图像
-                    </h2>
-                    
-                    <div id="imageContainer" class="annotation-overlay">
-                        <div id="placeholderImage" class="bg-gray-100 rounded-lg p-12 text-center">
-                            <i class="fas fa-image text-6xl text-gray-300 mb-4"></i>
-                            <p class="text-gray-500">上传图像后显示分析结果</p>
-                        </div>
-                        <img id="annotatedImage" class="hidden rounded-lg cursor-crosshair" alt="标注图像">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-lg font-semibold flex items-center">
+                            <i class="fas fa-eye text-purple-600 mr-2"></i> 标注结果
+                        </h2>
                     </div>
 
-                    <!-- 加载状态 -->
-                    <div id="loadingState" class="hidden text-center py-8">
-                        <div class="loading-spinner mx-auto mb-4"></div>
-                        <p class="text-gray-600">正在分析图像...</p>
+                    <div
+                        class="bg-gray-100 rounded-lg min-h-[300px] flex items-center justify-center overflow-hidden relative">
+                        <img id="resultImage" class="max-w-full h-auto hidden" alt="Analysis Result">
+                        <div id="emptyState" class="text-center text-gray-400">
+                            <i class="fas fa-image text-4xl mb-3 opacity-30"></i>
+                            <p>分析后的图像将显示在这里</p>
+                        </div>
                     </div>
                 </div>
 
                 <!-- 数据表格 -->
                 <div class="bg-white rounded-lg shadow p-6">
-                    <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                        <i class="fas fa-table text-indigo-600 mr-2"></i>
-                        量化数据
-                    </h2>
-                    
-                    <div id="dataTableContainer" class="result-table">
-                        <div id="placeholderTable" class="text-center py-8 text-gray-500">
-                            <i class="fas fa-table text-4xl text-gray-300 mb-3"></i>
-                            <p>分析完成后显示数据表格</p>
-                        </div>
-                        <div id="dataTable" class="hidden overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-50">
-                                    <tr>
-                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">标签</th>
-                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">长度(mm)</th>
-                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">宽度(mm)</th>
-                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">面积(mm²)</th>
-                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">周长(mm)</th>
-                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">长宽比</th>
-                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">圆形度</th>
-                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">角度(°)</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="dataTableBody" class="bg-white divide-y divide-gray-200">
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <!-- 导出按钮 -->
-                    <div id="exportButtons" class="mt-4 flex space-x-3 hidden">
-                        <button id="exportCSV" class="flex-1 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center">
-                            <i class="fas fa-file-csv mr-2"></i>
-                            导出CSV
-                        </button>
-                        <button id="exportJSON" class="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center">
-                            <i class="fas fa-file-code mr-2"></i>
-                            导出JSON
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-lg font-semibold flex items-center">
+                            <i class="fas fa-table text-indigo-600 mr-2"></i> 量化数据
+                        </h2>
+                        <button id="downloadBtn"
+                            class="hidden text-sm text-blue-600 bg-blue-50 hover:bg-blue-100 px-3 py-1 rounded transition">
+                            <i class="fas fa-download mr-1"></i> 导出 CSV
                         </button>
                     </div>
-                </div>
 
-                <!-- 统计信息 -->
-                <div id="statisticsPanel" class="bg-white rounded-lg shadow p-6 hidden">
-                    <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                        <i class="fas fa-chart-bar text-teal-600 mr-2"></i>
-                        统计信息
-                    </h2>
-                    
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <div class="bg-blue-50 rounded-lg p-4">
-                            <div class="text-2xl font-bold text-blue-600" id="totalCount">0</div>
-                            <div class="text-sm text-blue-600">检测数量</div>
-                        </div>
-                        <div class="bg-green-50 rounded-lg p-4">
-                            <div class="text-2xl font-bold text-green-600" id="avgLength">0</div>
-                            <div class="text-sm text-green-600">平均长度(mm)</div>
-                        </div>
-                        <div class="bg-purple-50 rounded-lg p-4">
-                            <div class="text-2xl font-bold text-purple-600" id="avgArea">0</div>
-                            <div class="text-sm text-purple-600">平均面积(mm²)</div>
-                        </div>
-                        <div class="bg-orange-50 rounded-lg p-4">
-                            <div class="text-2xl font-bold text-orange-600" id="pixelRatio">0</div>
-                            <div class="text-sm text-orange-600">像素/毫米</div>
-                        </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200 text-sm">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-3 text-left font-medium text-gray-500">ID</th>
+                                    <th class="px-4 py-3 text-left font-medium text-gray-500">长度(mm)</th>
+                                    <th class="px-4 py-3 text-left font-medium text-gray-500">宽度(mm)</th>
+                                    <th class="px-4 py-3 text-left font-medium text-gray-500">面积(mm²)</th>
+                                    <th class="px-4 py-3 text-left font-medium text-gray-500">长宽比</th>
+                                    <th class="px-4 py-3 text-left font-medium text-gray-500">圆形度</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableBody" class="divide-y divide-gray-200 bg-white">
+                                <!-- 数据行 -->
+                            </tbody>
+                        </table>
+                        <div id="tableEmpty" class="text-center py-8 text-gray-400">暂无数据</div>
                     </div>
                 </div>
             </div>
@@ -295,313 +183,419 @@
     </main>
 
     <script>
-        // 全局状态
+        // --- 核心算法函数 (移植自 JSX) ---
+
+        // 1. 灰度化
+        const toGrayscale = (r, g, b) => 0.299 * r + 0.587 * g + 0.114 * b;
+
+        // 2. OTSU 阈值
+        const getOtsuThreshold = (histogram, totalPixels) => {
+            let sum = 0;
+            for (let i = 0; i < 256; i++) sum += i * histogram[i];
+            let sumB = 0, wB = 0, wF = 0, maxVar = 0, threshold = 0;
+
+            for (let i = 0; i < 256; i++) {
+                wB += histogram[i];
+                if (wB === 0) continue;
+                wF = totalPixels - wB;
+                if (wF === 0) break;
+                sumB += i * histogram[i];
+                const mB = sumB / wB;
+                const mF = (sum - sumB) / wF;
+                const varBetween = wB * wF * (mB - mF) * (mB - mF);
+                if (varBetween > maxVar) {
+                    maxVar = varBetween;
+                    threshold = i;
+                }
+            }
+            return threshold;
+        };
+
+        // 3. 形态学腐蚀
+        const erode = (data, width, height, iterations = 1) => {
+            let curr = new Uint8Array(data);
+            let next = new Uint8Array(data);
+            for (let k = 0; k < iterations; k++) {
+                for (let y = 1; y < height - 1; y++) {
+                    for (let x = 1; x < width - 1; x++) {
+                        const idx = y * width + x;
+                        if (curr[idx] === 1) {
+                            if (curr[idx - 1] === 0 || curr[idx + 1] === 0 || curr[idx - width] === 0 || curr[idx + width] === 0) {
+                                next[idx] = 0;
+                            } else {
+                                next[idx] = 1;
+                            }
+                        } else {
+                            next[idx] = 0;
+                        }
+                    }
+                }
+                curr.set(next);
+            }
+            return curr;
+        };
+
+        // 4. 形态学膨胀
+        const dilate = (data, width, height, iterations = 1) => {
+            let curr = new Uint8Array(data);
+            let next = new Uint8Array(data);
+            for (let k = 0; k < iterations; k++) {
+                for (let y = 1; y < height - 1; y++) {
+                    for (let x = 1; x < width - 1; x++) {
+                        const idx = y * width + x;
+                        if (curr[idx] === 0) {
+                            if (curr[idx - 1] === 1 || curr[idx + 1] === 1 || curr[idx - width] === 1 || curr[idx + width] === 1) {
+                                next[idx] = 1;
+                            } else {
+                                next[idx] = 0;
+                            }
+                        } else {
+                            next[idx] = 1;
+                        }
+                    }
+                }
+                curr.set(next);
+            }
+            return curr;
+        };
+
+        // 5. 计算 OBB
+        const calculateOBB = (points) => {
+            if (points.length === 0) return null;
+            let cx = 0, cy = 0;
+            for (let p of points) { cx += p[0]; cy += p[1]; }
+            cx /= points.length; cy /= points.length;
+
+            let u20 = 0, u02 = 0, u11 = 0;
+            for (let p of points) {
+                const dx = p[0] - cx, dy = p[1] - cy;
+                u20 += dx * dx; u02 += dy * dy; u11 += dx * dy;
+            }
+            u20 /= points.length; u02 /= points.length; u11 /= points.length;
+
+            const theta = 0.5 * Math.atan2(2 * u11, u20 - u02);
+            const cos = Math.cos(theta), sin = Math.sin(theta);
+
+            let minU = Infinity, maxU = -Infinity, minV = Infinity, maxV = -Infinity;
+            for (let p of points) {
+                const dx = p[0] - cx, dy = p[1] - cy;
+                const u = dx * cos + dy * sin;
+                const v = -dx * sin + dy * cos;
+                minU = Math.min(minU, u); maxU = Math.max(maxU, u);
+                minV = Math.min(minV, v); maxV = Math.max(maxV, v);
+            }
+
+            const width = maxU - minU;
+            const height = maxV - minV;
+            const centerU = (minU + maxU) / 2;
+            const centerV = (minV + maxV) / 2;
+            const realCx = cx + centerU * cos - centerV * sin;
+            const realCy = cy + centerU * sin + centerV * cos;
+
+            const corners = [
+                [realCx + (cos * width - sin * height) / 2, realCy + (sin * width + cos * height) / 2],
+                [realCx + (-cos * width - sin * height) / 2, realCy + (-sin * width + cos * height) / 2],
+                [realCx + (-cos * width + sin * height) / 2, realCy + (-sin * width - cos * height) / 2],
+                [realCx + (cos * width + sin * height) / 2, realCy + (sin * width - cos * height) / 2],
+            ];
+
+            return { cx: realCx, cy: realCy, width, height, theta, corners, area: points.length };
+        };
+
+        // --- 界面交互逻辑 ---
+
         let currentImage = null;
-        let analysisResults = null;
-        let analysisState = null;
+        let analysisData = null;
+        let refShape = 'square';
 
-        // DOM元素
-        const uploadArea = document.getElementById('uploadArea');
         const fileInput = document.getElementById('fileInput');
-        const imagePreview = document.getElementById('imagePreview');
+        const uploadArea = document.getElementById('uploadArea');
         const previewImg = document.getElementById('previewImg');
-        const removeImage = document.getElementById('removeImage');
+        const uploadPlaceholder = document.getElementById('uploadPlaceholder');
+        const removeBtn = document.getElementById('removeBtn');
         const analyzeBtn = document.getElementById('analyzeBtn');
-        const resetBtn = document.getElementById('resetBtn');
-        const loadingState = document.getElementById('loadingState');
-        const placeholderImage = document.getElementById('placeholderImage');
-        const annotatedImage = document.getElementById('annotatedImage');
-        const placeholderTable = document.getElementById('placeholderTable');
-        const dataTable = document.getElementById('dataTable');
-        const exportButtons = document.getElementById('exportButtons');
-        const statisticsPanel = document.getElementById('statisticsPanel');
+        const tableBody = document.getElementById('tableBody');
+        const resultImage = document.getElementById('resultImage');
 
-        // 滑块值显示
-        const expectedCount = document.getElementById('expectedCount');
-        const expectedCountValue = document.getElementById('expectedCountValue');
-        const refSize = document.getElementById('refSize');
-        const refSizeValue = document.getElementById('refSizeValue');
-        const minArea = document.getElementById('minArea');
-        const minAreaValue = document.getElementById('minAreaValue');
-        const maxArea = document.getElementById('maxArea');
-        const maxAreaValue = document.getElementById('maxAreaValue');
-        const hsvLow = document.getElementById('hsvLow');
-        const hsvLowValue = document.getElementById('hsvLowValue');
-        const hsvHigh = document.getElementById('hsvHigh');
-        const hsvHighValue = document.getElementById('hsvHighValue');
+        // UI 切换
+        document.getElementById('btnSquare').onclick = function () {
+            refShape = 'square';
+            this.className = "flex-1 py-1.5 text-sm rounded bg-white shadow text-blue-600 font-medium transition";
+            document.getElementById('btnCircle').className = "flex-1 py-1.5 text-sm rounded text-gray-500 transition";
+            document.getElementById('sizeLabel').innerText = "边长";
+        };
+        document.getElementById('btnCircle').onclick = function () {
+            refShape = 'circle';
+            this.className = "flex-1 py-1.5 text-sm rounded bg-white shadow text-blue-600 font-medium transition";
+            document.getElementById('btnSquare').className = "flex-1 py-1.5 text-sm rounded text-gray-500 transition";
+            document.getElementById('sizeLabel').innerText = "直径";
+        };
 
-        // 样本类型切换
-        const sampleType = document.getElementById('sampleType');
-        const hsvControls = document.getElementById('hsvControls');
-
-        // 交互校正
-        const correctionMode = document.getElementById('correctionMode');
-
-        // 更新滑块显示值
-        expectedCount.addEventListener('input', () => {
-            expectedCountValue.textContent = expectedCount.value;
-        });
-
-        refSize.addEventListener('input', () => {
-            refSizeValue.textContent = parseFloat(refSize.value).toFixed(1);
-        });
-
-        minArea.addEventListener('input', () => {
-            minAreaValue.textContent = minArea.value;
-        });
-
-        maxArea.addEventListener('input', () => {
-            maxAreaValue.textContent = maxArea.value;
-        });
-
-        hsvLow.addEventListener('input', () => {
-            hsvLowValue.textContent = hsvLow.value;
-        });
-
-        hsvHigh.addEventListener('input', () => {
-            hsvHighValue.textContent = hsvHigh.value;
-        });
-
-        // 样本类型切换
-        sampleType.addEventListener('change', () => {
-            if (sampleType.value === 'leaves') {
-                hsvControls.style.display = 'block';
-            } else {
-                hsvControls.style.display = 'none';
-            }
-        });
-
-        // 文件上传处理
-        uploadArea.addEventListener('click', () => {
-            fileInput.click();
-        });
-
-        uploadArea.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            uploadArea.classList.add('dragover');
-        });
-
-        uploadArea.addEventListener('dragleave', () => {
-            uploadArea.classList.remove('dragover');
-        });
-
-        uploadArea.addEventListener('drop', (e) => {
-            e.preventDefault();
-            uploadArea.classList.remove('dragover');
-            const files = e.dataTransfer.files;
-            if (files.length > 0) {
-                handleFileSelect(files[0]);
-            }
-        });
-
-        fileInput.addEventListener('change', (e) => {
-            if (e.target.files.length > 0) {
-                handleFileSelect(e.target.files[0]);
-            }
-        });
-
-        function handleFileSelect(file) {
-            if (!file.type.startsWith('image/')) {
-                alert('请选择图像文件');
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                currentImage = e.target.result;
-                previewImg.src = currentImage;
-                uploadArea.classList.add('hidden');
-                imagePreview.classList.remove('hidden');
-            };
-            reader.readAsDataURL(file);
+        document.getElementById('sensitivityInput').oninput = function () {
+            document.getElementById('sensitivityValue').innerText = this.value;
         }
 
-        removeImage.addEventListener('click', () => {
+        // 上传处理
+        uploadArea.onclick = () => fileInput.click();
+
+        fileInput.onchange = (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (evt) => {
+                    currentImage = new Image();
+                    currentImage.onload = () => {
+                        previewImg.src = evt.target.result;
+                        previewImg.classList.remove('hidden');
+                        uploadPlaceholder.classList.add('hidden');
+                        removeBtn.classList.remove('hidden');
+                        analyzeBtn.disabled = false;
+
+                        // 重置结果
+                        resultImage.classList.add('hidden');
+                        document.getElementById('emptyState').classList.remove('hidden');
+                        tableBody.innerHTML = '';
+                        document.getElementById('tableEmpty').classList.remove('hidden');
+                        document.getElementById('downloadBtn').classList.add('hidden');
+                    };
+                    currentImage.src = evt.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        };
+
+        removeBtn.onclick = (e) => {
+            e.stopPropagation();
             currentImage = null;
-            analysisResults = null;
-            analysisState = null;
-            uploadArea.classList.remove('hidden');
-            imagePreview.classList.add('hidden');
-            resetResults();
-        });
+            fileInput.value = '';
+            previewImg.classList.add('hidden');
+            uploadPlaceholder.classList.remove('hidden');
+            removeBtn.classList.add('hidden');
+            analyzeBtn.disabled = true;
+        };
 
-        // 分析按钮
-        analyzeBtn.addEventListener('click', performAnalysis);
+        // --- 主分析流程 ---
+        analyzeBtn.onclick = async () => {
+            if (!currentImage) return;
 
-        async function performAnalysis() {
-            if (!currentImage) {
-                alert('请先上传图像');
+            // UI Loading
+            analyzeBtn.disabled = true;
+            document.getElementById('btnText').classList.add('hidden');
+            document.getElementById('btnLoader').classList.remove('hidden');
+
+            // 延时一下让UI渲染Loading
+            setTimeout(() => {
+                try {
+                    runComputerVision();
+                } catch (err) {
+                    alert('分析出错: ' + err.message);
+                    console.error(err);
+                } finally {
+                    analyzeBtn.disabled = false;
+                    document.getElementById('btnText').classList.remove('hidden');
+                    document.getElementById('btnLoader').classList.add('hidden');
+                }
+            }, 100);
+        };
+
+        function runComputerVision() {
+            const refSize = parseFloat(document.getElementById('refSizeInput').value);
+            const minArea = parseInt(document.getElementById('sensitivityInput').value);
+
+            // 1. 降采样
+            const maxDim = 800;
+            const scale = Math.min(1, maxDim / Math.max(currentImage.width, currentImage.height));
+            const processW = Math.floor(currentImage.width * scale);
+            const processH = Math.floor(currentImage.height * scale);
+
+            const canvas = document.createElement('canvas');
+            canvas.width = processW;
+            canvas.height = processH;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(currentImage, 0, 0, processW, processH);
+
+            const imageData = ctx.getImageData(0, 0, processW, processH);
+            const data = imageData.data;
+
+            // 2. 灰度 + OTSU
+            const grayData = new Uint8Array(processW * processH);
+            const histogram = new Array(256).fill(0);
+            for (let i = 0; i < data.length; i += 4) {
+                const g = Math.round(toGrayscale(data[i], data[i + 1], data[i + 2]));
+                grayData[i / 4] = g;
+                histogram[g]++;
+            }
+
+            const otsuThreshold = getOtsuThreshold(histogram, processW * processH);
+            const binaryMap = new Uint8Array(processW * processH);
+            const finalThreshold = Math.max(0, otsuThreshold - 5);
+
+            for (let i = 0; i < grayData.length; i++) {
+                binaryMap[i] = grayData[i] < finalThreshold ? 1 : 0;
+            }
+
+            // 3. 形态学去噪
+            let processedMap = erode(binaryMap, processW, processH, 1);
+            processedMap = dilate(processedMap, processW, processH, 1);
+
+            // 4. 连通域分析
+            const visited = new Uint8Array(processW * processH);
+            const objects = [];
+
+            for (let y = 0; y < processH; y++) {
+                for (let x = 0; x < processW; x++) {
+                    const idx = y * processW + x;
+                    if (processedMap[idx] === 1 && !visited[idx]) {
+                        const points = [];
+                        const queue = [[x, y]];
+                        visited[idx] = 1;
+
+                        while (queue.length > 0) {
+                            const [cx, cy] = queue.shift();
+                            points.push([cx, cy]);
+
+                            const dirs = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+                            for (let d of dirs) {
+                                const nx = cx + d[0], ny = cy + d[1];
+                                if (nx >= 0 && nx < processW && ny >= 0 && ny < processH) {
+                                    const nIdx = ny * processW + nx;
+                                    if (processedMap[nIdx] === 1 && !visited[nIdx]) {
+                                        visited[nIdx] = 1;
+                                        queue.push([nx, ny]);
+                                    }
+                                }
+                            }
+                        }
+
+                        if (points.length > minArea) {
+                            const obb = calculateOBB(points);
+                            if (obb) objects.push(obb);
+                        }
+                    }
+                }
+            }
+
+            if (objects.length === 0) {
+                alert("未检测到对象，请检查背景是否为白色且光照均匀。");
                 return;
             }
 
-            // 显示加载状态
-            loadingState.classList.remove('hidden');
-            placeholderImage.classList.add('hidden');
-            annotatedImage.classList.add('hidden');
-            analyzeBtn.disabled = true;
+            // 5. 排序与计算
+            objects.sort((a, b) => (a.cx * a.cx + a.cy * a.cy) - (b.cx * b.cx + b.cy * b.cy));
 
-            try {
-                // 模拟分析过程
-                await new Promise(resolve => setTimeout(resolve, 2000));
+            const finalObjects = objects.map((obj, idx) => ({
+                ...obj,
+                cx: obj.cx / scale, cy: obj.cy / scale,
+                width: obj.width / scale, height: obj.height / scale,
+                corners: obj.corners.map(c => [c[0] / scale, c[1] / scale]),
+                area: obj.area / (scale * scale),
+                id: idx === 0 ? 'REF' : `S${idx}`
+            }));
 
-                // 生成模拟结果
-                const mockResults = generateMockResults();
-                displayResults(mockResults);
-                
-            } catch (error) {
-                console.error('分析失败:', error);
-                alert('分析失败，请重试');
-            } finally {
-                loadingState.classList.add('hidden');
-                analyzeBtn.disabled = false;
-            }
+            const refObj = finalObjects[0];
+            const refPixelSize = refShape === 'square'
+                ? Math.max(refObj.width, refObj.height)
+                : (refObj.width + refObj.height) / 2;
+            const pixelsPerMm = refPixelSize / refSize;
+
+            // 6. 渲染结果
+            renderResults(finalObjects, pixelsPerMm);
         }
 
-        function generateMockResults() {
-            const count = parseInt(expectedCount.value);
-            const results = [];
-            
-            for (let i = 1; i <= count; i++) {
-                results.push({
-                    label: `s${i}`,
-                    length_mm: (Math.random() * 50 + 20).toFixed(2),
-                    width_mm: (Math.random() * 30 + 10).toFixed(2),
-                    area_mm2: (Math.random() * 1000 + 200).toFixed(2),
-                    perimeter_mm: (Math.random() * 150 + 50).toFixed(2),
-                    aspect_ratio: (Math.random() * 2 + 1).toFixed(2),
-                    circularity: (Math.random() * 0.5 + 0.5).toFixed(3),
-                    angle_deg: (Math.random() * 180).toFixed(1),
-                    meanR: Math.floor(Math.random() * 100 + 100),
-                    meanG: Math.floor(Math.random() * 100 + 150),
-                    meanB: Math.floor(Math.random() * 50 + 50),
-                    hue: Math.floor(Math.random() * 60 + 30),
-                    saturation: Math.floor(Math.random() * 100 + 100),
-                    value: Math.floor(Math.random() * 100 + 150),
-                    greenIndex: (Math.random() * 0.5).toFixed(3),
-                    brownIndex: (Math.random() * 0.3).toFixed(3)
-                });
-            }
+        function renderResults(objects, pixelsPerMm) {
+            // 绘制图像
+            const displayCanvas = document.createElement('canvas');
+            displayCanvas.width = currentImage.width;
+            displayCanvas.height = currentImage.height;
+            const ctx = displayCanvas.getContext('2d');
+            ctx.drawImage(currentImage, 0, 0);
 
-            return {
-                components: results,
-                pixelRatio: 4.0,
-                annotatedImage: currentImage // 实际应用中应该是处理后的图像
-            };
-        }
+            const lw = Math.max(2, currentImage.width / 300);
+            ctx.lineWidth = lw;
+            ctx.font = `bold ${Math.max(16, currentImage.width / 40)}px Arial`;
 
-        function displayResults(results) {
-            analysisResults = results;
-            
-            // 显示标注图像
-            annotatedImage.src = results.annotatedImage;
-            placeholderImage.classList.add('hidden');
-            annotatedImage.classList.remove('hidden');
+            // 表格数据
+            let csvData = [];
+            tableBody.innerHTML = '';
 
-            // 显示数据表格
-            const tbody = document.getElementById('dataTableBody');
-            tbody.innerHTML = '';
-            
-            results.components.forEach(item => {
-                const row = tbody.insertRow();
-                row.innerHTML = `
-                    <td class="px-4 py-2 text-sm font-medium text-gray-900">${item.label}</td>
-                    <td class="px-4 py-2 text-sm text-gray-700">${item.length_mm}</td>
-                    <td class="px-4 py-2 text-sm text-gray-700">${item.width_mm}</td>
-                    <td class="px-4 py-2 text-sm text-gray-700">${item.area_mm2}</td>
-                    <td class="px-4 py-2 text-sm text-gray-700">${item.perimeter_mm}</td>
-                    <td class="px-4 py-2 text-sm text-gray-700">${item.aspect_ratio}</td>
-                    <td class="px-4 py-2 text-sm text-gray-700">${item.circularity}</td>
-                    <td class="px-4 py-2 text-sm text-gray-700">${item.angle_deg}</td>
+            objects.forEach((obj, i) => {
+                // 绘图
+                const color = i === 0 ? '#ef4444' : '#3b82f6';
+
+                // OBB 框
+                ctx.strokeStyle = color;
+                ctx.beginPath();
+                ctx.moveTo(obj.corners[0][0], obj.corners[0][1]);
+                for (let j = 1; j < 4; j++) ctx.lineTo(obj.corners[j][0], obj.corners[j][1]);
+                ctx.closePath();
+                ctx.stroke();
+
+                // 十字轴
+                const cos = Math.cos(obj.theta), sin = Math.sin(obj.theta);
+                // 长轴(黄)
+                ctx.strokeStyle = 'rgba(255, 255, 0, 0.8)';
+                ctx.beginPath();
+                ctx.moveTo(obj.cx - (obj.width / 2) * cos, obj.cy - (obj.width / 2) * sin);
+                ctx.lineTo(obj.cx + (obj.width / 2) * cos, obj.cy + (obj.width / 2) * sin);
+                ctx.stroke();
+                // 短轴(青)
+                ctx.strokeStyle = 'rgba(0, 255, 255, 0.8)';
+                ctx.beginPath();
+                ctx.moveTo(obj.cx - (obj.height / 2) * (-sin), obj.cy - (obj.height / 2) * cos);
+                ctx.lineTo(obj.cx + (obj.height / 2) * (-sin), obj.cy + (obj.height / 2) * cos);
+                ctx.stroke();
+
+                // 标签
+                ctx.fillStyle = color;
+                ctx.fillText(obj.id, obj.corners[2][0], obj.corners[2][1] - 10);
+
+                // 数据计算
+                const len = (Math.max(obj.width, obj.height) / pixelsPerMm).toFixed(2);
+                const wid = (Math.min(obj.width, obj.height) / pixelsPerMm).toFixed(2);
+                const area = (obj.area / (pixelsPerMm * pixelsPerMm)).toFixed(2);
+                const ratio = (len / wid).toFixed(2);
+                const circularity = (4 * Math.PI * obj.area / Math.pow(obj.width * 2 + obj.height * 2, 2)).toFixed(3);
+
+                // 填充表格
+                const row = `
+                    <tr class="${i === 0 ? 'bg-red-50' : 'hover:bg-gray-50'}">
+                        <td class="px-4 py-3 font-medium ${i === 0 ? 'text-red-600' : 'text-blue-600'}">${obj.id}</td>
+                        <td class="px-4 py-3">${len}</td>
+                        <td class="px-4 py-3">${wid}</td>
+                        <td class="px-4 py-3">${area}</td>
+                        <td class="px-4 py-3">${ratio}</td>
+                        <td class="px-4 py-3">${circularity}</td>
+                    </tr>
                 `;
+                tableBody.insertAdjacentHTML('beforeend', row);
+
+                csvData.push({ id: obj.id, len, wid, area, ratio, circularity });
             });
 
-            placeholderTable.classList.add('hidden');
-            dataTable.classList.remove('hidden');
-            exportButtons.classList.remove('hidden');
-            statisticsPanel.classList.remove('hidden');
-
-            // 更新统计信息
-            updateStatistics(results);
+            // 显示结果
+            resultImage.src = displayCanvas.toDataURL();
+            resultImage.classList.remove('hidden');
+            document.getElementById('emptyState').classList.add('hidden');
+            document.getElementById('tableEmpty').classList.add('hidden');
+            document.getElementById('downloadBtn').classList.remove('hidden');
+            analysisData = csvData;
         }
 
-        function updateStatistics(results) {
-            const count = results.components.length;
-            const avgLength = (results.components.reduce((sum, item) => sum + parseFloat(item.length_mm), 0) / count).toFixed(2);
-            const avgArea = (results.components.reduce((sum, item) => sum + parseFloat(item.area_mm2), 0) / count).toFixed(2);
-
-            document.getElementById('totalCount').textContent = count;
-            document.getElementById('avgLength').textContent = avgLength;
-            document.getElementById('avgArea').textContent = avgArea;
-            document.getElementById('pixelRatio').textContent = results.pixelRatio.toFixed(2);
-        }
-
-        // 重置按钮
-        resetBtn.addEventListener('click', resetResults);
-
-        function resetResults() {
-            analysisResults = null;
-            analysisState = null;
-            
-            placeholderImage.classList.remove('hidden');
-            annotatedImage.classList.add('hidden');
-            placeholderTable.classList.remove('hidden');
-            dataTable.classList.add('hidden');
-            exportButtons.classList.add('hidden');
-            statisticsPanel.classList.add('hidden');
-            
-            document.getElementById('dataTableBody').innerHTML = '';
-        }
-
-        // 导出功能
-        document.getElementById('exportCSV').addEventListener('click', () => {
-            if (!analysisResults) return;
-            
-            let csv = 'Label,Length(mm),Width(mm),Area(mm²),Perimeter(mm),Aspect Ratio,Circularity,Angle(°)\n';
-            analysisResults.components.forEach(item => {
-                csv += `${item.label},${item.length_mm},${item.width_mm},${item.area_mm2},${item.perimeter_mm},${item.aspect_ratio},${item.circularity},${item.angle_deg}\n`;
+        // 导出CSV
+        document.getElementById('downloadBtn').onclick = () => {
+            if (!analysisData) return;
+            let csv = "ID,Length(mm),Width(mm),Area(mm2),AspectRatio,Circularity\n";
+            analysisData.forEach(row => {
+                csv += `${row.id},${row.len},${row.wid},${row.area},${row.ratio},${row.circularity}\n`;
             });
-            
-            downloadFile(csv, 'analysis_results.csv', 'text/csv');
-        });
-
-        document.getElementById('exportJSON').addEventListener('click', () => {
-            if (!analysisResults) return;
-            
-            const json = JSON.stringify(analysisResults.components, null, 2);
-            downloadFile(json, 'analysis_results.json', 'application/json');
-        });
-
-        function downloadFile(content, filename, contentType) {
-            const blob = new Blob([content], { type: contentType });
+            const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = filename;
+            a.download = 'analysis_result.csv';
             a.click();
-            URL.revokeObjectURL(url);
-        }
-
-        // 图像点击交互
-        annotatedImage.addEventListener('click', (e) => {
-            if (!analysisResults || correctionMode.value === 'none') return;
-            
-            const rect = annotatedImage.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            
-            console.log(`点击位置: (${x.toFixed(0)}, ${y.toFixed(0)}), 模式: ${correctionMode.value}`);
-            
-            // 这里可以实现实际的交互校正逻辑
-            if (correctionMode.value === 'set-ref') {
-                alert('设置参考对象功能需要在实际应用中实现');
-            } else if (correctionMode.value === 'toggle-sample') {
-                alert('切换样本选择功能需要在实际应用中实现');
-            }
-        });
-
-        // 初始化
-        sampleType.dispatchEvent(new Event('change'));
+        };
     </script>
 </body>
+
 </html>
-    
