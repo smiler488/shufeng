@@ -36,24 +36,19 @@ export default function Products(props) {
   }, []);
   const categories = [{
     id: 'all',
-    name: '全部产品',
-    icon: '🔬' },
+    name: '全部产品' },
   {
     id: 'photosynthesis-gas',
-    name: '光合-气体交换',
-    icon: '🌿' },
+    name: '光合-气体交换' },
   {
     id: 'photosynthesis-fluorescence',
-    name: '光合-叶绿素荧光',
-    icon: '✨' },
+    name: '光合-叶绿素荧光' },
   {
     id: 'phenotype',
-    name: '植物表型',
-    icon: '📊' },
+    name: '植物表型' },
   {
     id: 'environment',
-    name: '环境监测',
-    icon: '🌡️' }];
+    name: '环境监测' }];
 
   const products = {
     'photosynthesis-gas': [{
@@ -229,7 +224,7 @@ export default function Products(props) {
 
     'photosynthesis-fluorescence': [{
       id: 'fdm-m',
-      name: '叶绿素荧光成像系统 FDM-M系列',
+      name: '叶绿素荧光成像系统FDM-M系列',
       category: '光合-叶绿素荧光',
       description: 'FDM-M系列是由一个测量箱体、一台主机、一个显示屏组成的台式测量系统，该系列包括FDM-M1定焦版、FDM-M2变焦版、FDM-M3多光谱版三个型号。FDM-M系列的测量面积为15cm*20cm，搭载可变焦相机最大成像面积为23*23cm，适用于微藻、叶片及拟南芥、烟草、番茄等小型盆栽植物的测量。通过检测植物叶片叶绿素荧光信号，直观呈现光合生理状态，为植物生理生态、农业科研等提供量化分析工具。',
       features: ['高分辨率500万像素成像', '成像范围15*20cm，变焦版最大23*23cm', '可选配自动变焦镜头', '自定义框选区域分析', '自动去除暗背景功能', '图像与数据本地自动存储', '支持FLC、SL等自动测量曲线', '可选配多光谱荧光成像', '提供API接口支持集成开发', '实时显示15种以上荧光参数'],
@@ -266,8 +261,8 @@ export default function Products(props) {
         '暗适应状态的最小荧光': 'Fo',
         '暗适应后饱和脉冲测量的最大荧光': 'Fm',
         '作用光下的稳态荧光': 'Ft',
-        '作用光下的最小荧光': 'Fo\'',
-        '作用光下的最大荧光': 'Fm\'',
+        '作用光下的最小荧光': 'Fo',
+        '作用光下的最大荧光': 'Fm',
         '暗适应之后的最大可变荧光': 'Fv',
         '光系统II最大量子效率': 'Fv/Fm',
         '作用光下光系统II实际量子效率': 'Y(II)',
@@ -282,144 +277,437 @@ export default function Products(props) {
       id: 'fdm-s',
       name: '大面积叶绿素荧光成像系统FDM-S系列',
       category: '光合-叶绿素荧光',
-      description: '适用于大面积样品的叶绿素荧光成像分析系统',
-      features: ['大面积成像', '均匀照明', '高信噪比', '自动化扫描'],
+      description: 'FDM-S系列为一体化立式设计，该系列包括FDM-S1定焦版、FDM-S2变焦版、FDM-S3多光谱版三个型号。FDM-S系列的测量面积为35cm*40cm，适用于各类中大型盆栽植物测量及高通量多孔穴盘筛选。通过检测植物叶片叶绿素荧光信号，直观呈现光合生理状态，为植物生理生态、农业科研等提供量化分析工具。',
+      features: ['高分辨率500万像素', '成像范围35*40cm', '可选配自动变焦镜头，测量尺度切换无压力', '自定义框选，同步获取整株/单叶数据', '自动去除暗背景，平均值计算及保存功能', '图像与数据本地自动存储', '支持FLC、SL等自动测量曲线，时间、光强可设置', '可选配多光谱荧光成像及荧光蛋白成像', '提供API接口，支持集成开发'],
       specifications: {
-        '成像面积': '30×30cm',
-        '分辨率': '4096×4096',
-        '均匀性': '>95%',
-        '扫描时间': '<30s' },
+        '产品型号': 'FDM-S1定焦版、FDM-S2变焦版、FDM-S3多光谱版',
+        '图像分辨率': '≥500万像素',
+        '成像范围': '≥35cm*40cm，适合高通量多孔穴盘筛选、中大型盆栽植物',
+        '激发光源': '450nm蓝光',
+        '叶片吸光度测量光源': '红光，远红光',
+        '光强均匀度变异': '<5% (目标范围内)',
+        '激发光标准光强': '0.5 umol m-2 s-1（可调节）',
+        '饱和脉冲SP最大光强': '5000 umol m-2 s-1（可调节）',
+        '光化光AL强度': '1800 umol m-2 s-1（可调节）',
+        '实时荧光参数输出': '≥15种，包括Fo, Fm, Fv, Fv/Fm, Fm\', Ft, Y(II), NPQ, Y(NPQ), Y(NO), Fo\', qP, qL, qN, ETR等',
+        '叶片吸光度检测': '具备',
+        '图像输出格式': 'TIFF，JPG',
+        '工作温度': '5~45摄氏度，非凝结',
+        '软件功能': '设备连接，自定义存储路径，自动去除背景噪点，测量光、光化光及饱和光的光强设置，图像采集与分析功能',
+        '自动快速光曲线测量': '支持Fast Light Curve快速光曲线荧光成像自动测量，光强梯度、测量时长等参数可设置，测量进度可实时查看',
+        '自动荧光诱导曲线测量': '支持Slow Kinetics暗弛豫曲线荧光成像自动测量，光下序列数组、暗下序列数组及光强参数可设置，测量进度可实时查看',
+        '平均值计算': '自动去除暗背景，平均值计算和保存功能',
+        '数据自动存储': '支持图像及参数数据本地实时存储，无需手动导出',
+        '集成开发支持': '提供API接口，可控制模块执行拍摄任务，可指定图像存储目录',
+        '感兴趣区域框选计算': '可手动框选感兴趣的测量区域，可自定义形状（圆形、矩形等）框选，并对选中的多个区域内的荧光参数值进行比较，并导出到EXCEL表格中，支持下载查看',
+        '伪彩色调节': '软件内置至少12种伪彩色标尺，可实时调节成像伪彩',
+        '控制单元': '固态硬盘容量≥1T，显示器≥24英寸，内存≥16G'
+      },
 
       images: ['https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=800&h=600&fit=crop', 'https://images.unsplash.com/photo-1593115048165-9dc1b9d0c6ab?w=800&h=600&fit=crop'],
-      applications: ['高通量筛选', '大面积样品分析', '群体研究', '育种应用'] },
+      applications: ['光系统II机制解析', '作物表型与育种筛选', '病虫害早期诊断', '逆境生理生态研究', '胁迫响应机制', '作物生理状态监测'],
+      sampleTypes: ['中大型盆栽植物', '高通量多孔穴盘筛选'],
+      researchBackground: '通过检测植物叶片叶绿素荧光信号，直观呈现光合生理状态。能测定PSⅡ最大光化学效率、光化学猝灭等参数，用于研究植物光合效率、逆境胁迫（如干旱、高温、重金属）响应、遗传育种筛选及药物/农药对光合系统的影响等，以成像方式可视化不同区域光合性能差异，为植物生理生态、农业科研等提供量化分析工具。',
+      measurableParameters: {
+        '暗适应状态的最小荧光': 'Fo',
+        '暗适应后饱和脉冲测量的最大荧光': 'Fm',
+        '作用光下的稳态荧光': 'Ft',
+        '作用光下的最小荧光': 'Fo',
+        '作用光下的最大荧光': 'Fm',
+        '暗适应之后的最大可变荧光': 'Fv',
+        '光系统II最大量子效率': 'Fv/Fm',
+        '作用光下光系统II实际量子效率': 'Y(II)',
+        '电子传递速率': 'ETR=YII*PAR*0.5*abs',
+        '非光化学猝灭系数': 'NPQ, qN',
+        '光化学淬灭系数': 'qP, qL',
+        '非光化学淬灭耗散的能量比例': 'Y(NPQ)',
+        '非调节性能量耗散的比例': 'Y(NO)'
+      },
+      technicalHighlights: [
+        '高分辨率500万像素成像，清晰呈现荧光细节',
+        '一体化立式设计，适合实验室空间限制',
+        '可选配自动变焦镜头，测量尺度切换无压力',
+        '实时显示15种以上荧光参数，每个参数均可显示荧光彩色图像',
+        '支持Fast Light Curve和Slow Kinetics自动测量曲线',
+        '自定义框选感兴趣区域，支持多区域数据比较分析',
+        '提供API接口，支持系统集成和二次开发',
+        '自动去除暗背景和平均值计算功能，提高数据准确性'
+      ]
+    },
     {
       id: 'fdm-l',
       name: '吊装式叶绿素荧光成像系统FDM-L系列',
       category: '光合-叶绿素荧光',
-      description: '吊装式设计，适用于温室和大田植物的叶绿素荧光成像',
-      features: ['吊装设计', '远程控制', '防尘防水', '大范围覆盖'],
+      description: 'FDM-L作为专业的吊装式植物表型测量设备，采用模块化设计理念，可高效集成于田间表型平台及室内可移动桁架上，与其他表型采集模块深度兼容，实现植物生长数据的连续动态采集。该系列测量面积为35cm*40cm，既满足单株植物精细化测量需求，又适配行距≥50cm的田间种植模式（如玉米、大豆等中耕作物）。',
+      features: ['高分辨率500万像素', '成像范围35*40cm', '模块化设计，可与表型平台深度兼容', '自定义框选，同步获取整株/单叶数据', '自动去除暗背景，平均值计算及保存功能', '图像与数据本地自动存储', '支持FLC、SL等自动测量曲线，时间、光强可设置', '可选配多光谱荧光成像及荧光蛋白成像', '提供API接口，支持集成开发'],
       specifications: {
-        '安装高度': '2-5m',
-        '覆盖范围': '2×2m',
-        '防护等级': 'IP66',
-        '控制距离': '100m' },
+        '产品型号': 'FDM-L系列吊装式',
+        '图像分辨率': '≥500万像素',
+        '成像范围': '≥35cm*40cm，适合吊装，可集成于植物表型平台',
+        '激发光源': '450nm蓝光',
+        '叶片吸光度测量光源': '红光，远红光',
+        '光强均匀度变异': '<5% (目标范围内)',
+        '激发光标准光强': '0.5 umol m-2 s-1（可调节）',
+        '饱和脉冲SP最大光强': '5000 umol m-2 s-1（可调节）',
+        '光化光AL强度': '1800 umol m-2 s-1（可调节）',
+        '实时荧光参数输出': '≥15种，包括Fo, Fm, Fv, Fv/Fm, Fm\', Ft, Y(II), NPQ, Y(NPQ), Y(NO), Fo\', qP, qL, qN, ETR等',
+        '叶片吸光度检测': '具备',
+        '图像输出格式': 'TIFF，JPG',
+        '工作温度': '5~45摄氏度，非凝结',
+        '软件功能': '设备连接，自定义存储路径，自动去除背景噪点，测量光、光化光及饱和光的光强设置，图像采集与分析功能',
+        '自动快速光曲线测量': '支持Fast Light Curve快速光曲线荧光成像自动测量，光强梯度、测量时长等参数可设置，测量进度可实时查看',
+        '自动荧光诱导曲线测量': '支持Slow Kinetics暗弛豫曲线荧光成像自动测量，光下序列数组、暗下序列数组及光强参数可设置，测量进度可实时查看',
+        '平均值计算': '自动去除暗背景，平均值计算和保存功能',
+        '数据自动存储': '支持图像及参数数据本地实时存储，无需手动导出',
+        '集成开发支持': '提供API接口，可控制模块执行拍摄任务，可指定图像存储目录',
+        '感兴趣区域框选计算': '可手动框选感兴趣的测量区域，可自定义形状（圆形、矩形等）框选，并对选中的多个区域内的荧光参数值进行比较，并导出到EXCEL表格中，支持下载查看',
+        '伪彩色调节': '软件内置至少12种伪彩色标尺，可实时调节成像伪彩',
+        '控制单元': '固态硬盘容量≥1T，显示器≥24英寸，内存≥16G'
+      },
 
       images: ['https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&h=600&fit=crop', 'https://images.unsplash.com/photo-1542831371-29b0f74f9713?w=800&h=600&fit=crop'],
-      applications: ['温室监测', '大田研究', '连续观测', '自动化管理'] },
+      applications: ['光系统II机制解析', '作物表型与育种筛选', '病虫害早期诊断', '逆境生理生态研究', '胁迫响应机制', '作物生理状态监测'],
+      sampleTypes: ['中大型盆栽植物', '田间植物'],
+      researchBackground: '通过检测植物叶片叶绿素荧光信号，直观呈现光合生理状态。能测定PSⅡ最大光化学效率、光化学猝灭等参数，用于研究植物光合效率、逆境胁迫（如干旱、高温、重金属）响应、遗传育种筛选及药物/农药对光合系统的影响等，以成像方式可视化不同区域光合性能差异，为植物生理生态、农业科研等提供量化分析工具。',
+      measurableParameters: {
+        '暗适应状态的最小荧光': 'Fo',
+        '暗适应后饱和脉冲测量的最大荧光': 'Fm',
+        '作用光下的稳态荧光': 'Ft',
+        '作用光下的最小荧光': 'Fo',
+        '作用光下的最大荧光': 'Fm',
+        '暗适应之后的最大可变荧光': 'Fv',
+        '光系统II最大量子效率': 'Fv/Fm',
+        '作用光下光系统II实际量子效率': 'Y(II)',
+        '电子传递速率': 'ETR=YII*PAR*0.5*abs',
+        '非光化学猝灭系数': 'NPQ, qN',
+        '光化学淬灭系数': 'qP, qL',
+        '非光化学淬灭耗散的能量比例': 'Y(NPQ)',
+        '非调节性能量耗散的比例': 'Y(NO)'
+      },
+      technicalHighlights: [
+        '专业的吊装式植物表型测量设备，采用模块化设计理念',
+        '可高效集成于田间表型平台及室内可移动桁架上',
+        '与其他表型采集模块深度兼容，实现植物生长数据的连续动态采集',
+        '高分辨率500万像素成像，清晰呈现荧光细节',
+        '适配行距≥50cm的田间种植模式（如玉米、大豆等中耕作物）',
+        '实时显示15种以上荧光参数，每个参数均可显示荧光彩色图像',
+        '支持Fast Light Curve和Slow Kinetics自动测量曲线',
+        '提供API接口，支持系统集成和二次开发'
+      ]
+    },
     {
       id: 'fdm-r',
       name: '可翻转叶绿素荧光成像系统FDM-R系列',
       category: '光合-叶绿素荧光',
-      description: '可翻转设计，支持多角度叶绿素荧光成像分析',
-      features: ['可翻转设计', '多角度成像', '精确定位', '灵活操作'],
+      description: 'FDM-R系列成像箱体可移动、可旋转、可升降。该系列包括FDM-R1小尺寸版、FDM-R2大面积版两个型号。FDM-R1的测量面积为15cm*20cm，R2的测量面积为35cm*40cm。可拍摄植物冠层及侧面，适用于各类中大型盆栽植物测量及高通量多孔穴盘筛选。',
+      features: ['高分辨率500万像素', '成像范围15*20cm / 35*40cm', '箱体可移动、可旋转、可升降', '自定义框选，同步获取整株/单叶数据', '自动去除暗背景，平均值计算及保存功能', '图像与数据本地自动存储', '支持FLC、SL等自动测量曲线，时间、光强可设置', '可选配多光谱荧光成像及荧光蛋白成像', '提供API接口，支持集成开发'],
       specifications: {
-        '翻转角度': '0-180°',
-        '定位精度': '±0.1mm',
-        '重复性': '±0.5%',
-        '稳定性': '<0.1%/h' },
+        '产品型号': 'FDM-R1小尺寸版、FDM-R2大面积版',
+        '图像分辨率': '≥500万像素',
+        '成像范围': '≥15cm*20cm / 35cm*40cm，适合高通量多孔穴盘筛选、中大型盆栽植物',
+        '激发光源': '450nm蓝光',
+        '叶片吸光度测量光源': '红光，远红光',
+        '光强均匀度变异': '<5% (目标范围内)',
+        '激发光标准光强': '0.5 umol m-2 s-1（可调节）',
+        '饱和脉冲SP最大光强': '5000 umol m-2 s-1（可调节）',
+        '光化光AL强度': '1800 umol m-2 s-1（可调节）',
+        '实时荧光参数输出': '≥15种，包括Fo, Fm, Fv, Fv/Fm, Fm\', Ft, Y(II), NPQ, Y(NPQ), Y(NO), Fo\', qP, qL, qN, ETR等',
+        '叶片吸光度检测': '具备',
+        '图像输出格式': 'TIFF，JPG',
+        '工作温度': '5~45摄氏度，非凝结',
+        '软件功能': '设备连接，自定义存储路径，自动去除背景噪点，测量光、光化光及饱和光的光强设置，图像采集与分析功能',
+        '自动快速光曲线测量': '支持Fast Light Curve快速光曲线荧光成像自动测量，光强梯度、测量时长等参数可设置，测量进度可实时查看',
+        '自动荧光诱导曲线测量': '支持Slow Kinetics暗弛豫曲线荧光成像自动测量，光下序列数组、暗下序列数组及光强参数可设置，测量进度可实时查看',
+        '平均值计算': '自动去除暗背景，平均值计算和保存功能',
+        '数据自动存储': '支持图像及参数数据本地实时存储，无需手动导出',
+        '集成开发支持': '提供API接口，可控制模块执行拍摄任务，可指定图像存储目录',
+        '感兴趣区域框选计算': '可手动框选感兴趣的测量区域，可自定义形状（圆形、矩形等）框选，并对选中的多个区域内的荧光参数值进行比较，并导出到EXCEL表格中，支持下载查看',
+        '伪彩色调节': '软件内置至少12种伪彩色标尺，可实时调节成像伪彩',
+        '控制单元': '固态硬盘容量≥1T，显示器≥24英寸，内存≥16G'
+      },
 
       images: ['https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=800&h=600&fit=crop', 'https://images.unsplash.com/photo-1593115048165-9dc1b9d0c6ab?w=800&h=600&fit=crop'],
-      applications: ['立体成像', '多角度分析', '精密研究', '特殊样品'] }],
+      applications: ['光系统II机制解析', '作物表型与育种筛选', '病虫害早期诊断', '逆境生理生态研究', '胁迫响应机制', '作物生理状态监测'],
+      sampleTypes: ['中大型盆栽植物', '高通量多孔穴盘筛选'],
+      researchBackground: '通过检测植物叶片叶绿素荧光信号，直观呈现光合生理状态。能测定PSⅡ最大光化学效率、光化学猝灭等参数，用于研究植物光合效率、逆境胁迫（如干旱、高温、重金属）响应、遗传育种筛选及药物/农药对光合系统的影响等，以成像方式可视化不同区域光合性能差异，为植物生理生态、农业科研等提供量化分析工具。',
+      measurableParameters: {
+        '暗适应状态的最小荧光': 'Fo',
+        '暗适应后饱和脉冲测量的最大荧光': 'Fm',
+        '作用光下的稳态荧光': 'Ft',
+        '作用光下的最小荧光': 'Fo',
+        '作用光下的最大荧光': 'Fm',
+        '暗适应之后的最大可变荧光': 'Fv',
+        '光系统II最大量子效率': 'Fv/Fm',
+        '作用光下光系统II实际量子效率': 'Y(II)',
+        '电子传递速率': 'ETR=YII*PAR*0.5*abs',
+        '非光化学猝灭系数': 'NPQ, qN',
+        '光化学淬灭系数': 'qP, qL',
+        '非光化学淬灭耗散的能量比例': 'Y(NPQ)',
+        '非调节性能量耗散的比例': 'Y(NO)'
+      },
+      technicalHighlights: [
+        '成像箱体可移动、可旋转、可升降，灵活适应不同测量需求',
+        '可拍摄植物冠层及侧面，提供多角度测量能力',
+        '高分辨率500万像素成像，清晰呈现荧光细节',
+        '提供两种型号：FDM-R1小尺寸版（15cm*20cm）和FDM-R2大面积版（35cm*40cm）',
+        '适用于各类中大型盆栽植物测量及高通量多孔穴盘筛选',
+        '实时显示15种以上荧光参数，每个参数均可显示荧光彩色图像',
+        '支持Fast Light Curve和Slow Kinetics自动测量曲线',
+        '提供API接口，支持系统集成和二次开发'
+      ]
+    }],
 
-    'phenotype': [{
+    'phenotype': [    {
       id: 'mctp',
       name: '轨道式田间高通量植物表型平台mCTP',
       category: '植物表型',
-      description: '轨道式设计，实现田间高通量植物表型数据的自动化采集',
-      features: ['轨道式移动', '高通量采集', '多传感器融合', '全天候工作'],
+      description: '移动式植物光合表型平台系统拥有多项自有技术，整合了高光谱成像、激光雷达成像、红外热成像、可见光成像、荧光成像以及自动化测量等技术，实现对田间作物光合生理表型和冠层结构表型的高通量、自动化监测。日监测通量800-1600个样本。',
+      features: ['田间/温室光合表型性状检测系统', '灵活设置测量区块', '可进行远程控制', '高通量、高效率、高准确性', '"sensor to plant"模式，对被测植物零扰动', '配置宽光谱光源系统，提供可控光环境', '集成传感器', '图形化的数据分析软件，界面友好', '系统可远程控制，数据无线远程传输', '轨道覆盖范围灵活，拓展性好'],
       specifications: {
-        '轨道长度': '100-500m',
-        '检测速度': '1m/s',
-        '传感器数量': '8-16个',
-        '数据采集率': '1000株/小时' },
+        '系统功能': '田间/温室光合表型性状检测系统',
+        '监测通量': '日监测800-1600个样本',
+        '测量模式': '"sensor to plant"模式，对被测植物零扰动',
+        '传感器类型': '高光谱成像、激光雷达点云、荧光成像、可见光成像、红外热成像',
+        '远程控制': '支持，数据无线远程传输',
+        '轨道覆盖范围': '灵活可调，拓展性好'
+      },
 
       images: ['https://images.unsplash.com/photo-1593115048165-9dc1b9d0c6ab?w=800&h=600&fit=crop', 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&h=600&fit=crop'],
-      applications: ['田间育种', '品种筛选', '生长监测', '产量预测'] },
+      applications: ['田间育种', '品种筛选', '生长监测', '产量预测', '植物光合作用研究', '植物表型分析'],
+      sampleTypes: ['适用于田间、大棚、玻璃温室内的植物原位测量'],
+      researchBackground: '在智慧农业推进与作物育种效率提升的需求下，田间植物表型（如株高、叶面积、生长动态、抗逆性等）的高通量、精准化监测成为解析作物生长规律、优化育种筛选及指导田间管理的关键；但传统表型测量依赖人工采样，不仅耗时费力、主观性强，还易对作物造成损伤，且难以实现大范围田间作物的连续动态监测，而早期表型设备多局限于室内环境，无法模拟田间复杂光照、土壤、气候条件下的植物真实生长状态。随着植物表型研究向"田间原位、高通量、多维度、自动化"发展，适配田间场景的专用表型监测设备需求日益迫切，m-CTP田间轨道式植物表型平台由此研发，填补了田间植物表型高效精准监测的技术空白，为作物育种、农业生产优化及植物生理生态研究提供核心支撑。',
+      measurableParameters: {
+        'RGB成像单元': '株高、株宽、质心坐标、覆盖度、叶面积、周长、凸包最长轴、凸包最短轴、凸包顶点数、最小外接椭圆横坐标、最小外接椭圆纵坐标、最小外接椭圆长轴长、最小外接椭圆短轴长、最小外接圆直径、最小外接矩形长度、最小外接矩形宽度、植物绿色等级、植物投影面积、熵值、均匀度、标准差、三阶矩、小梯度优势、灰度分布不均匀性、灰度均值、灰度熵、混合熵、逆差分矩、梯度标准差、对比度、平均值、平滑度、相关性、大梯度优势、梯度分别不均匀性、梯度均值、梯度熵、差分矩、灰度标准差、能量',
+        '高光谱成像单元': '宽度绿度指数：归一化差异植被指数(NDV)、三角形植被指数(TV)、绿色归一化差异植被指数(GDV川)、差异化植被指数(DV)、增强植被指数(EV)、大气阻抗植被指数(ARV)、归一化差异红边植被指数(NDRE)、比值植被指数(RVI)、窄度绿度指数：红边归一化植被指数(NDVⅥ705)、红边指数(VOG)、光利用率指数：光化学植被指数(PR)、结构不敏感色素指数(SP)、干旱或碳衰减指数：植被衰减指数(PSRI)、叶色素指数：土壤调节植被指数(SAV)、最优化土壤调节植被指数(OSAV)、转换叶绿素指吸收指数(TCARI)、类胡萝卜素反射指数1(CRI1)、类胡萝卜素反射指数 2(CRI2)、花青素反射指数1(ARI1)、花青素反射指数2(ARI2)、特定色素简单比值指数PSSRa、特定色素简单比值指数PSSRb、冠层水分含量：水波段指数(WB)、反演指数：SPAD(叶绿素相对含量)、饱和光下光合速率、氮含量、叶绿素A含量、叶绿素B含量',
+        '激光雷达单元': '株高、株宽、冠幅、植株分层切片、植株分层投影面积、叶面积',
+        '热红外单元': '植物表面温度，干旱胁迫研究、蒸腾研究',
+        '多视角立体成像三维点云单元': '株高、株宽、冠幅、植物投影面积、植物占空体积、植物包围体积、植物正面/底面投影包围面积、植物正面/底面投影凸包面积、植被体素个数、植株质心质心位置、提取植物骨架，叶片分割、叶长、叶宽、叶向值、叶面积、叶倾角、植株分层投影面积、冠层光线分布模拟计算、计算冠层光合速率',
+        '叶绿素荧光成像单元': '获取荧光参数Fo、Fm、Ft、Fm\'、Fo\',计算标准光合荧光参数Fv/Fm、PSII、NPQ等。分析植物生理状态、表征植物光合作用效率，用于植物衰老研究等'
+      }
+    },
     {
       id: 'm-ctp-greenhouse',
       name: '温室盆栽高通量植物表型成像系统m-CTP',
       category: '植物表型',
-      description: '专为温室盆栽植物设计的高通量表型成像分析系统',
-      features: ['自动化传送', '多光谱成像', '3D重建', '智能分析'],
+      description: '温室盆栽高通量植物表型成像系统由盆栽传送单元、成像暗室（支持多个）、RGB成像单元、多视角立体成像三维点云单元、高光谱成像单元、激光雷达单元、热成像单元、叶绿素荧光成像单元、自动浇水单元、自动称重单元、控制系统及分析软件组成。该系统能够对水稻、玉米、花卉及蔬菜等盆栽植物的株高、株宽、茎粗、植株投影面积、冠层占空体积等基础表型性状进行全自动、无损、高通量的表型分析。',
+      features: ['高通量、全自动、电子识别', '"plant to sensor"模式', '宽光谱立体光源系统', '模块化传送单元', '方便拓展和升级', '界面友好的一键式分析软件、集成多种图像处理算法'],
       specifications: {
-        '处理能力': '200盆/小时',
-        '成像分辨率': '5MP',
-        '光谱范围': '400-1000nm',
-        '重建精度': '±0.5mm' },
+        '系统组成': '盆栽传送单元、成像暗室（支持多个）、RGB成像单元、多视角立体成像三维点云单元、高光谱成像单元、激光雷达单元、热成像单元、叶绿素荧光成像单元、自动浇水单元、自动称重单元、控制系统及分析软件',
+        '测量模式': '"plant to sensor"模式',
+        '植物类型': '适用于水稻、玉米、花卉及蔬菜等盆栽植物',
+        '测量参数': '株高、株宽、茎粗、植株投影面积、冠层占空体积等基础表型性状',
+        '光源系统': '宽光谱立体光源系统'
+      },
 
       images: ['https://images.unsplash.com/photo-1542831371-29b0f74f9713?w=800&h=600&fit=crop', 'https://images.unsplash.com/photo-1593115048165-9dc1b9d0c6ab?w=800&h=600&fit=crop'],
-      applications: ['温室研究', '盆栽实验', '精准农业', '品种改良'] },
+      applications: ['温室研究', '盆栽实验', '精准农业', '品种改良', '病虫害监测', '植物新品种鉴定测试', '干旱等胁迫对植株的影响'],
+      sampleTypes: ['适用于盆栽植物'],
+      researchBackground: '在设施农业升级与盆栽作物（如蔬菜、花卉、药用植物）育种研究深化的背景下，温室盆栽植物表型（如株型结构、叶片形态、生长速率、胁迫响应等）的高通量、精准化监测，成为优化盆栽种植管理、加速育种筛选、解析环境因子影响的关键需求；但传统盆栽表型测量依赖人工逐盆观测，不仅效率低下、数据主观性强，还易因频繁操作干扰盆栽生长环境，而早期表型设备或聚焦田间大尺度场景，或仅能实现单一维度测量，难以适配温室盆栽"小空间、多批次、精细化"的监测需求。随着设施农业向"精准化调控、高效化育种、智能化管理"发展，适配温室盆栽场景的专用高通量表型设备需求愈发迫切，m-CTP温室盆栽高通量表型平台由此研发，填补了温室盆栽植物表型高效精准监测的技术空白，为盆栽作物育种改良、种植环境优化及植物生理研究提供核心支撑。',
+      measurableParameters: {
+        'RGB成像单元': '株高、株宽、质心坐标、覆盖度、叶面积、周长、凸包最长轴、凸包最短轴、凸包顶点数、最小外接椭圆横坐标、最小外接椭圆纵坐标、最小外接椭圆长轴长、最小外接椭圆短轴长、最小外接圆直径、最小外接矩形长度、最小外接矩形宽度、植物绿色等级、植物投影面积、熵值、均匀度、标准差、三阶矩、小梯度优势、灰度分布不均匀性、灰度均值、灰度熵、混合熵、逆差分矩、梯度标准差、对比度、平均值、平滑度、相关性、大梯度优势、梯度分别不均匀性、梯度均值、梯度熵、差分矩、灰度标准差、能量',
+        '高光谱成像单元': '宽度绿度指数：归一化差异植被指数(NDV)、三角形植被指数(TV)、绿色归一化差异植被指数(GDV川)、差异化植被指数(DV)、增强植被指数(EV)、大气阻抗植被指数(ARV)、归一化差异红边植被指数(NDRE)、比值植被指数(RVI)、窄度绿度指数：红边归一化植被指数(NDVⅥ705)、红边指数(VOG)、光利用率指数：光化学植被指数(PR)、结构不敏感色素指数(SP)、干旱或碳衰减指数：植被衰减指数(PSRI)、叶色素指数：土壤调节植被指数(SAV)、最优化土壤调节植被指数(OSAV)、转换叶绿素指吸收指数(TCARI)、类胡萝卜素反射指数1(CRI1)、类胡萝卜素反射指数 2(CRI2)、花青素反射指数1(ARI1)、花青素反射指数2(ARI2)、特定色素简单比值指数PSSRa、特定色素简单比值指数PSSRb、冠层水分含量：水波段指数(WB)、反演指数：SPAD(叶绿素相对含量)、饱和光下光合速率、氮含量、叶绿素A含量、叶绿素B含量',
+        '激光雷达单元': '株高、株宽、冠幅、植株分层切片、植株分层投影面积、叶面积',
+        '热红外单元': '植物表面温度，干旱胁迫研究、蒸腾研究',
+        '多视角立体成像三维点云单元': '株高、株宽、冠幅、植物投影面积、植物占空体积、植物包围体积、植物正面/底面投影包围面积、植物正面/底面投影凸包面积、植被体素个数、植株质心质心位置、提取植物骨架，叶片分割、叶长、叶宽、叶向值、叶面积、叶倾角、植株分层投影面积、冠层光线分布模拟计算、计算冠层光合速率',
+        '叶绿素荧光成像单元': '获取荧光参数Fo、Fm、Ft、Fm\'、Fo\',计算标准光合荧光参数Fv/Fm、PSII、NPQ等。分析植物生理状态、表征植物光合作用效率，用于植物衰老研究等'
+      }
+    },
     {
       id: 'a-ctp',
       name: '植物三维成像与建模系统a-CTP',
       category: '植物表型',
-      description: '高精度植物三维成像与建模分析系统',
-      features: ['3D成像', '精确建模', '参数提取', '可视化分析'],
+      description: '植物三维成像与建模系统（a-CTP）提供了一套完整的三维冠层模型构建和分析原始方案。该设备通过多视角相机立体视觉技术对单株植物进行三维点云获取，能实现噪点过滤，从点云数据可以分析获取三维株型参数，包括株高、冠辐、黄叶比例、空间体积、点云空间分布参数等。',
+      features: ['获得多格式的原始三维点云数据', '三维点云数据预处理', '批量处理、生成植物模型', '通过点云计算植物表型、进行切片、骨架分割', '依据单株模型构建群体冠层模型', '光线追踪模拟计算冠层光分布', '结合叶片光合曲线测量数据，计算冠层光合速率'],
       specifications: {
-        '建模精度': '±0.1mm',
-        '点云密度': '1000万点/株',
-        '处理时间': '<5min',
-        '模型格式': 'PLY/STL/OBJ' },
+        '相机数量': '6个/8个/12个（可定制）',
+        '系统原理': '多视角立体视觉3D成像',
+        '单株植物照片采集时间': '不超过120s (单个模型全方位照片)',
+        '成像器件': '2400万像素级成像单元',
+        '传感器': 'APS-C画幅(22.3*14.9mm)',
+        '对焦方式': '自动/手动',
+        '快门速度': '1/4000-30秒，B门，闪光同步速度1/200秒',
+        '连拍功能': '支持(最高约5张/秒)',
+        '测光方式': '评价测光，局部测光，中央重点测光，点测光',
+        '续拍能力': '外部连续供电，可持续续拍(支持连续工作时间>10小时，连续工作拍摄张数>3000张)',
+        '白平衡': '自动(氛围优先)，自动(白色优先)，预设(日光，阴影，阴天，钨丝灯，白色荧光灯，闪光灯)，用户自定义具备白平衡校正和白平衡包围曝光',
+        '感光度': 'ISO 100-25600，可扩展51200',
+        '图像数据格式': 'JPG',
+        '拍摄范围': '30cm×30cm×65cm - 60cm×60cm×130cm，可调节',
+        '拍摄方式': '转台自动控制，自动拍摄',
+        '同步触发': '相机硬件同步触发；闪光灯同步触发',
+        '同步触发时间': '低于1ms',
+        '照明方式': '影室闪光灯×4台',
+        '电控转台': '1个',
+        '结构框架材质': '铝合金，配备可程控转台'
+      },
 
       images: ['https://images.unsplash.com/photo-1581092795360-fd1ca04f0958?w=800&h=600&fit=crop', 'https://images.unsplash.com/photo-1593115048165-9dc1b9d0c6ab?w=800&h=600&fit=crop'],
-      applications: ['结构分析', '生物量计算', '生长建模', '虚拟植物'] },
+      applications: ['结构分析', '生物量计算', '生长建模', '虚拟植物', '植物遗传与发育研究', '植物逆境胁迫响应', '作物理想株型研究'],
+      researchBackground: '植物三维形态，也称为株型，作为最基本的植物表型，是植物表型研究中的核心要素。植物三维株型结构直接决定了冠层的光吸收能力以及光在冠层内的分布，进而影响植物叶片对光能的转化效率，并最终影响冠层光合速率。因此，构建准确的植物三维冠层模型并对冠层光合速率进行模拟和分布，对于研究冠层光合作用以及理想株型都至关重要。植物表型过去依赖肉眼观察和手工测量，肉眼观察只能进行对植物的表型进行描述，无法将表型参数量化；手工测量可以获取植物直径、叶长、叶片数目等指标，获得的性状参数有限且缺乏规范性。随着科研需求的增长和技术方法的发展，进行快速、精准和经济的植物多表型数据测定和环境参数监控的必要性和可行性已经具备。',
+      technicalHighlights: [
+        '多视角相机立体视觉技术，实现高精度三维点云获取',
+        '噪点过滤功能，提高数据准确性',
+        '深度学习算法进行叶片分割，计算叶片尺度的叶长、叶宽、叶面积、叶倾角、叶向值等参数',
+        '骨架结构分析与提取功能',
+        '群体模拟和光线追踪模拟计算功能',
+        '结合叶片光合曲线测量数据，计算冠层光合速率'
+      ]
+    },
     {
       id: 'icm',
       name: '成像与建模分析系统ICM',
       category: '植物表型',
-      description: '专业的植物图像处理与建模分析软件系统',
-      features: ['图像处理', '数据建模', '统计分析', '报告生成'],
+      description: 'ICM采用二维图像采集、处理与数字水稻模型相结合的解决方案，测量一株水稻只需要15-20分钟。通过对被测植物在不同空间层次和角度上的图像采集，获取其精细结构特征参数，包括株高、分蘖数、各叶位叶片叶面积、叶长、叶宽、叶角、叶片弯曲度、叶片卷曲度、穗长、穗粒数、着粒密度、一次枝梗数等。',
+      features: ['采用二维图像采集、处理与数字水稻模型相结合的解决方案', '测量一株水稻只需要15-20分钟', '获取精细结构特征参数', '模型计算分析叶片及冠层光合特征', '图像采集、参数提取和数据分析一体化'],
       specifications: {
-        '支持格式': '50+种',
-        '处理速度': '1000张/小时',
-        '分析参数': '200+个',
-        '报告模板': '20+种' },
+        '图像采集单元传感器类型': 'CMOS',
+        '传感器尺寸': '全画幅(35.9*24mm)',
+        '有效像素': '3600万',
+        '最高分辨率': '7360×4912',
+        '显示屏类型': '高清屏',
+        '显示屏尺寸': '3.2英寸',
+        '显示屏像素': '123万像素液晶屏',
+        '传感器个数': '3',
+        '红外遥控器': '1个',
+        '液晶屏特性': '约170°可视角度的TFT显示屏，约100%画面覆盖率，可进行亮度调节',
+        '数据存储与分析单元CPU类型': 'Intel E5-2620v4,入核，16线程',
+        '内存类型': 'DDR4,16GB',
+        '硬盘': 'SSD512GB+SATA4TB',
+        '显卡': 'NVIDIA QuadroRTX40008G',
+        '图像采集软件': '预装',
+        '参数提取软件': '预装',
+        '数据分析软件': '预装',
+        '数据展示软件': '预装'
+      },
 
       images: ['https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=800&h=600&fit=crop', 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&h=600&fit=crop'],
-      applications: ['数据分析', '科研报告', '品种比较', '趋势分析'] },
+      applications: ['数据分析', '科研报告', '品种比较', '趋势分析', '水稻品种研究', '水稻株型分析', '冠层光合作用研究'],
+      technicalHighlights: [
+        '专为水稻等具有多分蘖的株型特点植物设计',
+        '通过2D图像拍摄与分析的方式获取单个分蘖的株型结构参数',
+        '配有一整套的图像参数提取软件',
+        '三维模型构建、光线模拟与冠层光合分析软件',
+        '整个设备集硬件和软件于一体，可以全程完成样品测量、参数提取和数据分析等工作'
+      ]
+    },
     {
       id: 'a-ctp-64',
       name: '64相机植物瞬时三维成像与建模系统a-CTP',
       category: '植物表型',
-      description: '采用64相机阵列的瞬时三维成像系统，实现无运动伪影的高精度建模',
-      features: ['64相机阵列', '瞬时成像', '无运动伪影', '超高精度'],
+      description: '植物瞬时三维成像与建模系统基于系统通过多视角相机立体视觉技术，对单株植物进行瞬时成像，在0.1s内拍摄64幅图像，系统自带三维重建软件可计算三维点云。针对不同植物，可用于设计开发基于点云的株型参数提取算法等。',
+      features: ['获得多格式的原始三维点云数据', '三维点云数据预处理', '批量处理、生成植物模型', '通过点云计算植物表型、进行切片、骨架分割', '依据单株模型构建群体冠层模型', '光线追踪模拟计算冠层光分布', '结合叶片光合曲线测量数据，计算冠层光合速率', '瞬时成像，避免运动伪影'],
       specifications: {
         '相机数量': '64个',
-        '成像时间': '<0.1s',
-        '建模精度': '±0.05mm',
-        '数据处理': '实时处理' },
+        '系统原理': '多视角立体视觉3D成像',
+        '单株植物照片采集时间': '0.1s (单个模型全方位照片)',
+        '成像器件': '2400万像素级成像单元',
+        '传感器': 'APS-C画幅(22.3*14.9mm)',
+        '对焦方式': '自动/手动',
+        '快门速度': '1/4000-30秒，B门，闪光同步速度1/200秒',
+        '连拍功能': '支持(最高约5张/秒)',
+        '测光方式': '评价测光，局部测光，中央重点测光，点测光',
+        '续拍能力': '外部连续供电，可持续续拍(支持连续工作时间>10小时，连续工作拍摄张数>3000张)',
+        '白平衡': '自动(氛围优先)，自动(白色优先)，预设(日光，阴影，阴天，钨丝灯，白色荧光灯，闪光灯)，用户自定义具备白平衡校正和白平衡包围曝光',
+        '感光度': 'ISO 100-25600，可扩展51200',
+        '图像数据格式': 'JPG',
+        '拍摄范围': '30cm×30cm×65cm - 60cm×60cm×130cm，可调节',
+        '拍摄方式': '转台自动控制，自动拍摄',
+        '同步触发': '相机硬件同步触发；闪光灯同步触发',
+        '同步触发时间': '低于1ms',
+        '照明方式': '影室闪光灯×4台',
+        '电控转台': '1个',
+        '结构框架材质': '铝合金，配备可程控转台'
+      },
 
       images: ['https://images.unsplash.com/photo-1542831371-29b0f74f9713?w=800&h=600&fit=crop', 'https://images.unsplash.com/photo-1593115048165-9dc1b9d0c6ab?w=800&h=600&fit=crop'],
-      applications: ['高精度研究', '动态分析', '精密育种', '基础研究'] }],
+      applications: ['高精度研究', '动态分析', '精密育种', '基础研究', '植物遗传与发育研究', '植物逆境胁迫响应', '作物理想株型研究'],
+      researchBackground: '植物三维形态，也称为株型，作为最基本的植物表型，是植物表型研究中的核心要素。植物三维株型结构直接决定了冠层的光吸收能力以及光在冠层内的分布，进而影响植物叶片对光能的转化效率，并最终影响冠层光合速率。因此，构建准确的植物三维冠层模型并对冠层光合速率进行模拟和分布，对于研究冠层光合作用以及理想株型都至关重要。植物表型过去依赖肉眼观察和手工测量，肉眼观察只能进行对植物的表型进行描述，无法将表型参数量化；手工测量可以获取植物直径、叶长、叶片数目等指标，获得的性状参数有限且缺乏规范性。随着科研需求的增长和技术方法的发展，进行快速、精准和经济的植物多表型数据测定和环境参数监控的必要性和可行性已经具备。',
+      literature: [{
+        authors: 'Song Q, Liu F, Bu H, Zhu XG',
+        title: 'Quantifying Contributions of Different Factors to Canopy Photosynthesis in 2 Maize Varieties: Development of a Novel 3D Canopy Modeling Pipeline',
+        journal: 'Plant Phenomics',
+        year: '2023',
+        volume: '5',
+        pages: '0075'
+      }],
+      technicalHighlights: [
+        '64相机阵列设计，实现0.1s内瞬时成像',
+        '无运动伪影的高精度建模',
+        '针对不同植物，可用于设计开发基于点云的株型参数提取算法',
+        '从点云建立网格模型，该模型可用于计算冠层光合作用',
+        '支持对光线追踪模拟计算等',
+        '是一种新型的、无损测量技术，将难以描述的植物表型标准化、数字化、可重复'
+      ]
+    }],
 
     'environment': [{
       id: 'cmc',
-      name: '冠层微气候测量仪 CMC',
+      name: '冠层微气候测量仪CMC',
       category: '环境监测',
-      description: '专业用于植物冠层微气候参数测量的精密仪器',
-      features: ['多参数测量', '高精度传感器', '实时监测', '数据记录'],
+      description: '通过采用多支光合有效光子通量密度三合一传感器垂直立体布置，可同步测量作物不同冠层高度的光合有效光量子通量密度、温度及相对湿度。该设备操作简单，传感器高度可以调节，且具备优异的防水能力，可在田间灵活离线布置。',
+      features: ['高精度传感器，数据一致性高', 'U盘数据存储，csv格式存储', '自动记录数据，可设置1-10s一次', '田间灵活插拔使用', '配田间地插底座，方便多点测量', '大容量锂电池供电，长时间监测'],
       specifications: {
-        '测量参数': '温度/湿度/光照/CO2',
-        '精度': '±0.1°C/±2%/±5%/±50ppm',
-        '采样频率': '1Hz-1Hz',
-        '存储容量': '16GB' },
+        '测量微气候参数': '光合有效辐射PAR，温度，湿度',
+        '测量冠层高度': '10层，可调节',
+        '采样频率': '间隔10s（可定制）',
+        '采样方式': '全天候自动测量',
+        '传感器分布方式': '全天不互相遮挡，每个传感器可拆卸移动，可调节高度',
+        '传感器数量': '10套，防水防尘IP67',
+        '传感器精度': '光量子1umol/m2/s，温度0.2℃，湿度3%',
+        '测量数据格式': 'CSV表格',
+        '支撑杆高度': '1米，带刻度标记',
+        '田间测量模式': '垂直安装测量，配多个底座方便多点移动采样',
+        '供电方式': '锂电池供电，电池单次使用时间>72h'
+      },
 
       images: ['https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&h=600&fit=crop', 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=800&h=600&fit=crop'],
-      applications: ['微气候监测', '环境研究', '生态分析', '农业气象'] },
+      applications: ['测量冠层内部PAR垂直分布曲线', '温、湿度的垂直分布曲线', '测量冠层微气候随时间的动态', '测量冠层吸光度及全天动态', '作物理想株型研究', '植物冠层光合研究', '冠层光截获及利用效率研究', '动态光合作用研究', '作物高光效研究'],
+      researchBackground: '植物株型及冠层结构主要影响冠层内的微⽓候因⼦，进⽽影响不同⾼度叶⽚的实际光合效率以及冠层光合效率。植物冠层内的光强、温度及湿度随⾼度变化，⽽且由于环境波动以及叶⽚相互遮荫效应的影响⽽随时间动态变化。波动光下光合效率是当前⾼光效研究的领域前沿。冠层微⽓候数据是植物形态发育研究、"理想株型"育种、⾼产栽培研究的重要数据。',
+      technicalHighlights: [
+        '多支光合有效光子通量密度三合一传感器垂直立体布置',
+        '可同步测量作物不同冠层高度的光合有效光量子通量密度、温度及相对湿度',
+        '操作简单，传感器高度可以调节',
+        '具备优异的防水能力，可在田间灵活离线布置',
+        '采用大功率蓄电池及U盘数据存储',
+        '数据采集间隔时间可调节（最短0.1s）'
+      ]
+    },
     {
       id: 'cmc-distributed',
-      name: '多点分布式冠层微气侯测量系统 CMC',
+      name: '多点分布式冠层微气侯测量系统CMC',
       category: '环境监测',
-      description: '分布式多点冠层微气候监测网络系统',
-      features: ['分布式部署', '网络化管理', '无线通信', '云平台集成'],
+      description: '多点分布式冠层微气候测量系统采用多节点分布式测量，可自动采集植物冠层不同高度的光合有效辐射PAR、温度和湿度等微气候数据。该系统配置16个采集节点，每个节点具有10层传感器且高度可以调节，数据采集间隔时间10s（最短0.1s）。',
+      features: ['高精度传感器，数据一致性高', 'U盘数据存储，csv格式存储', '自动记录数据，可设置1-10s一次', '田间灵活插拔使用', '配田间地插底座，方便多点测量', '大容量锂电池供电，长时间监测', '多节点分布式测量'],
       specifications: {
-        '监测点数': '1-100个',
-        '通信距离': '2km',
-        '数据传输': '4G/NB-IoT',
-        '平台支持': 'Web/移动端' },
+        '微气候采集节点': '16个',
+        '每节点测量微气候参数': '测量400nm-700nm光合有效波段光量子通量密度、温度、相对湿度',
+        '测量冠层高度': '10层，高度可调节',
+        '采样频率': '间隔10s（可定制）',
+        '采样方式': '全天候自动测量',
+        '传感器分布方式': '全天不互相遮挡，每个传感器可拆卸移动，可调节高度',
+        '传感器数量': '10套，防水防尘IP67',
+        '传感器精度': '光量子1umol/m2/s，温度0.2℃，湿度3%',
+        '测量数据格式': 'CSV表格',
+        '支撑杆高度': '1米，带刻度标记',
+        '田间测量模式': '多节点垂直安装测量，配多个底座方便多点移动采样',
+        '供电方式': '锂电池供电，电池单次使用时间>72h',
+        '平均功耗': '0.1W',
+        '工作温度': '-25℃-60℃'
+      },
 
       images: ['https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&h=600&fit=crop', 'https://images.unsplash.com/photo-1593115048165-9dc1b9d0c6ab?w=800&h=600&fit=crop'],
-      applications: ['大田监测', '森林生态', '智慧农业', '环境网络'] }] };
+      applications: ['测量冠层内部PAR垂直分布曲线', '温、湿度的垂直分布曲线', '测量冠层微气候随时间的动态', '测量冠层吸光度及全天动态', '作物理想株型研究', '植物冠层光合研究', '冠层光截获及利用效率研究', '动态光合作用研究', '作物高光效研究', '大田监测', '森林生态', '智慧农业', '环境网络'],
+      researchBackground: '植物株型及冠层结构主要影响冠层内的微⽓候因⼦，进⽽影响不同⾼度叶⽚的实际光合效率以及冠层光合效率。植物冠层内的光强、温度及湿度随⾼度变化，⽽且由于环境波动以及叶⽚相互遮荫效应的影响⽽随时间动态变化。波动光下光合效率是当前⾼光效研究的领域前沿。冠层微⽓候数据是植物形态发育研究、"理想株型"育种、⾼产栽培研究的重要数据。大田作物冠层微气候数据是植物形态发育研究、"理想株型"育种、高产栽培研究的重要数据。',
+      technicalHighlights: [
+        '多节点分布式测量，可自动采集植物冠层不同高度的微气候数据',
+        '配置16个采集节点，每个节点具有10层传感器且高度可以调节',
+        '数据采集间隔时间10s（最短0.1s）',
+        '高精度传感器，数据一致性高',
+        'U盘数据存储，csv格式存储，便于数据分析',
+        '田间灵活插拔使用，配田间地插底座，方便多点测量',
+        '大容量锂电池供电，支持长时间监测'
+      ]
+    }] };
 
 
   const getAllProducts = () => {
@@ -464,7 +752,6 @@ export default function Products(props) {
         <div className="mb-6">
           <div className="flex space-x-2 overflow-x-auto pb-2">
             {categories.map((category) => <button key={category.id} onClick={() => setSelectedCategory(category.id)} className={`flex items-center space-x-2 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${selectedCategory === category.id ? 'bg-green-600 text-white' : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700'}`}>
-                <span></span>
                 <span>{category.name}</span>
               </button>)}
           </div>
@@ -561,21 +848,21 @@ export default function Products(props) {
                 </div>
               </div>
 
-              {/* 研究背景 - CAPTS、P-Chamber、C-GHG和FDM-M产品显示 */}
-              {(selectedProduct.id === 'capts' || selectedProduct.id === 'c-ghg' || selectedProduct.id === 'p-chamber' || selectedProduct.id === 'fdm-m') && selectedProduct.researchBackground && <div>
+              {/* 研究背景 - 所有显示研究背景的产品 */}
+              {(selectedProduct.id === 'capts' || selectedProduct.id === 'c-ghg' || selectedProduct.id === 'p-chamber' || selectedProduct.id === 'fdm-m' || selectedProduct.id === 'fdm-s' || selectedProduct.id === 'fdm-l' || selectedProduct.id === 'fdm-r' || selectedProduct.id === 'mctp' || selectedProduct.id === 'm-ctp-greenhouse' || selectedProduct.id === 'a-ctp' || selectedProduct.id === 'a-ctp-64' || selectedProduct.id === 'icm' || selectedProduct.id === 'cmc' || selectedProduct.id === 'cmc-distributed') && selectedProduct.researchBackground && <div>
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3 flex items-center">
-                    {selectedProduct.id === 'c-ghg' ? <Globe className="w-5 h-5 mr-2 text-green-500" /> : selectedProduct.id === 'p-chamber' ? <Microscope className="w-5 h-5 mr-2 text-purple-500" /> : selectedProduct.id === 'fdm-m' ? <Camera className="w-5 h-5 mr-2 text-blue-500" /> : <BookOpen className="w-5 h-5 mr-2 text-blue-500" />}
+                    {selectedProduct.id === 'c-ghg' ? <Globe className="w-5 h-5 mr-2 text-green-500" /> : selectedProduct.id === 'p-chamber' ? <Microscope className="w-5 h-5 mr-2 text-purple-500" /> : selectedProduct.id === 'fdm-m' || selectedProduct.id === 'fdm-s' || selectedProduct.id === 'fdm-l' || selectedProduct.id === 'fdm-r' ? <Camera className="w-5 h-5 mr-2 text-blue-500" /> : selectedProduct.id === 'mctp' || selectedProduct.id === 'm-ctp-greenhouse' || selectedProduct.id === 'a-ctp' || selectedProduct.id === 'a-ctp-64' || selectedProduct.id === 'icm' ? <Activity className="w-5 h-5 mr-2 text-indigo-500" /> : selectedProduct.id === 'cmc' || selectedProduct.id === 'cmc-distributed' ? <Globe className="w-5 h-5 mr-2 text-green-500" /> : <BookOpen className="w-5 h-5 mr-2 text-blue-500" />}
                     研究背景
                   </h3>
-                  <div className={`${selectedProduct.id === 'c-ghg' ? 'bg-green-50 dark:bg-green-900/20 border-green-500' : selectedProduct.id === 'p-chamber' ? 'bg-purple-50 dark:bg-purple-900/20 border-purple-500' : selectedProduct.id === 'fdm-m' ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-500' : 'bg-blue-50 dark:bg-blue-900/20 border-blue-500'} border-l-4 p-4 rounded`}>
+                  <div className={`${selectedProduct.id === 'c-ghg' || selectedProduct.id === 'cmc' || selectedProduct.id === 'cmc-distributed' ? 'bg-green-50 dark:bg-green-900/20 border-green-500' : selectedProduct.id === 'p-chamber' ? 'bg-purple-50 dark:bg-purple-900/20 border-purple-500' : selectedProduct.id === 'fdm-m' || selectedProduct.id === 'fdm-s' || selectedProduct.id === 'fdm-l' || selectedProduct.id === 'fdm-r' ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-500' : selectedProduct.id === 'mctp' || selectedProduct.id === 'm-ctp-greenhouse' || selectedProduct.id === 'a-ctp' || selectedProduct.id === 'a-ctp-64' || selectedProduct.id === 'icm' ? 'bg-indigo-50 dark:bg-indigo-900/20 border-indigo-500' : 'bg-blue-50 dark:bg-blue-900/20 border-blue-500'} border-l-4 p-4 rounded`}>
                     <p className="text-gray-700 dark:text-gray-300 leading-relaxed text-sm">
                       {selectedProduct.researchBackground}
                     </p>
                   </div>
                 </div>}
 
-              {/* 技术亮点 - P-Chamber、C-GHG和FDM-M产品显示 */}
-              {(selectedProduct.id === 'p-chamber' || selectedProduct.id === 'c-ghg' || selectedProduct.id === 'fdm-m') && selectedProduct.technicalHighlights && <div>
+              {/* 技术亮点 - 所有显示技术亮点的产品 */}
+              {(selectedProduct.id === 'p-chamber' || selectedProduct.id === 'c-ghg' || selectedProduct.id === 'fdm-m' || selectedProduct.id === 'fdm-s' || selectedProduct.id === 'fdm-l' || selectedProduct.id === 'fdm-r' || selectedProduct.id === 'a-ctp' || selectedProduct.id === 'a-ctp-64' || selectedProduct.id === 'icm' || selectedProduct.id === 'cmc' || selectedProduct.id === 'cmc-distributed') && selectedProduct.technicalHighlights && <div>
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3 flex items-center">
                     <Zap className="w-5 h-5 mr-2 text-orange-500" />
                     技术亮点
@@ -590,8 +877,8 @@ export default function Products(props) {
                   </div>
                 </div>}
 
-              {/* 适用样本类型 - 仅FDM-M产品显示 */}
-              {selectedProduct.id === 'fdm-m' && selectedProduct.sampleTypes && <div>
+              {/* 适用样本类型 - 所有显示适用样本类型的产品 */}
+              {(selectedProduct.id === 'fdm-m' || selectedProduct.id === 'fdm-s' || selectedProduct.id === 'fdm-l' || selectedProduct.id === 'fdm-r' || selectedProduct.id === 'mctp' || selectedProduct.id === 'm-ctp-greenhouse') && selectedProduct.sampleTypes && <div>
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3 flex items-center">
                     <Leaf className="w-5 h-5 mr-2 text-green-500" />
                     适用样本类型
@@ -605,22 +892,37 @@ export default function Products(props) {
                   </div>
                 </div>}
 
-              {/* 可测量参数 - 仅FDM-M产品显示 */}
-              {selectedProduct.id === 'fdm-m' && selectedProduct.measurableParameters && <div>
+              {/* 可测量参数 - 所有显示可测量参数的产品 */}
+              {(selectedProduct.id === 'fdm-m' || selectedProduct.id === 'fdm-s' || selectedProduct.id === 'fdm-l' || selectedProduct.id === 'fdm-r' || selectedProduct.id === 'mctp' || selectedProduct.id === 'm-ctp-greenhouse') && selectedProduct.measurableParameters && <div>
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3 flex items-center">
                     <Activity className="w-5 h-5 mr-2 text-indigo-500" />
                     可测量参数
                   </h3>
                   <div className="bg-indigo-50 dark:bg-indigo-900/20 border-l-4 border-indigo-500 p-4 rounded">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      {Object.entries(selectedProduct.measurableParameters).map(([param, desc], index) => <div key={index} className="flex items-start space-x-2">
-                          <div className="w-2 h-2 bg-indigo-500 rounded-full mt-1.5 flex-shrink-0"></div>
-                          <div>
-                            <span className="font-medium text-gray-900 dark:text-white text-sm">{param}:</span>
-                            <span className="text-gray-600 dark:text-gray-300 text-sm ml-1">{desc}</span>
+                    {typeof selectedProduct.measurableParameters === 'object' && Object.keys(selectedProduct.measurableParameters).length > 0 ? 
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {Object.entries(selectedProduct.measurableParameters).map(([param, desc], index) => (
+                          <div key={index} className="flex items-start space-x-2">
+                            <div className="w-2 h-2 bg-indigo-500 rounded-full mt-1.5 flex-shrink-0"></div>
+                            <div>
+                              <span className="font-medium text-gray-900 dark:text-white text-sm">{param}:</span>
+                              <span className="text-gray-600 dark:text-gray-300 text-sm ml-1">{desc}</span>
+                            </div>
                           </div>
-                        </div>)}
-                    </div>
+                        ))}
+                      </div> : 
+                      <div className="space-y-2">
+                        {Array.isArray(selectedProduct.measurableParameters) ? 
+                          selectedProduct.measurableParameters.map((param, index) => (
+                            <div key={index} className="flex items-start space-x-2">
+                              <div className="w-2 h-2 bg-indigo-500 rounded-full mt-1.5 flex-shrink-0"></div>
+                              <span className="text-gray-600 dark:text-gray-300 text-sm">{param}</span>
+                            </div>
+                          )) :
+                          <span className="text-gray-600 dark:text-gray-300 text-sm">{selectedProduct.measurableParameters}</span>
+                        }
+                      </div>
+                    }
                   </div>
                 </div>}
 
