@@ -9,8 +9,23 @@
       "type": "String"
     },
     {
+      "name": "openid",
+      "title": "微信OpenID",
+      "type": "String"
+    },
+    {
+      "name": "unionid",
+      "title": "微信UnionID",
+      "type": "String"
+    },
+    {
       "name": "avatar",
       "title": "头像",
+      "type": "Image"
+    },
+    {
+      "name": "avatarUrl",
+      "title": "微信头像URL",
       "type": "Image"
     },
     {
@@ -32,6 +47,26 @@
       "name": "bio",
       "title": "个人简介",
       "type": "MultiLineString"
+    },
+    {
+      "name": "gender",
+      "title": "性别",
+      "type": "Number"
+    },
+    {
+      "name": "country",
+      "title": "国家",
+      "type": "String"
+    },
+    {
+      "name": "province",
+      "title": "省份",
+      "type": "String"
+    },
+    {
+      "name": "city",
+      "title": "城市",
+      "type": "String"
     }
   ]
 }
